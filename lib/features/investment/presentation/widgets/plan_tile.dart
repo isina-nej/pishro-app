@@ -46,13 +46,42 @@ class PlanTile extends StatelessWidget {
                       : 'برآورد ماهانه ${Fmt.fa(rate.toStringAsFixed(0))}٪'),
             style: context.text.bodySmall.copyWith(color: c.textSecondary),
           ),
-          const SizedBox(height: Space.s2),
-          Text(
-            'حداقل ${Fmt.toman(plan.minAmount)} · ${Fmt.fa('${plan.minDurationMonths}')} تا ${Fmt.fa('${plan.maxDurationMonths}')} ماه',
-            style: context.text.caption.copyWith(color: c.textMuted),
+          const SizedBox(height: Space.s3),
+          _Spec(label: 'حداقل مبلغ', value: Fmt.toman(plan.minAmount)),
+          const SizedBox(height: Space.s1),
+          _Spec(
+            // A hold plan states a hold period, a monthly plan a term.
+            label: plan.isDynamic ? 'دوره هولد' : 'مدت طرح',
+            value:
+                '${Fmt.fa('${plan.minDurationMonths}')} تا ${Fmt.fa('${plan.maxDurationMonths}')} ماه',
           ),
         ],
       ),
+    );
+  }
+}
+
+class _Spec extends StatelessWidget {
+  const _Spec({required this.label, required this.value});
+
+  final String label;
+  final String value;
+
+  @override
+  Widget build(BuildContext context) {
+    final c = context.colors;
+    return Row(
+      children: [
+        Text(label, style: context.text.caption.copyWith(color: c.textMuted)),
+        const Spacer(),
+        Text(
+          value,
+          style: context.text.caption.copyWith(
+            color: c.textPrimary,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ],
     );
   }
 }

@@ -87,6 +87,34 @@ class _CoursesSearchScreenState extends ConsumerState<CoursesSearchScreen> {
             ),
           ),
           const SizedBox(height: Space.s5),
+          Text(
+            'دسته‌بندی‌های محبوب',
+            style: context.text.bodySmall.copyWith(
+              color: c.textSecondary,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          const SizedBox(height: Space.s2),
+          ref
+              .watch(courseCategoriesProvider)
+              .maybeWhen(
+                data: (cats) => Wrap(
+                  spacing: Space.s2,
+                  runSpacing: Space.s2,
+                  children: [
+                    for (final cat in cats.take(6))
+                      ActionChip(
+                        label: Text(cat.title),
+                        onPressed: () {
+                          _controller.text = cat.title;
+                          _submit(cat.title);
+                        },
+                      ),
+                  ],
+                ),
+                orElse: () => const SizedBox.shrink(),
+              ),
+          const SizedBox(height: Space.s5),
           Row(
             children: [
               Text(

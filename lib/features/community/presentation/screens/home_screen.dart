@@ -6,14 +6,11 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/tokens.dart';
 import '../../../../routing/routes.dart';
-import '../../../../shared/widgets/common.dart';
-import '../../../../shared/widgets/pishro_badge.dart';
 import '../../../../shared/widgets/pishro_chip.dart';
 import '../../../../shared/widgets/states.dart';
-
-import '../../../../core/utils/formatters.dart';
 import '../../data/community_models.dart';
 import '../../data/community_repository.dart';
+import '../widgets/analysis_card.dart';
 
 class CommunityHomeScreen extends ConsumerStatefulWidget {
   const CommunityHomeScreen({super.key});
@@ -95,63 +92,13 @@ class _CommunityHomeScreenState extends ConsumerState<CommunityHomeScreen> {
                         ),
                         const SizedBox(height: Space.s4),
                         for (final a in items) ...[
-                          _AnalysisCard(a),
+                          AnalysisCard(a),
                           const SizedBox(height: Space.s3),
                         ],
                       ],
                     ),
             ),
           ),
-        ],
-      ),
-    );
-  }
-}
-
-class _AnalysisCard extends StatelessWidget {
-  const _AnalysisCard(this.a);
-  final Analysis a;
-  @override
-  Widget build(BuildContext context) {
-    final c = context.colors;
-    return PishroCard(
-      onTap: a.isLocked
-          ? null
-          : () => context.push(Routes.analysisDetails(a.id)),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Text(
-                a.assetSymbol,
-                style: context.text.caption.copyWith(color: c.textMuted),
-              ),
-              const Spacer(),
-              if (a.risk != null) RiskBadge(a.risk!),
-            ],
-          ),
-          const SizedBox(height: Space.s2),
-          Text(
-            a.title,
-            style: context.text.bodyMedium.copyWith(
-              color: c.textPrimary,
-              fontWeight: FontWeight.w700,
-            ),
-          ),
-          const SizedBox(height: Space.s1),
-          Text(
-            '${a.author.displayName} · ${a.kind.label} · ${Fmt.relative(a.publishedAt)}',
-            style: context.text.caption.copyWith(color: c.textMuted),
-          ),
-          if (a.isLocked) ...[
-            const SizedBox(height: Space.s2),
-            const PishroBadge(
-              label: 'مخصوص مشترکان',
-              tone: PishroBadgeTone.premium,
-              icon: Icons.lock_outline_rounded,
-            ),
-          ],
         ],
       ),
     );

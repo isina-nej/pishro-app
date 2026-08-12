@@ -22,6 +22,7 @@ class CompletionScreen extends ConsumerWidget {
     final c = context.colors;
     final enrollment = ref.watch(enrollmentProvider(id));
     final e = enrollment.valueOrNull;
+    final curriculum = ref.watch(curriculumProvider(id)).valueOrNull;
 
     if (e != null && !e.isCompleted) {
       return Scaffold(
@@ -104,8 +105,23 @@ class CompletionScreen extends ConsumerWidget {
                       ? '—'
                       : Fmt.jalaliLong(e!.completedAt!),
                 ),
+                _Row(
+                  'فایل‌های دانلودشده',
+                  curriculum == null
+                      ? '—'
+                      : '${Fmt.fa('${curriculum.downloadedCount}')} فایل',
+                ),
+                // Lesson notes have no endpoint; the row stays but never
+                // shows a fabricated count.
+                const _Row('یادداشت‌های ثبت‌شده', 'داده در دسترس نیست'),
               ],
             ),
+          ),
+          const SizedBox(height: Space.s4),
+          PishroButton(
+            label: 'ثبت نظر درباره این دوره',
+            variant: PishroButtonVariant.ghost,
+            onPressed: () => context.push(Routes.courseDetails(id)),
           ),
           const SizedBox(height: Space.s6),
           PishroButton(

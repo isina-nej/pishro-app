@@ -45,6 +45,9 @@ class _NewsSearchScreenState extends ConsumerState<NewsSearchScreen> {
       category: current.category,
       sort: current.sort,
       range: current.range,
+      kind: current.kind,
+      source: current.source,
+      custom: current.custom,
     );
     if (q.isNotEmpty) {
       await ref.read(recentSearchesProvider).remember(q);

@@ -8,6 +8,7 @@ import '../../../../core/theme/tokens.dart';
 import '../../../../core/utils/formatters.dart';
 import '../../../../shared/widgets/common.dart';
 import '../../../../shared/widgets/states.dart';
+import '../../../../shared/widgets/pishro_button.dart';
 import '../../data/account_repository.dart';
 
 /// Screen/Account/Referrals — mock · بدون نرخ تبدیل.
@@ -53,6 +54,18 @@ class AccountReferralsScreen extends ConsumerWidget {
                     icon: Icon(Icons.copy_rounded, color: c.actionPrimary),
                   ),
                 ],
+              ),
+            ),
+            const SizedBox(height: Space.s3),
+            PishroButton(
+              label: 'اشتراک‌گذاری لینک',
+              variant: PishroButtonVariant.secondary,
+              // No share plugin is a dependency; copying the invite text is
+              // the same outcome without adding one.
+              onPressed: () => Clipboard.setData(
+                ClipboardData(
+                  text: 'با کد معرف ${r.code} در پیشرو سرمایه ثبت‌نام کنید.',
+                ),
               ),
             ),
             const SizedBox(height: Space.s4),

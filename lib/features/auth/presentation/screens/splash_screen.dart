@@ -8,6 +8,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/tokens.dart';
 import '../../../../routing/routes.dart';
+import '../../../../shared/providers/app_preferences_provider.dart';
 import '../../../../shared/providers/session_provider.dart';
 import '../../../../shared/widgets/states.dart';
 import '../widgets/brand_mark.dart';
@@ -78,7 +79,11 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
                     bottom: Space.s16 + Space.s5,
                     child: Column(
                       children: [
-                        const _PulsingDots(),
+                        _PulsingDots(
+                          stillness: ref
+                              .watch(appPreferencesProvider)
+                              .reduceMotion,
+                        ),
                         const SizedBox(height: Space.s4 + 2),
                         Text(
                           'v1.0.0',
@@ -100,7 +105,10 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
 /// Three 7px dots fading in sequence. Held still when the platform asks for
 /// reduced motion.
 class _PulsingDots extends StatefulWidget {
-  const _PulsingDots();
+  const _PulsingDots({required this.stillness});
+
+  /// The user's own «کاهش انیمیشن» switch, on top of the platform flag.
+  final bool stillness;
 
   @override
   State<_PulsingDots> createState() => _PulsingDotsState();
@@ -116,7 +124,17 @@ class _PulsingDotsState extends State<_PulsingDots>
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    if (MediaQuery.disableAnimationsOf(context)) {
+    _applyMotionSetting();
+  }
+
+  @override
+  void didUpdateWidget(covariant _PulsingDots oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.stillness != widget.stillness) _applyMotionSetting();
+  }
+
+  void _applyMotionSetting() {
+    if (widget.stillness || MediaQuery.disableAnimationsOf(context)) {
       _controller.stop();
     } else if (!_controller.isAnimating) {
       _controller.repeat();

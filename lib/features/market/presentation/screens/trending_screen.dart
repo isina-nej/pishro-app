@@ -9,6 +9,7 @@ import '../../../../routing/routes.dart';
 import '../../../../shared/widgets/states.dart';
 import '../../data/market_repository.dart';
 import '../widgets/asset_row.dart';
+import '../widgets/data_source_note.dart';
 import '../widgets/market_async.dart';
 
 /// Screen/Market/Trending — بیشترین حجم ۲۴ساعته.
@@ -23,7 +24,7 @@ class MarketTrendingScreen extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'پرطرفدار',
+          'ارزهای پرطرفدار',
           style: context.text.h3.copyWith(color: c.textPrimary),
         ),
       ),
@@ -36,17 +37,29 @@ class MarketTrendingScreen extends ConsumerWidget {
           if (items.isEmpty) {
             return const EmptyState(title: 'داده‌ای برای نمایش نیست');
           }
-          return ListView.separated(
-            padding: const EdgeInsets.all(Space.page),
-            itemCount: items.take(20).length,
-            separatorBuilder: (_, __) => const SizedBox(height: Space.s3),
-            itemBuilder: (_, i) {
-              final a = items[i];
-              return AssetRow(
-                asset: a,
-                onTap: () => context.push(Routes.coinDetails(a.id)),
-              );
-            },
+          final top = items.take(20).toList();
+          return Column(
+            children: [
+              Expanded(
+                child: ListView.separated(
+                  padding: const EdgeInsets.all(Space.page),
+                  itemCount: top.length,
+                  separatorBuilder: (_, __) => const SizedBox(height: Space.s3),
+                  itemBuilder: (_, i) => AssetRow(
+                    asset: top[i],
+                    onTap: () => context.push(Routes.coinDetails(top[i].id)),
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: Space.page),
+                child: DataSourceNote(
+                  generatedAt: data.generatedAt,
+                  extra: 'معیار پرطرفداربودن از سرویس داده دریافت می‌شود.',
+                ),
+              ),
+              const SizedBox(height: Space.s4),
+            ],
           );
         },
       ),

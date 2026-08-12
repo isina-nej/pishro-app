@@ -167,12 +167,15 @@ final courseCategoriesProvider = FutureProvider<List<CourseCategory>>((
   final courses = await ref.watch(courseCatalogProvider.future);
   final counts = <String, int>{};
   final titles = <String, String>{};
+  final latest = <String, String>{};
   final featured = <String>{};
   for (final c in courses) {
     final id = c.categoryId;
     if (id == null || id.isEmpty) continue;
     counts[id] = (counts[id] ?? 0) + 1;
     if (c.categoryTitle != null) titles[id] = c.categoryTitle!;
+    // The catalogue arrives newest-first, so the first hit is the newest.
+    latest.putIfAbsent(id, () => c.title);
     if (c.featured) featured.add(id);
   }
   final out = [
@@ -183,6 +186,7 @@ final courseCategoriesProvider = FutureProvider<List<CourseCategory>>((
           title: title,
           courseCount: e.value,
           featured: featured.contains(e.key),
+          latestTitle: latest[e.key],
         ),
   ]..sort((a, b) => b.courseCount.compareTo(a.courseCount));
   return out;

@@ -83,6 +83,18 @@ class _AccountPrivacyScreenState extends State<AccountPrivacyScreen> {
           ),
           const SizedBox(height: Space.s3),
           PishroButton(
+            label: 'کاربران مسدودشده',
+            variant: PishroButtonVariant.ghost,
+            // Blocking lives in Community, which has no backend yet.
+            onPressed: null,
+          ),
+          const SizedBox(height: Space.s2),
+          Text(
+            'فهرست کاربران مسدودشده پس از اتصال سرویس جامعه فعال می‌شود.',
+            style: context.text.caption.copyWith(color: c.textMuted),
+          ),
+          const SizedBox(height: Space.s3),
+          PishroButton(
             label: 'اسناد حقوقی',
             variant: PishroButtonVariant.ghost,
             onPressed: () => context.push(Routes.legalDocuments),

@@ -170,8 +170,48 @@ abstract class AccountRepository {
   });
 }
 
+/// The Screen/Account/EditProfile fields `/user/personal` does not carry:
+/// username, city and the public-profile switch. Kept behind the mock
+/// repository so wiring the real endpoint later is a provider change.
+@immutable
+class ProfileExtras {
+  const ProfileExtras({
+    this.username = '',
+    this.city = '',
+    this.publicProfile = false,
+    this.avatarPublic = false,
+  });
+
+  final String username;
+  final String city;
+  final bool publicProfile;
+
+  /// «حریم خصوصی تصویر پروفایل» — off means the avatar is shown to no one but
+  /// the account owner.
+  final bool avatarPublic;
+
+  ProfileExtras copyWith({
+    String? username,
+    String? city,
+    bool? publicProfile,
+    bool? avatarPublic,
+  }) => ProfileExtras(
+    username: username ?? this.username,
+    city: city ?? this.city,
+    publicProfile: publicProfile ?? this.publicProfile,
+    avatarPublic: avatarPublic ?? this.avatarPublic,
+  );
+}
+
 abstract class AccountMockRepository {
   Future<KycSnapshot> kyc();
+
+  Future<ProfileExtras> profileExtras();
+
+  Future<void> saveProfileExtras(ProfileExtras extras);
+
+  /// «در دسترس است» / «این نام کاربری گرفته شده است».
+  Future<bool> isUsernameAvailable(String username);
 
   Future<List<CoinLedgerEntry>> coinLedger();
 
@@ -223,6 +263,25 @@ class ApiAccountRepository implements AccountRepository {
 }
 
 class MockAccountExtras implements AccountMockRepository {
+  ProfileExtras _extras = const ProfileExtras();
+
+  /// Stand-in for the uniqueness index the real endpoint would query.
+  static const _takenUsernames = {'admin', 'pishro', 'support', 'sample_user'};
+
+  @override
+  Future<ProfileExtras> profileExtras() async => _extras;
+
+  @override
+  Future<void> saveProfileExtras(ProfileExtras extras) async =>
+      _extras = extras;
+
+  @override
+  Future<bool> isUsernameAvailable(String username) async {
+    final u = username.trim().toLowerCase();
+    if (u.isEmpty) return false;
+    return !_takenUsernames.contains(u);
+  }
+
   @override
   Future<KycSnapshot> kyc() async => const KycSnapshot(
     identity: KycStatus.verified,
@@ -322,6 +381,10 @@ final kycSnapshotProvider = FutureProvider<KycSnapshot>((ref) {
   }
   return ref.watch(accountMockProvider).kyc();
 });
+
+final profileExtrasProvider = FutureProvider<ProfileExtras>(
+  (ref) => ref.watch(accountMockProvider).profileExtras(),
+);
 
 final coinLedgerProvider = FutureProvider<List<CoinLedgerEntry>>(
   (ref) => ref.watch(accountMockProvider).coinLedger(),

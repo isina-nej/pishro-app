@@ -5,6 +5,8 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../routing/routes.dart';
+import '../../../../core/theme/tokens.dart';
+import '../../../../shared/widgets/pishro_button.dart';
 import '../../../../shared/widgets/states.dart';
 import '../../data/checkout_repository.dart';
 
@@ -19,16 +21,32 @@ class CheckoutNetworkErrorScreen extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'خطای شبکه',
+          'خطای اتصال شبکه',
           style: context.text.h3.copyWith(color: c.textPrimary),
         ),
       ),
-      body: ErrorStateView(
-        message:
-            'اتصال اینترنت هنگام پرداخت قطع شد. اگر مبلغ کسر شده، وضعیت را از سفارش‌ها پیگیری کنید.',
-        onRetry: () => context.go(
-          draft == null ? Routes.courses : Routes.checkoutProcessing,
-        ),
+      body: Column(
+        children: [
+          Expanded(
+            child: ErrorStateView(
+              message:
+                  'ارتباط با سرویس پرداخت برقرار نشد. اگر مبلغ کسر شده، وضعیت '
+                  'را از سفارش‌ها پیگیری کنید.',
+              onRetry: () => context.go(
+                draft == null ? Routes.courses : Routes.checkoutProcessing,
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(Space.page),
+            child: PishroButton(
+              label: 'بازگشت به جزئیات خرید',
+              variant: PishroButtonVariant.secondary,
+              onPressed: () =>
+                  context.go(draft == null ? Routes.courses : Routes.checkout),
+            ),
+          ),
+        ],
       ),
     );
   }

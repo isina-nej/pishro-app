@@ -10,6 +10,7 @@ import '../../../../shared/widgets/states.dart';
 import '../../data/favorites_repository.dart';
 import '../../data/market_repository.dart';
 import '../widgets/asset_row.dart';
+import '../widgets/data_source_note.dart';
 import '../widgets/market_async.dart';
 
 /// Screen/Market/Favorites.
@@ -47,17 +48,28 @@ class MarketFavoritesScreen extends ConsumerWidget {
               onAction: () => context.push(Routes.allAssets),
             );
           }
-          return ListView.separated(
-            padding: const EdgeInsets.all(Space.page),
-            itemCount: items.length,
-            separatorBuilder: (_, __) => const SizedBox(height: Space.s3),
-            itemBuilder: (_, i) {
-              final a = items[i];
-              return AssetRow(
-                asset: a,
-                onTap: () => context.push(Routes.coinDetails(a.id)),
-              );
-            },
+          return Column(
+            children: [
+              Expanded(
+                child: ListView.separated(
+                  padding: const EdgeInsets.all(Space.page),
+                  itemCount: items.length,
+                  separatorBuilder: (_, __) => const SizedBox(height: Space.s3),
+                  itemBuilder: (_, i) {
+                    final a = items[i];
+                    return AssetRow(
+                      asset: a,
+                      onTap: () => context.push(Routes.coinDetails(a.id)),
+                    );
+                  },
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: Space.page),
+                child: const DelayedDataNote(),
+              ),
+              const SizedBox(height: Space.s4),
+            ],
           );
         },
       ),

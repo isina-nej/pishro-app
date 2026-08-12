@@ -10,6 +10,8 @@ import '../../../../routing/routes.dart';
 import '../../../../shared/widgets/common.dart';
 import '../../../../shared/widgets/pishro_button.dart';
 import '../../../../shared/widgets/states.dart';
+import '../../../../core/utils/formatters.dart';
+import '../../data/investment_models.dart';
 import '../../data/investment_repository.dart';
 import '../widgets/plan_tile.dart';
 
@@ -71,8 +73,18 @@ class InvestmentHomeScreen extends ConsumerWidget {
               tone: NoticeTone.warning,
             ),
           ),
+          const SizedBox(height: Space.s4),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: Space.page),
+            child: _PortfolioSummary(txs: ref.watch(transactionsProvider)),
+          ),
           SectionHeader(
-            title: 'طرح‌ها',
+            title: 'طرح‌های فعال',
+            onSeeAll: () => context.push(Routes.activeInvestments),
+          ),
+          _ActivePreview(txs: ref.watch(transactionsProvider)),
+          SectionHeader(
+            title: 'طرح‌های سرمایه‌گذاری',
             onSeeAll: () => context.push(Routes.planCatalog),
           ),
           plans.when(
@@ -116,21 +128,151 @@ class InvestmentHomeScreen extends ConsumerWidget {
                 ),
                 ListTile(
                   contentPadding: EdgeInsets.zero,
-                  title: const Text('سرمایه‌گذاری‌های فعال'),
+                  title: const Text('اطلاع‌رسانی ریسک'),
                   trailing: const Icon(Icons.chevron_left_rounded),
-                  onTap: () => context.push(Routes.activeInvestments),
+                  onTap: () => context.push(Routes.riskDisclosure),
                 ),
                 ListTile(
                   contentPadding: EdgeInsets.zero,
-                  title: const Text('افشای ریسک'),
+                  title: const Text('قراردادها'),
                   trailing: const Icon(Icons.chevron_left_rounded),
-                  onTap: () => context.push(Routes.riskDisclosure),
+                  onTap: () => context.push(Routes.terms),
                 ),
               ],
             ),
           ),
         ],
       ),
+    );
+  }
+}
+
+/// «سرمایه فعال · دریافتی ثبت‌شده · پرداخت بعدی» — the deck's header trio.
+///
+/// Totals are summed from the user's own transactions; there is no portfolio
+/// endpoint, so nothing here is a projection. «دریافتی ثبت‌شده» counts only
+/// settled payouts, never pending ones.
+class _PortfolioSummary extends StatelessWidget {
+  const _PortfolioSummary({required this.txs});
+
+  final AsyncValue<List<InvestmentTransaction>> txs;
+
+  @override
+  Widget build(BuildContext context) {
+    return txs.when(
+      loading: () => const Skeleton.box(height: 84),
+      error: (_, __) => const SizedBox.shrink(),
+      data: (items) {
+        final active = [
+          for (final t in items)
+            if (t.status == TxStatus.success) t,
+        ];
+        final invested = active.fold<int>(0, (sum, t) => sum + t.amount);
+
+        return PishroCard(
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                child: _SummaryCell(
+                  label: 'سرمایه فعال',
+                  value: invested == 0 ? kSampleValue : Fmt.toman(invested),
+                ),
+              ),
+              Expanded(
+                child: _SummaryCell(
+                  label: 'دریافتی ثبت‌شده',
+                  // No payout ledger exists yet — never guess a return.
+                  value: kSampleValue,
+                ),
+              ),
+              const Expanded(
+                child: _SummaryCell(
+                  label: 'پرداخت بعدی',
+                  value: 'طبق برنامه قرارداد',
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _SummaryCell extends StatelessWidget {
+  const _SummaryCell({required this.label, required this.value});
+
+  final String label;
+  final String value;
+
+  @override
+  Widget build(BuildContext context) {
+    final c = context.colors;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(label, style: context.text.caption.copyWith(color: c.textMuted)),
+        const SizedBox(height: Space.s1),
+        Text(
+          value,
+          style: context.text.bodySmall.copyWith(
+            color: c.textPrimary,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+/// The single most recent active plan, matching the deck's «طرح‌های فعال» row.
+class _ActivePreview extends StatelessWidget {
+  const _ActivePreview({required this.txs});
+
+  final AsyncValue<List<InvestmentTransaction>> txs;
+
+  @override
+  Widget build(BuildContext context) {
+    final c = context.colors;
+
+    return txs.maybeWhen(
+      data: (items) {
+        final active = [
+          for (final t in items)
+            if (t.status == TxStatus.success) t,
+        ];
+        if (active.isEmpty) {
+          return const Padding(
+            padding: EdgeInsets.symmetric(horizontal: Space.page),
+            child: EmptyState(title: 'هنوز طرح فعالی ندارید'),
+          );
+        }
+        final t = active.first;
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: Space.page),
+          child: PishroCard(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  t.title,
+                  style: context.text.bodyMedium.copyWith(
+                    color: c.textPrimary,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                const SizedBox(height: Space.s1),
+                Text(
+                  'شروع: ${Fmt.jalaliLong(t.createdAt)} · نرخ اعلام‌شده طرح',
+                  style: context.text.caption.copyWith(color: c.textMuted),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+      orElse: () => const SizedBox.shrink(),
     );
   }
 }

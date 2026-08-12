@@ -134,9 +134,22 @@ List<NewsArticle> applyNewsQuery(
       ? null
       : (now ?? DateTime.now()).subtract(window);
 
+  final custom = query.range == NewsRange.custom ? query.custom : null;
+
+  bool inWindow(NewsArticle a) {
+    if (custom != null) {
+      final d = a.date;
+      return d != null && !d.isBefore(custom.start) && !d.isAfter(custom.end);
+    }
+    return cutoff == null || (a.date?.isAfter(cutoff) ?? false);
+  }
+
   final out = [
     for (final a in items)
-      if (cutoff == null || (a.date?.isAfter(cutoff) ?? false)) a,
+      if (inWindow(a) &&
+          query.kind.matches(a) &&
+          (query.source == null || a.author == query.source))
+        a,
   ];
 
   out.sort(switch (query.sort) {
@@ -275,6 +288,17 @@ final newsArticleProvider = FutureProvider.family<NewsArticle, String>(
 final newsCategoriesProvider = FutureProvider<List<NewsCategoryGroup>>(
   (ref) => ref.watch(newsRepositoryProvider).categories(),
 );
+
+/// «منبع» in the filter sheet. There is no publishers endpoint either, so the
+/// list is the distinct authors of the newest page.
+final newsSourcesProvider = FutureProvider<List<String>>((ref) async {
+  final page = await ref.watch(newsRepositoryProvider).feed();
+  final names = {
+    for (final a in page.items)
+      if (a.author != null && a.author!.isNotEmpty) a.author!,
+  }.toList()..sort();
+  return names;
+});
 
 final newsCommentsProvider = FutureProvider.family<List<NewsComment>, String>(
   (ref, articleId) =>

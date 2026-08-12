@@ -11,6 +11,7 @@ import '../../../../shared/widgets/states.dart';
 import '../../data/market_models.dart';
 import '../../data/market_repository.dart';
 import '../widgets/asset_row.dart';
+import '../widgets/data_source_note.dart';
 import '../widgets/market_async.dart';
 
 /// Screen/Market/TopLosers.
@@ -32,7 +33,7 @@ class _TopLosersScreenState extends ConsumerState<TopLosersScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'بیشترین افت',
+          'بیشترین کاهش',
           style: context.text.h3.copyWith(color: c.textPrimary),
         ),
       ),
@@ -52,18 +53,33 @@ class _TopLosersScreenState extends ConsumerState<TopLosersScreen> {
                 if (items.isEmpty) {
                   return const EmptyState(title: 'افتی در این بازه ثبت نشده');
                 }
-                return ListView.separated(
-                  padding: const EdgeInsets.all(Space.page),
-                  itemCount: items.length,
-                  separatorBuilder: (_, __) => const SizedBox(height: Space.s3),
-                  itemBuilder: (_, i) {
-                    final a = items[i];
-                    return AssetRow(
-                      asset: a,
-                      window: _window,
-                      onTap: () => context.push(Routes.coinDetails(a.id)),
-                    );
-                  },
+                return Column(
+                  children: [
+                    Expanded(
+                      child: ListView.separated(
+                        padding: const EdgeInsets.all(Space.page),
+                        itemCount: items.length,
+                        separatorBuilder: (_, __) =>
+                            const SizedBox(height: Space.s3),
+                        itemBuilder: (_, i) {
+                          final a = items[i];
+                          return AssetRow(
+                            asset: a,
+                            window: _window,
+                            onTap: () => context.push(Routes.coinDetails(a.id)),
+                          );
+                        },
+                      ),
+                    ),
+                    const Padding(
+                      padding: EdgeInsets.symmetric(horizontal: Space.page),
+                      child: DataSourceNote(
+                        extra:
+                            'تغییر در بازه انتخاب‌شده — بدون ادعای فرصت خرید',
+                      ),
+                    ),
+                    const SizedBox(height: Space.s4),
+                  ],
                 );
               },
             ),

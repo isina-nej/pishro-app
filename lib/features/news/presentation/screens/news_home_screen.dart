@@ -33,6 +33,9 @@ class _NewsHomeScreenState extends ConsumerState<NewsHomeScreen> {
     category: _category?.id,
     sort: NewsSort.newest,
     range: NewsRange.all,
+    kind: NewsKind.all,
+    source: null,
+    custom: null,
   );
 
   @override

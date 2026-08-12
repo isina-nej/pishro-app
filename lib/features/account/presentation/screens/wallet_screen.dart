@@ -34,7 +34,7 @@ class AccountWalletScreen extends ConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'موجودی قابل برداشت',
+                  'موجودی قابل استفاده',
                   style: context.text.caption.copyWith(color: c.textMuted),
                 ),
                 const SizedBox(height: Space.s2),
@@ -42,7 +42,24 @@ class AccountWalletScreen extends ConsumerWidget {
                   'مقدار نمونه',
                   style: context.text.h2.copyWith(color: c.textPrimary),
                 ),
-                const SizedBox(height: Space.s2),
+                const SizedBox(height: Space.s4),
+                // The deck splits the balance three ways. There is no wallet
+                // endpoint, so every figure stays the sample placeholder
+                // rather than a computed guess.
+                const Row(
+                  children: [
+                    Expanded(
+                      child: _Balance(label: 'در انتظار', value: 'مقدار نمونه'),
+                    ),
+                    Expanded(
+                      child: _Balance(label: 'رزروشده', value: 'مقدار نمونه'),
+                    ),
+                    Expanded(
+                      child: _Balance(label: 'مجموع', value: 'مقدار نمونه'),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: Space.s3),
                 const NoticeBanner(
                   message: 'موجودی کیف پول endpoint مستقل ندارد.',
                   tone: NoticeTone.info,
@@ -50,9 +67,15 @@ class AccountWalletScreen extends ConsumerWidget {
               ],
             ),
           ),
+          const SizedBox(height: Space.s3),
+          Text(
+            'این کیف پول برای استفاده در خرید دوره، اشتراک و تأمین وجه '
+            'سرمایه‌گذاری داخل برنامه است.',
+            style: context.text.caption.copyWith(color: c.textMuted),
+          ),
           const SizedBox(height: Space.s4),
           PishroButton(
-            label: 'تراکنش‌ها',
+            label: 'تراکنش‌های کیف پول',
             variant: PishroButtonVariant.secondary,
             onPressed: () => context.push(Routes.walletTransactions),
           ),
@@ -89,6 +112,32 @@ class AccountWalletScreen extends ConsumerWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+class _Balance extends StatelessWidget {
+  const _Balance({required this.label, required this.value});
+
+  final String label;
+  final String value;
+
+  @override
+  Widget build(BuildContext context) {
+    final c = context.colors;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(label, style: context.text.caption.copyWith(color: c.textMuted)),
+        const SizedBox(height: Space.s1),
+        Text(
+          value,
+          style: context.text.bodySmall.copyWith(
+            color: c.textPrimary,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ],
     );
   }
 }

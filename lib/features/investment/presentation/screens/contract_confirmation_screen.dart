@@ -63,7 +63,7 @@ class ContractConfirmationScreen extends ConsumerWidget {
             value: draft.riskAccepted && draft.termsAccepted,
             showRequired: draft.showConsentError,
             onChanged: (v) {
-              ref.read(investmentFlowProvider.notifier).setRiskAccepted(v);
+              ref.read(investmentFlowProvider.notifier).setAllRiskChecks(v);
               ref.read(investmentFlowProvider.notifier).setTermsAccepted(v);
             },
             label:

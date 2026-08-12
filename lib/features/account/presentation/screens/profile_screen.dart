@@ -66,12 +66,71 @@ class AccountProfileScreen extends ConsumerWidget {
                   : Icons.hourglass_top_rounded,
             ),
             const SizedBox(height: Space.s6),
+            Text(
+              'هویتی',
+              style: context.text.bodySmall.copyWith(
+                color: c.textSecondary,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            const SizedBox(height: Space.s2),
+            _Field(label: 'نام حقوقی', value: p.displayName),
+            const _Field(label: 'کد ملی', value: 'ثبت‌نشده'),
+            const SizedBox(height: Space.s2),
+            Text(
+              'برای تغییر این اطلاعات، درخواست بررسی هویت ثبت کنید.',
+              style: context.text.caption.copyWith(color: c.textMuted),
+            ),
+            const SizedBox(height: Space.s5),
+            Text(
+              'تماس',
+              style: context.text.bodySmall.copyWith(
+                color: c.textSecondary,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            const SizedBox(height: Space.s2),
+            _Field(label: 'موبایل', value: Fmt.maskPhone(p.phone)),
+            _Field(label: 'ایمیل', value: p.email ?? 'ثبت‌نشده'),
+            const SizedBox(height: Space.s4),
+            Text(
+              // Join date is not on /user/me, so only the status is stated.
+              'وضعیت حساب: فعال',
+              style: context.text.caption.copyWith(color: c.textMuted),
+            ),
+            const SizedBox(height: Space.s6),
             PishroButton(
               label: 'ویرایش پروفایل',
               onPressed: () => context.push(Routes.editProfile),
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+/// One «برچسب … مقدار» row of the deck's account-information list.
+class _Field extends StatelessWidget {
+  const _Field({required this.label, required this.value});
+
+  final String label;
+  final String value;
+
+  @override
+  Widget build(BuildContext context) {
+    final c = context.colors;
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: Space.s2),
+      child: Row(
+        children: [
+          Text(label, style: context.text.caption.copyWith(color: c.textMuted)),
+          const Spacer(),
+          Text(
+            value,
+            style: context.text.bodySmall.copyWith(color: c.textPrimary),
+          ),
+        ],
       ),
     );
   }

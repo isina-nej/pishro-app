@@ -11,6 +11,7 @@ import '../../../../shared/widgets/states.dart';
 import '../../data/market_models.dart';
 import '../../data/market_repository.dart';
 import '../widgets/asset_row.dart';
+import '../widgets/data_source_note.dart';
 import '../widgets/market_async.dart';
 
 /// Screen/Market/TopGainers.
@@ -52,18 +53,35 @@ class _TopGainersScreenState extends ConsumerState<TopGainersScreen> {
                 if (items.isEmpty) {
                   return const EmptyState(title: 'رشدی در این بازه ثبت نشده');
                 }
-                return ListView.separated(
-                  padding: const EdgeInsets.all(Space.page),
-                  itemCount: items.length,
-                  separatorBuilder: (_, __) => const SizedBox(height: Space.s3),
-                  itemBuilder: (_, i) {
-                    final a = items[i];
-                    return AssetRow(
-                      asset: a,
-                      window: _window,
-                      onTap: () => context.push(Routes.coinDetails(a.id)),
-                    );
-                  },
+                return Column(
+                  children: [
+                    Expanded(
+                      child: ListView.separated(
+                        padding: const EdgeInsets.all(Space.page),
+                        itemCount: items.length,
+                        separatorBuilder: (_, __) =>
+                            const SizedBox(height: Space.s3),
+                        itemBuilder: (_, i) {
+                          final a = items[i];
+                          return AssetRow(
+                            asset: a,
+                            window: _window,
+                            onTap: () => context.push(Routes.coinDetails(a.id)),
+                          );
+                        },
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: Space.page,
+                      ),
+                      child: DataSourceNote(
+                        generatedAt: data.generatedAt,
+                        extra: 'بازه انتخاب‌شده: ${_window.label}',
+                      ),
+                    ),
+                    const SizedBox(height: Space.s4),
+                  ],
                 );
               },
             ),

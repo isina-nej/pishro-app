@@ -258,8 +258,8 @@ class NewsCategoryGroup {
 /// so anything else is applied to the loaded pages client-side.
 enum NewsSort { newest, mostViewed, mostCommented }
 
-/// «امروز · ۷ روز گذشته · ۳۰ روز گذشته» — also client-side.
-enum NewsRange { all, today, week, month }
+/// «امروز · ۷ روز گذشته · ۳۰ روز گذشته · بازه دلخواه» — also client-side.
+enum NewsRange { all, today, week, month, custom }
 
 extension NewsRangeX on NewsRange {
   String get label => switch (this) {
@@ -267,6 +267,7 @@ extension NewsRangeX on NewsRange {
     NewsRange.today => 'امروز',
     NewsRange.week => 'این هفته',
     NewsRange.month => 'این ماه',
+    NewsRange.custom => 'بازه دلخواه',
   };
 
   /// Label used inside the filter sheet, which words the same ranges as spans.
@@ -275,6 +276,7 @@ extension NewsRangeX on NewsRange {
     NewsRange.today => 'امروز',
     NewsRange.week => '۷ روز گذشته',
     NewsRange.month => '۳۰ روز گذشته',
+    NewsRange.custom => 'بازه دلخواه',
   };
 
   Duration? get window => switch (this) {
@@ -282,6 +284,8 @@ extension NewsRangeX on NewsRange {
     NewsRange.today => const Duration(days: 1),
     NewsRange.week => const Duration(days: 7),
     NewsRange.month => const Duration(days: 30),
+    // Explicit endpoints instead of a rolling window — see NewsQuery.custom.
+    NewsRange.custom => null,
   };
 }
 
@@ -293,6 +297,27 @@ extension NewsSortX on NewsSort {
   };
 }
 
+/// «نوع محتوا» from the filter sheet. `GET /news` has no content-type column,
+/// so a kind is matched against the article's own tags and category text —
+/// the only signal the payload carries.
+enum NewsKind { all, news, analysis, report, tutorial }
+
+extension NewsKindX on NewsKind {
+  String get label => switch (this) {
+    NewsKind.all => 'همه',
+    NewsKind.news => 'خبر',
+    NewsKind.analysis => 'تحلیل',
+    NewsKind.report => 'گزارش',
+    NewsKind.tutorial => 'آموزش',
+  };
+
+  bool matches(NewsArticle a) {
+    if (this == NewsKind.all) return true;
+    final needle = label;
+    return a.category.contains(needle) || a.tags.any((t) => t.contains(needle));
+  }
+}
+
 /// Identity of a feed request. A record so `FutureProvider.family` gets value
 /// equality for free.
 typedef NewsQuery = ({
@@ -300,6 +325,14 @@ typedef NewsQuery = ({
   String? category,
   NewsSort sort,
   NewsRange range,
+  NewsKind kind,
+
+  /// Publisher name as it appears in `NewsArticle.author`; null = همه منابع.
+  String? source,
+
+  /// Endpoints of «بازه دلخواه». Only read when [range] is
+  /// [NewsRange.custom]; a custom range without one falls back to همه زمان‌ها.
+  ({DateTime start, DateTime end})? custom,
 });
 
 const NewsQuery latestNews = (
@@ -307,6 +340,9 @@ const NewsQuery latestNews = (
   category: null,
   sort: NewsSort.newest,
   range: NewsRange.all,
+  kind: NewsKind.all,
+  source: null,
+  custom: null,
 );
 
 String? _nullableString(dynamic value) {

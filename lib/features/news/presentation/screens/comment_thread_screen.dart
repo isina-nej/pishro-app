@@ -6,6 +6,7 @@ import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/tokens.dart';
 import '../../../../shared/widgets/pishro_text_field.dart';
 import '../../../../shared/widgets/states.dart';
+import '../../../../core/utils/formatters.dart';
 import '../../data/news_models.dart';
 import '../../data/news_repository.dart';
 import '../widgets/article_card.dart';
@@ -48,9 +49,14 @@ class NewsCommentThreadScreen extends ConsumerWidget {
                   padding: const EdgeInsets.all(Space.page),
                   children: [
                     CommentTile(comment: parent),
+                    const SizedBox(height: Space.s2),
+                    Text(
+                      'در پاسخ به ${parent.author}',
+                      style: context.text.caption.copyWith(color: c.textMuted),
+                    ),
                     const SizedBox(height: Space.s4),
                     Text(
-                      'پاسخ‌ها',
+                      'پاسخ‌ها (${Fmt.fa('${parent.totalReplies}')})',
                       style: context.text.bodySmall.copyWith(
                         color: c.textSecondary,
                         fontWeight: FontWeight.w600,
@@ -69,6 +75,14 @@ class NewsCommentThreadScreen extends ConsumerWidget {
                         CommentTile(comment: r, compact: true),
                         const SizedBox(height: Space.s3),
                       ],
+                    // Only offered when the server reports more replies than
+                    // this page carries — never a button that does nothing.
+                    if (parent.totalReplies > parent.replies.length)
+                      TextButton(
+                        onPressed: () =>
+                            ref.invalidate(newsCommentsProvider(id)),
+                        child: const Text('مشاهده پاسخ‌های بیشتر'),
+                      ),
                   ],
                 );
               },

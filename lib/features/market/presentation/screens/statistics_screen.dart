@@ -8,6 +8,7 @@ import '../../../../core/utils/formatters.dart';
 import '../../../../shared/widgets/common.dart';
 import '../../data/market_models.dart';
 import '../../data/market_repository.dart';
+import '../widgets/data_source_note.dart';
 import '../widgets/market_async.dart';
 
 /// Screen/Market/Statistics — مقدار ناموجود هرگز صفر نمی‌شود.
@@ -57,11 +58,16 @@ class StatisticsScreen extends ConsumerWidget {
               _Stat('تغییر ۲۴ساعت', Fmt.percentDelta(a.change24h)),
               _Stat('تغییر ۷روز', Fmt.percentDelta(a.change7d)),
               _Stat('تغییر ۳۰روز', Fmt.percentDelta(a.change30d)),
-              _Stat('حجم ۲۴ساعت', orMissing(a.volume24h, faMillions)),
+              _Stat('حجم ۲۴ ساعت', orMissing(a.volume24h, faMillions)),
               _Stat('ارزش بازار', orMissing(a.marketCap, faMillions)),
+              _Stat('بیشترین قیمت روز', orMissing(a.high24h, faToman)),
+              _Stat('کمترین قیمت روز', orMissing(a.low24h, faToman)),
               _Stat(
-                'ATH',
-                orMissing(a.athUsd, (v) => Fmt.fa(v.toStringAsFixed(2))),
+                'بالاترین قیمت تاریخی',
+                orMissing(
+                  a.athUsd,
+                  (v) => '${Fmt.fa(v.toStringAsFixed(2))} \$',
+                ),
               ),
               _Stat(
                 'تاریخ ATH',
@@ -70,7 +76,15 @@ class StatisticsScreen extends ConsumerWidget {
                     : Fmt.jalaliLong(a.athDate!),
               ),
               _Stat('عرضه در گردش', orMissing(a.circulatingSupply, faMillions)),
-              _Stat('سقف عرضه', orMissing(a.maxSupply, faMillions)),
+              _Stat('حداکثر عرضه', orMissing(a.maxSupply, faMillions)),
+              _Stat(
+                'رتبه بازار',
+                a.rank <= 0 ? 'داده در دسترس نیست' : Fmt.fa('${a.rank}'),
+              ),
+              DataSourceNote(
+                source: a.marketSource,
+                generatedAt: data.generatedAt,
+              ),
             ],
           );
         },

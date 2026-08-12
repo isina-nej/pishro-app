@@ -23,6 +23,10 @@ class _AccountNotificationsScreenState
     extends ConsumerState<AccountNotificationsScreen> {
   var _tab = 0;
 
+  /// Local only — there is no read-state endpoint, so «علامت‌گذاری همه» dims
+  /// the unread dots for this session rather than claiming a server write.
+  var _allRead = false;
+
   @override
   Widget build(BuildContext context) {
     final c = context.colors;
@@ -33,6 +37,12 @@ class _AccountNotificationsScreenState
           'اعلان‌ها',
           style: context.text.h3.copyWith(color: c.textPrimary),
         ),
+        actions: [
+          TextButton(
+            onPressed: () => setState(() => _allRead = true),
+            child: const Text('علامت‌گذاری همه'),
+          ),
+        ],
       ),
       body: Column(
         children: [
@@ -63,7 +73,7 @@ class _AccountNotificationsScreenState
                         children: [
                           Row(
                             children: [
-                              if (!n.read)
+                              if (!n.read && !_allRead)
                                 Container(
                                   width: 8,
                                   height: 8,

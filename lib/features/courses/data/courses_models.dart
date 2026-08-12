@@ -233,12 +233,18 @@ class CourseCategory {
     required this.title,
     required this.courseCount,
     required this.featured,
+    this.latestTitle,
   });
 
   final String id;
   final String title;
   final int courseCount;
   final bool featured;
+
+  /// Newest course in the bucket. The deck pairs each category with a second
+  /// line; there is no category description anywhere in the payload, so this
+  /// stands in for it with real data instead of invented copy.
+  final String? latestTitle;
 }
 
 enum PriceBand {

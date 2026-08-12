@@ -4,15 +4,18 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/tokens.dart';
-import '../../../../shared/widgets/common.dart';
-import '../../../../shared/widgets/states.dart';
-
 import '../../../../core/utils/formatters.dart';
+import '../../../../shared/widgets/common.dart';
+import '../../../../shared/widgets/pishro_badge.dart';
+import '../../../../shared/widgets/states.dart';
 import '../../data/community_repository.dart';
 
+/// Screen/Community/AnalystRatings — بدون معیار سوددهی.
 class AnalystRatingsScreen extends ConsumerWidget {
   const AnalystRatingsScreen({super.key, this.id = ''});
+
   final String id;
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final c = context.colors;
@@ -20,7 +23,7 @@ class AnalystRatingsScreen extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'امتیاز تحلیلگر',
+          'امتیازها و نظرات',
           style: context.text.h3.copyWith(color: c.textPrimary),
         ),
       ),
@@ -33,10 +36,20 @@ class AnalystRatingsScreen extends ConsumerWidget {
           padding: const EdgeInsets.all(Space.page),
           children: [
             Text(
-              '${Fmt.fa(s.average.toStringAsFixed(1))} از ۵ · ${Fmt.fa('${s.reviewCount}')} نظر',
-              style: context.text.h3.copyWith(color: c.textPrimary),
+              Fmt.fa(s.average.toStringAsFixed(1)),
+              style: context.text.h2.copyWith(color: c.textPrimary),
             ),
-            const SizedBox(height: Space.s4),
+            Row(
+              children: [
+                Icon(Icons.star_rounded, size: 18, color: c.warning),
+                const SizedBox(width: 4),
+                Text(
+                  '${Fmt.fa('${s.reviewCount}')} نظر',
+                  style: context.text.caption.copyWith(color: c.textMuted),
+                ),
+              ],
+            ),
+            const SizedBox(height: Space.s5),
             for (final cat in s.categories) ...[
               Text(
                 cat.label,
@@ -46,7 +59,8 @@ class AnalystRatingsScreen extends ConsumerWidget {
               const SizedBox(height: Space.s3),
             ],
             const NoticeBanner(
-              message: 'معیار میزان سوددهی وجود ندارد.',
+              message:
+                  'داده عملکرد تأییدشده برای این رتبه‌بندی در دسترس نیست. رتبه‌بندی بر اساس امتیاز و مشارکت کاربران است و معیار میزان سوددهی وجود ندارد.',
               tone: NoticeTone.info,
             ),
             const SizedBox(height: Space.s4),
@@ -55,13 +69,39 @@ class AnalystRatingsScreen extends ConsumerWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      '${r.authorName} · ${Fmt.fa('${r.stars}')} ستاره',
-                      style: context.text.bodySmall.copyWith(
-                        color: c.textPrimary,
-                        fontWeight: FontWeight.w600,
-                      ),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            r.authorName,
+                            style: context.text.bodySmall.copyWith(
+                              color: c.textPrimary,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                        if (r.isVerifiedSubscriber)
+                          const PishroBadge(
+                            label: 'مشترک تأییدشده',
+                            tone: PishroBadgeTone.success,
+                            icon: Icons.verified_outlined,
+                          ),
+                      ],
                     ),
+                    const SizedBox(height: Space.s1),
+                    Row(
+                      children: [
+                        Icon(Icons.star_rounded, size: 14, color: c.warning),
+                        const SizedBox(width: 4),
+                        Text(
+                          Fmt.fa('${r.stars}'),
+                          style: context.text.caption.copyWith(
+                            color: c.textSecondary,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: Space.s2),
                     Text(
                       r.body,
                       style: context.text.bodySmall.copyWith(

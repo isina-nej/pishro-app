@@ -6,16 +6,18 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/tokens.dart';
 import '../../../../routing/routes.dart';
+import '../../../../shared/widgets/pishro_badge.dart';
 import '../../../../shared/widgets/pishro_button.dart';
 import '../../../../shared/widgets/pishro_chip.dart';
 import '../../../../shared/widgets/pishro_text_field.dart';
 import '../../../../shared/widgets/states.dart';
-
 import '../../data/community_models.dart';
 import '../../data/community_repository.dart';
 
+/// Screen/Community/CreateAnalysis — افشا بدون پیش‌انتخاب.
 class CreateAnalysisScreen extends ConsumerWidget {
   const CreateAnalysisScreen({super.key});
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final c = context.colors;
@@ -24,7 +26,7 @@ class CreateAnalysisScreen extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'تحلیل جدید',
+          'ایجاد تحلیل',
           style: context.text.h3.copyWith(color: c.textPrimary),
         ),
       ),
@@ -35,6 +37,7 @@ class CreateAnalysisScreen extends ConsumerWidget {
             'نوع تحلیل',
             style: context.text.bodySmall.copyWith(color: c.textSecondary),
           ),
+          const SizedBox(height: Space.s2),
           Wrap(
             spacing: Space.s2,
             children: [
@@ -49,15 +52,21 @@ class CreateAnalysisScreen extends ConsumerWidget {
             ],
           ),
           const SizedBox(height: Space.s4),
+          Text(
+            'دارایی',
+            style: context.text.bodySmall.copyWith(color: c.textSecondary),
+          ),
+          const SizedBox(height: Space.s2),
           assets.when(
             loading: () => const Skeleton.line(),
             error: (_, __) => const SizedBox.shrink(),
             data: (list) => Wrap(
               spacing: Space.s2,
+              runSpacing: Space.s2,
               children: [
                 for (final a in list)
                   PishroChip(
-                    label: a.symbol,
+                    label: a.label,
                     selected: draft.asset?.symbol == a.symbol,
                     onTap: () => ref
                         .read(analysisDraftProvider.notifier)
@@ -69,21 +78,76 @@ class CreateAnalysisScreen extends ConsumerWidget {
           const SizedBox(height: Space.s4),
           PishroTextField(
             label: 'عنوان',
-            hint: 'بدون توصیه خرید/فروش',
+            hint: 'عنوان تحلیل را بنویسید…',
             onChanged: (v) => ref
                 .read(analysisDraftProvider.notifier)
                 .update((d) => d.copyWith(title: v)),
           ),
           const SizedBox(height: Space.s4),
           Text(
-            'افشای منافع — بدون پیش‌انتخاب',
+            'بازه زمانی',
             style: context.text.bodySmall.copyWith(color: c.textSecondary),
           ),
           const SizedBox(height: Space.s2),
+          Wrap(
+            spacing: Space.s2,
+            children: [
+              for (final t in Timeframe.values)
+                PishroChip(
+                  label: t.label,
+                  selected: draft.timeframe == t,
+                  onTap: () => ref
+                      .read(analysisDraftProvider.notifier)
+                      .update((d) => d.copyWith(timeframe: t)),
+                ),
+            ],
+          ),
+          const SizedBox(height: Space.s4),
           Text(
-            'آیا در این دارایی موقعیت دارید؟',
+            'سطح ریسک',
+            style: context.text.bodySmall.copyWith(color: c.textSecondary),
+          ),
+          const SizedBox(height: Space.s2),
+          Wrap(
+            spacing: Space.s2,
+            children: [
+              PishroChip(
+                label: 'کم',
+                selected: draft.risk == RiskLevel.low,
+                onTap: () => ref
+                    .read(analysisDraftProvider.notifier)
+                    .update((d) => d.copyWith(risk: RiskLevel.low)),
+              ),
+              PishroChip(
+                label: 'متوسط',
+                selected: draft.risk == RiskLevel.medium,
+                onTap: () => ref
+                    .read(analysisDraftProvider.notifier)
+                    .update((d) => d.copyWith(risk: RiskLevel.medium)),
+              ),
+              PishroChip(
+                label: 'بالا',
+                selected: draft.risk == RiskLevel.high,
+                onTap: () => ref
+                    .read(analysisDraftProvider.notifier)
+                    .update((d) => d.copyWith(risk: RiskLevel.high)),
+              ),
+            ],
+          ),
+          const SizedBox(height: Space.s5),
+          Text(
+            'افشای منافع',
+            style: context.text.bodyMedium.copyWith(
+              color: c.textPrimary,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          const SizedBox(height: Space.s2),
+          Text(
+            'آیا دارایی مرتبط را در اختیار دارید؟',
             style: context.text.caption.copyWith(color: c.textMuted),
           ),
+          const SizedBox(height: Space.s2),
           Wrap(
             spacing: Space.s2,
             children: [
@@ -105,9 +169,10 @@ class CreateAnalysisScreen extends ConsumerWidget {
           ),
           const SizedBox(height: Space.s3),
           Text(
-            'آیا اسپانسر دارد؟',
+            'آیا محتوا حمایت مالی شده است؟',
             style: context.text.caption.copyWith(color: c.textMuted),
           ),
+          const SizedBox(height: Space.s2),
           Wrap(
             spacing: Space.s2,
             children: [

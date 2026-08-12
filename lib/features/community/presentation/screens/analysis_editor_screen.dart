@@ -5,17 +5,19 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/tokens.dart';
+import '../../../../core/utils/formatters.dart';
 import '../../../../routing/routes.dart';
 import '../../../../shared/widgets/pishro_badge.dart';
 import '../../../../shared/widgets/pishro_button.dart';
 import '../../../../shared/widgets/pishro_chip.dart';
 import '../../../../shared/widgets/pishro_text_field.dart';
-
 import '../../data/community_models.dart';
 import '../../data/community_repository.dart';
 
+/// Screen/Community/AnalysisEditor — نوار پایین اسکرول.
 class AnalysisEditorScreen extends ConsumerWidget {
   const AnalysisEditorScreen({super.key});
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final c = context.colors;
@@ -26,29 +28,60 @@ class AnalysisEditorScreen extends ConsumerWidget {
           'ویرایشگر تحلیل',
           style: context.text.h3.copyWith(color: c.textPrimary),
         ),
+        actions: [
+          Padding(
+            padding: const EdgeInsetsDirectional.only(end: Space.s3),
+            child: Center(
+              child: Text(
+                'ذخیره خودکار شد',
+                style: context.text.caption.copyWith(color: c.textMuted),
+              ),
+            ),
+          ),
+        ],
       ),
       body: ListView(
-        padding: const EdgeInsets.all(Space.page),
+        padding: const EdgeInsets.fromLTRB(
+          Space.page,
+          Space.s3,
+          Space.page,
+          120,
+        ),
         children: [
+          Text(
+            draft.title.isEmpty ? 'بدون عنوان' : draft.title,
+            style: context.text.h3.copyWith(color: c.textPrimary),
+          ),
+          const SizedBox(height: Space.s4),
           PishroTextField(
             label: 'خلاصه',
+            hint: 'در حال نوشتن…',
             onChanged: (v) => ref
                 .read(analysisDraftProvider.notifier)
                 .update((d) => d.copyWith(summary: v)),
           ),
           const SizedBox(height: Space.s4),
           PishroTextField(
-            label: 'متن',
+            label: 'متن تحلیل',
+            hint: 'متن اصلی تحلیل در این بخش نوشته می‌شود…',
             onChanged: (v) => ref
                 .read(analysisDraftProvider.notifier)
                 .update((d) => d.copyWith(body: v)),
           ),
           const SizedBox(height: Space.s4),
           PishroTextField(
-            label: 'شرط بی‌اعتبار شدن',
+            label: 'شرط بی‌اعتبارشدن',
+            hint: 'مثلاً شکست سطح نمونه',
             onChanged: (v) => ref
                 .read(analysisDraftProvider.notifier)
                 .update((d) => d.copyWith(invalidation: v)),
+          ),
+          const SizedBox(height: Space.s4),
+          PishroTextField(
+            label: 'منابع داده',
+            onChanged: (v) => ref
+                .read(analysisDraftProvider.notifier)
+                .update((d) => d.copyWith(sources: v)),
           ),
           const SizedBox(height: Space.s4),
           Text(
@@ -102,11 +135,76 @@ class AnalysisEditorScreen extends ConsumerWidget {
         ],
       ),
       bottomNavigationBar: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(Space.page),
-          child: PishroButton(
-            label: 'پیش‌نمایش',
-            onPressed: () => context.push(Routes.analysisPreview),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            SizedBox(
+              height: 52,
+              child: ListView(
+                scrollDirection: Axis.horizontal,
+                padding: const EdgeInsets.symmetric(horizontal: Space.page),
+                children: [
+                  _Tool('B'),
+                  _Tool('I'),
+                  _Tool('سناریوها'),
+                  _Tool('شرط'),
+                  _Tool('منابع'),
+                  Center(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: Space.s3),
+                      child: Text(
+                        '${Fmt.fa('${draft.characterCount}')} نویسه',
+                        style: context.text.caption.copyWith(
+                          color: c.textMuted,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(
+                Space.page,
+                Space.s2,
+                Space.page,
+                Space.s3,
+              ),
+              child: PishroButton(
+                label: 'پیش‌نمایش',
+                onPressed: () => context.push(Routes.analysisPreview),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _Tool extends StatelessWidget {
+  const _Tool(this.label);
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    final c = context.colors;
+    return Padding(
+      padding: const EdgeInsetsDirectional.only(end: Space.s2),
+      child: Center(
+        child: Container(
+          padding: const EdgeInsets.symmetric(
+            horizontal: Space.s3,
+            vertical: Space.s2,
+          ),
+          decoration: BoxDecoration(
+            color: c.surfaceSecondary,
+            borderRadius: BorderRadius.circular(Radii.pill),
+            border: Border.all(color: c.borderDefault),
+          ),
+          child: Text(
+            label,
+            style: context.text.caption.copyWith(color: c.textPrimary),
           ),
         ),
       ),

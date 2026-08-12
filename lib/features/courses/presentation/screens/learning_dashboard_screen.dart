@@ -6,15 +6,15 @@ import '../../../../core/network/api_exception.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/tokens.dart';
+import '../../../../core/utils/formatters.dart';
 import '../../../../routing/routes.dart';
 import '../../../../shared/widgets/common.dart';
 import '../../../../shared/widgets/pishro_badge.dart';
 import '../../../../shared/widgets/pishro_button.dart';
 import '../../../../shared/widgets/states.dart';
-import '../../data/courses_models.dart';
 import '../../data/courses_repository.dart';
 
-/// Screen/Course/LearningDashboard — پیشرفت + ادامه از آخرین جلسه.
+/// Screen/Course/LearningDashboard — گفت‌وگو فقط برای VIP.
 class LearningDashboardScreen extends ConsumerWidget {
   const LearningDashboardScreen({super.key, this.id = ''});
 
@@ -56,7 +56,9 @@ class LearningDashboardScreen extends ConsumerWidget {
               onAction: () => context.go(Routes.courseDetails(id)),
             );
           }
-          final current = curriculum.valueOrNull?.currentLesson;
+          final curr = curriculum.valueOrNull;
+          final current = curr?.currentLesson;
+          final downloaded = curr?.downloadedCount ?? 0;
           return ListView(
             padding: const EdgeInsets.all(Space.page),
             children: [
@@ -68,7 +70,7 @@ class LearningDashboardScreen extends ConsumerWidget {
                       style: context.text.h3.copyWith(color: c.textPrimary),
                     ),
                   ),
-                  enrolled.packageType == PackageType.vip
+                  enrolled.hasInstructorChat
                       ? const PishroBadge.vip()
                       : const PishroBadge.regular(),
                 ],
@@ -76,8 +78,17 @@ class LearningDashboardScreen extends ConsumerWidget {
               const SizedBox(height: Space.s4),
               PishroProgress(
                 value: enrolled.progress,
-                label: enrolled.lessonProgressLabel,
+                label: enrolled.lessonsTotal == 0
+                    ? null
+                    : '${Fmt.fa('${enrolled.lessonsCompleted}')} از ${Fmt.fa('${enrolled.lessonsTotal}')} جلسه تکمیل‌شده',
               ),
+              if (enrolled.timeSpent.inMinutes > 0) ...[
+                const SizedBox(height: Space.s2),
+                Text(
+                  'زمان صرف‌شده: ${Fmt.duration(enrolled.timeSpent)}',
+                  style: context.text.caption.copyWith(color: c.textMuted),
+                ),
+              ],
               const SizedBox(height: Space.s5),
               if (current != null)
                 PishroCard(
@@ -85,46 +96,49 @@ class LearningDashboardScreen extends ConsumerWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'ادامه از آخرین جلسه',
-                        style: context.text.caption.copyWith(
-                          color: c.textMuted,
-                        ),
-                      ),
-                      const SizedBox(height: Space.s2),
-                      Text(
-                        current.title,
+                        'ادامه یادگیری — ${current.title}',
                         style: context.text.bodyMedium.copyWith(
                           color: c.textPrimary,
-                          fontWeight: FontWeight.w600,
+                          fontWeight: FontWeight.w700,
                         ),
                       ),
                       const SizedBox(height: Space.s4),
                       PishroButton(
-                        label: 'پخش جلسه',
+                        label: 'ادامه یادگیری',
                         onPressed: () =>
                             context.push(Routes.lesson(id, current.id)),
                       ),
                     ],
                   ),
                 ),
-              const SizedBox(height: Space.s4),
-              _NavRow(
+              if (downloaded > 0) ...[
+                const SizedBox(height: Space.s3),
+                NoticeBanner(
+                  message:
+                      '${Fmt.fa('$downloaded')} جلسه برای مشاهده آفلاین دانلود شده است.',
+                  tone: NoticeTone.info,
+                ),
+              ],
+              const SizedBox(height: Space.s5),
+              _Shortcut(
                 icon: Icons.view_list_rounded,
-                label: 'فصل‌ها و جلسات',
+                label: 'سرفصل‌های دوره',
                 onTap: () => context.push(Routes.chapters(id)),
               ),
-              _NavRow(
-                icon: Icons.download_rounded,
-                label: 'دانلودها و منابع',
+              _Shortcut(
+                icon: Icons.folder_outlined,
+                label: 'منابع و فایل‌های دوره',
                 onTap: () => context.push(Routes.downloads(id)),
               ),
-              _NavRow(
-                icon: Icons.chat_bubble_outline_rounded,
-                label: 'گفت‌وگو با مدرس',
-                onTap: () => context.push(Routes.instructorChat(id)),
-              ),
+              if (enrolled.hasInstructorChat)
+                _Shortcut(
+                  icon: Icons.chat_bubble_outline_rounded,
+                  label: 'گفت‌وگو با مدرس',
+                  trailing: const PishroBadge.vip(),
+                  onTap: () => context.push(Routes.instructorChat(id)),
+                ),
               if (enrolled.isCompleted)
-                _NavRow(
+                _Shortcut(
                   icon: Icons.workspace_premium_rounded,
                   label: 'گواهی پایان دوره',
                   onTap: () => context.push(Routes.certificate(id)),
@@ -137,25 +151,42 @@ class LearningDashboardScreen extends ConsumerWidget {
   }
 }
 
-class _NavRow extends StatelessWidget {
-  const _NavRow({required this.icon, required this.label, required this.onTap});
+class _Shortcut extends StatelessWidget {
+  const _Shortcut({
+    required this.icon,
+    required this.label,
+    required this.onTap,
+    this.trailing,
+  });
 
   final IconData icon;
   final String label;
   final VoidCallback onTap;
+  final Widget? trailing;
 
   @override
   Widget build(BuildContext context) {
     final c = context.colors;
-    return ListTile(
-      contentPadding: EdgeInsets.zero,
-      leading: Icon(icon, color: c.textSecondary),
-      title: Text(
-        label,
-        style: context.text.bodyMedium.copyWith(color: c.textPrimary),
-      ),
-      trailing: Icon(Icons.chevron_left_rounded, color: c.textMuted),
+    return PishroCard(
       onTap: onTap,
+      padding: const EdgeInsets.symmetric(
+        horizontal: Space.s3,
+        vertical: Space.s3,
+      ),
+      child: Row(
+        children: [
+          Icon(icon, color: c.actionPrimary),
+          const SizedBox(width: Space.s3),
+          Expanded(
+            child: Text(
+              label,
+              style: context.text.bodyMedium.copyWith(color: c.textPrimary),
+            ),
+          ),
+          if (trailing != null) ...[trailing!, const SizedBox(width: Space.s2)],
+          Icon(Icons.chevron_left_rounded, color: c.textMuted),
+        ],
+      ),
     );
   }
 }

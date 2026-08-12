@@ -10,19 +10,30 @@ import '../../../../core/utils/formatters.dart';
 import '../../../../routing/routes.dart';
 import '../../../../shared/widgets/pishro_button.dart';
 import '../../../../shared/widgets/states.dart';
+import '../../data/courses_models.dart';
 import '../../data/courses_repository.dart';
+import '../widgets/course_widgets.dart';
 
-/// Screen/Course/LessonDetails — پخش‌نما + توضیح جلسه.
-class LessonDetailsScreen extends ConsumerWidget {
+/// Screen/Course/LessonDetails — دانلود + تکمیل.
+class LessonDetailsScreen extends ConsumerStatefulWidget {
   const LessonDetailsScreen({super.key, this.id = '', this.lessonId = ''});
 
   final String id;
   final String lessonId;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<LessonDetailsScreen> createState() =>
+      _LessonDetailsScreenState();
+}
+
+class _LessonDetailsScreenState extends ConsumerState<LessonDetailsScreen> {
+  var _downloaded = false;
+  var _completed = false;
+
+  @override
+  Widget build(BuildContext context) {
     final c = context.colors;
-    final curriculum = ref.watch(curriculumProvider(id));
+    final curriculum = ref.watch(curriculumProvider(widget.id));
 
     return curriculum.when(
       loading: () => const Scaffold(
@@ -35,11 +46,11 @@ class LessonDetailsScreen extends ConsumerWidget {
         appBar: AppBar(),
         body: ErrorStateView(
           message: e is ApiException ? e.message : 'جلسه بارگذاری نشد.',
-          onRetry: () => ref.invalidate(curriculumProvider(id)),
+          onRetry: () => ref.invalidate(curriculumProvider(widget.id)),
         ),
       ),
       data: (curr) {
-        final lesson = curr.lessonById(lessonId) ?? curr.currentLesson;
+        final lesson = curr.lessonById(widget.lessonId) ?? curr.currentLesson;
         if (lesson == null) {
           return Scaffold(
             appBar: AppBar(),
@@ -48,21 +59,40 @@ class LessonDetailsScreen extends ConsumerWidget {
         }
         if (!lesson.state.isPlayable) {
           return Scaffold(
-            appBar: AppBar(title: Text(lesson.title, style: context.text.h3)),
-            body: const EmptyState(
+            appBar: AppBar(
+              title: Text(
+                lesson.title,
+                style: context.text.h3.copyWith(color: c.textPrimary),
+              ),
+            ),
+            body: EmptyState(
               title: 'این جلسه قفل است',
-              message: 'پس از خرید یا تکمیل جلسه قبلی باز می‌شود.',
+              message: 'پس از تکمیل جلسات قبلی فصل، این جلسه باز می‌شود.',
               icon: Icons.lock_outline_rounded,
+              actionLabel: 'ادامه از جلسه فعلی',
+              onAction: () {
+                final current = curr.currentLesson;
+                if (current == null) return;
+                context.push(Routes.lesson(widget.id, current.id));
+              },
             ),
           );
         }
         final chapter = curr.chapterOf(lesson.id);
+        final chapterIndex = chapter == null
+            ? 0
+            : curr.chapters.indexOf(chapter) + 1;
+        final lessonIndex = chapter == null
+            ? 0
+            : chapter.lessons.indexWhere((l) => l.id == lesson.id) + 1;
+        final next = _nextPlayable(curr, lesson.id);
+
         return Scaffold(
           appBar: AppBar(
             title: Text(
-              lesson.title,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
+              chapter == null
+                  ? lesson.title
+                  : 'فصل ${Fmt.fa('$chapterIndex')} · جلسه ${Fmt.fa('$lessonIndex')}',
               style: context.text.h3.copyWith(color: c.textPrimary),
             ),
           ),
@@ -88,7 +118,7 @@ class LessonDetailsScreen extends ConsumerWidget {
                         ),
                         const SizedBox(height: Space.s2),
                         Text(
-                          'پخش جلسه · ${Fmt.duration(lesson.duration)}',
+                          '${Fmt.duration(lesson.duration)} · سرعت ۱x · زیرنویس',
                           style: context.text.caption.copyWith(
                             color: c.textMuted,
                           ),
@@ -99,12 +129,6 @@ class LessonDetailsScreen extends ConsumerWidget {
                 ),
               ),
               const SizedBox(height: Space.s4),
-              if (chapter != null)
-                Text(
-                  chapter.title,
-                  style: context.text.caption.copyWith(color: c.textMuted),
-                ),
-              const SizedBox(height: Space.s2),
               Text(
                 lesson.title,
                 style: context.text.h3.copyWith(color: c.textPrimary),
@@ -119,16 +143,108 @@ class LessonDetailsScreen extends ConsumerWidget {
                   ),
                 ),
               ],
-              const SizedBox(height: Space.s6),
-              PishroButton(
-                label: 'بازگشت به فصل‌ها',
-                variant: PishroButtonVariant.secondary,
-                onPressed: () => context.push(Routes.chapters(id)),
+              const SizedBox(height: Space.s5),
+              Row(
+                children: [
+                  Expanded(
+                    child: PishroButton(
+                      label: _downloaded ? 'دانلودشده' : 'دانلود جلسه',
+                      variant: PishroButtonVariant.secondary,
+                      icon: _downloaded
+                          ? Icons.download_done_rounded
+                          : Icons.download_rounded,
+                      onPressed: _downloaded
+                          ? null
+                          : () => setState(() => _downloaded = true),
+                    ),
+                  ),
+                  const SizedBox(width: Space.s3),
+                  Expanded(
+                    child: PishroButton(
+                      label: _completed || lesson.state == LessonState.completed
+                          ? 'تکمیل‌شده'
+                          : 'علامت تکمیل',
+                      icon: Icons.check_rounded,
+                      onPressed:
+                          _completed || lesson.state == LessonState.completed
+                          ? null
+                          : () => setState(() => _completed = true),
+                    ),
+                  ),
+                ],
               ),
+              const SizedBox(height: Space.s6),
+              Row(
+                children: [
+                  CircleAvatar(
+                    radius: 20,
+                    backgroundColor: c.surfaceSecondary,
+                    child: Icon(Icons.school_outlined, color: c.actionPrimary),
+                  ),
+                  const SizedBox(width: Space.s3),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          ref
+                                  .watch(courseProvider(widget.id))
+                                  .valueOrNull
+                                  ?.instructorName ??
+                              'مدرس این دوره',
+                          style: context.text.bodySmall.copyWith(
+                            color: c.textPrimary,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        Text(
+                          'مدرس این دوره',
+                          style: context.text.caption.copyWith(
+                            color: c.textMuted,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: Space.s5),
+              Text(
+                'نظرات دانشجویان',
+                style: context.text.bodyMedium.copyWith(
+                  color: c.textPrimary,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              const SizedBox(height: Space.s2),
+              const RatingLabel(4.8, count: 310),
+              const SizedBox(height: Space.s6),
+              if (next != null)
+                PishroButton(
+                  label: 'جلسه بعدی',
+                  onPressed: () =>
+                      context.push(Routes.lesson(widget.id, next.id)),
+                )
+              else
+                PishroButton(
+                  label: 'بازگشت به سرفصل‌ها',
+                  variant: PishroButtonVariant.secondary,
+                  onPressed: () => context.push(Routes.chapters(widget.id)),
+                ),
             ],
           ),
         );
       },
     );
+  }
+
+  Lesson? _nextPlayable(Curriculum curr, String currentId) {
+    final all = curr.lessons;
+    final i = all.indexWhere((l) => l.id == currentId);
+    if (i < 0) return null;
+    for (var j = i + 1; j < all.length; j++) {
+      if (all[j].state.isPlayable) return all[j];
+    }
+    return null;
   }
 }

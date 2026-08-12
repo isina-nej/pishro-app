@@ -1,94 +1,63 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/tokens.dart';
 import '../../../../shared/widgets/common.dart';
-import '../../../../shared/widgets/pishro_button.dart';
+import '../../../../shared/widgets/pishro_badge.dart';
+import '../../../../shared/widgets/states.dart';
 
-/// Screen/Account/Subscriptions — «اشتراک‌ها».
-///
-/// Source: `../desighn/_capture/11-09-account-part-2.dc.html` · Android 390dp · RTL.
+import '../../../community/data/community_repository.dart';
+
 class AccountSubscriptionsScreen extends ConsumerWidget {
   const AccountSubscriptionsScreen({super.key});
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final c = context.colors;
+    final subs = ref.watch(communitySubscriptionsProvider);
     return Scaffold(
       appBar: AppBar(
-        titleSpacing: Space.s5,
         title: Text(
           'اشتراک‌ها',
           style: context.text.h3.copyWith(color: c.textPrimary),
         ),
       ),
-      body: ListView(
-        padding: const EdgeInsets.fromLTRB(
-          Space.page,
-          Space.s4,
-          Space.page,
-          Space.s8,
+      body: subs.when(
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (_, __) => ErrorStateView(
+          onRetry: () => ref.invalidate(communitySubscriptionsProvider),
         ),
-        children: [
-          Text(
-            'اشتراک‌ها',
-            style: context.text.h2.copyWith(color: c.textPrimary),
-          ),
-          const SizedBox(height: Space.s2),
-          Text(
-            'پیاده‌سازی بر اساس دک طراحی · Screen/Account/Subscriptions',
-            style: context.text.bodySmall.copyWith(color: c.textMuted),
-          ),
-          const SizedBox(height: Space.s5),
-          PishroCard(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                _DeckRow(text: r'علامت‌گذاری همه'),
-                _DeckRow(text: r'اعلان‌ها'),
-                _DeckRow(text: r'همه'),
-              ],
-            ),
-          ),
-          const SizedBox(height: Space.s5),
-          PishroButton(
-            label: 'ادامه',
-            onPressed: () {
-              if (context.canPop()) {
-                context.pop();
-              }
-            },
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _DeckRow extends StatelessWidget {
-  const _DeckRow({required this.text});
-  final String text;
-
-  @override
-  Widget build(BuildContext context) {
-    final c = context.colors;
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: Space.s2),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(Icons.circle, size: 6, color: c.actionPrimary),
-          const SizedBox(width: Space.s3),
-          Expanded(
-            child: Text(
-              text,
-              style: context.text.bodyMedium.copyWith(color: c.textSecondary),
-            ),
-          ),
-        ],
+        data: (items) => items.isEmpty
+            ? const EmptyState(title: 'اشتراکی فعال نیست')
+            : ListView.separated(
+                padding: const EdgeInsets.all(Space.page),
+                itemCount: items.length,
+                separatorBuilder: (_, __) => const SizedBox(height: Space.s3),
+                itemBuilder: (_, i) {
+                  final s = items[i];
+                  return PishroCard(
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            s.providerName,
+                            style: context.text.bodyMedium.copyWith(
+                              color: c.textPrimary,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                        PishroBadge(
+                          label: s.status.label,
+                          tone: PishroBadgeTone.neutral,
+                          icon: Icons.circle_outlined,
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              ),
       ),
     );
   }

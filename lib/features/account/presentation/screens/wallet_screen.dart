@@ -5,84 +5,87 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/tokens.dart';
+import '../../../../routing/routes.dart';
 import '../../../../shared/widgets/common.dart';
 import '../../../../shared/widgets/pishro_button.dart';
+import '../../../../shared/widgets/states.dart';
 
-/// Screen/Account/Wallet — «کیف پول».
-///
-/// Source: `../desighn/_capture/10-09-account-part-1.dc.html` · Android 390dp · RTL.
+import '../../../../core/utils/formatters.dart';
+import '../../../courses/data/checkout_repository.dart';
+
 class AccountWalletScreen extends ConsumerWidget {
   const AccountWalletScreen({super.key});
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final c = context.colors;
+    final orders = ref.watch(orderHistoryProvider);
     return Scaffold(
       appBar: AppBar(
-        titleSpacing: Space.s5,
         title: Text(
           'کیف پول',
           style: context.text.h3.copyWith(color: c.textPrimary),
         ),
       ),
       body: ListView(
-        padding: const EdgeInsets.fromLTRB(
-          Space.page,
-          Space.s4,
-          Space.page,
-          Space.s8,
-        ),
+        padding: const EdgeInsets.all(Space.page),
         children: [
-          Text(
-            'کیف پول',
-            style: context.text.h2.copyWith(color: c.textPrimary),
-          ),
-          const SizedBox(height: Space.s2),
-          Text(
-            'پیاده‌سازی بر اساس دک طراحی · Screen/Account/Wallet',
-            style: context.text.bodySmall.copyWith(color: c.textMuted),
-          ),
-          const SizedBox(height: Space.s5),
           PishroCard(
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [_DeckRow(text: r'کیف پول')],
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'موجودی قابل برداشت',
+                  style: context.text.caption.copyWith(color: c.textMuted),
+                ),
+                const SizedBox(height: Space.s2),
+                Text(
+                  'مقدار نمونه',
+                  style: context.text.h2.copyWith(color: c.textPrimary),
+                ),
+                const SizedBox(height: Space.s2),
+                const NoticeBanner(
+                  message: 'موجودی کیف پول endpoint مستقل ندارد.',
+                  tone: NoticeTone.info,
+                ),
+              ],
             ),
           ),
-          const SizedBox(height: Space.s5),
+          const SizedBox(height: Space.s4),
           PishroButton(
-            label: 'ادامه',
-            onPressed: () {
-              if (context.canPop()) {
-                context.pop();
-              }
-            },
+            label: 'تراکنش‌ها',
+            variant: PishroButtonVariant.secondary,
+            onPressed: () => context.push(Routes.walletTransactions),
           ),
-        ],
-      ),
-    );
-  }
-}
-
-class _DeckRow extends StatelessWidget {
-  const _DeckRow({required this.text});
-  final String text;
-
-  @override
-  Widget build(BuildContext context) {
-    final c = context.colors;
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: Space.s2),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(Icons.circle, size: 6, color: c.actionPrimary),
-          const SizedBox(width: Space.s3),
-          Expanded(
-            child: Text(
-              text,
-              style: context.text.bodyMedium.copyWith(color: c.textSecondary),
+          const SizedBox(height: Space.s4),
+          Text(
+            'آخرین سفارش‌ها',
+            style: context.text.h3.copyWith(color: c.textPrimary),
+          ),
+          orders.when(
+            loading: () => const Skeleton.box(height: 64),
+            error: (_, __) => ErrorStateView(
+              onRetry: () => ref.invalidate(orderHistoryProvider),
             ),
+            data: (items) => items.isEmpty
+                ? const EmptyState(title: 'سفارشی نیست')
+                : Column(
+                    children: [
+                      for (final o in items.take(5))
+                        ListTile(
+                          contentPadding: EdgeInsets.zero,
+                          title: Text(
+                            o.titles.isEmpty ? 'سفارش' : o.titles.first,
+                          ),
+                          subtitle: Text(Fmt.toman(o.total)),
+                          trailing: Text(
+                            o.status,
+                            style: context.text.caption.copyWith(
+                              color: c.textMuted,
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
           ),
         ],
       ),

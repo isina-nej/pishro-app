@@ -5,86 +5,84 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/tokens.dart';
+import '../../../../routing/routes.dart';
 import '../../../../shared/widgets/common.dart';
+import '../../../../shared/widgets/pishro_badge.dart';
 import '../../../../shared/widgets/pishro_button.dart';
+import '../../../../shared/widgets/states.dart';
+import '../../data/investment_flow.dart';
+import '../../data/investment_models.dart';
 
-/// Screen/Investment/EligibilityAndKYC — «احراز شرایط».
-///
-/// Source: `../desighn/_capture/07-06-investment-part-2.dc.html` · Android 390dp · RTL.
+/// Screen/Investment/EligibilityAndKYC — mock تا endpoint بیاید.
 class EligibilityAndKYCScreen extends ConsumerWidget {
   const EligibilityAndKYCScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final c = context.colors;
+    final eligibility = ref.watch(eligibilityProvider);
+
     return Scaffold(
       appBar: AppBar(
-        titleSpacing: Space.s5,
         title: Text(
-          'احراز شرایط',
+          'احراز صلاحیت',
           style: context.text.h3.copyWith(color: c.textPrimary),
         ),
       ),
       body: ListView(
-        padding: const EdgeInsets.fromLTRB(
-          Space.page,
-          Space.s4,
-          Space.page,
-          Space.s8,
-        ),
+        padding: const EdgeInsets.all(Space.page),
         children: [
-          Text(
-            'احراز شرایط',
-            style: context.text.h2.copyWith(color: c.textPrimary),
+          const NoticeBanner(
+            message: 'وضعیت احراز هویت فعلاً نمونه است تا سرویس KYC وصل شود.',
+            tone: NoticeTone.info,
           ),
-          const SizedBox(height: Space.s2),
-          Text(
-            'پیاده‌سازی بر اساس دک طراحی · Screen/Investment/EligibilityAndKYC',
-            style: context.text.bodySmall.copyWith(color: c.textMuted),
-          ),
-          const SizedBox(height: Space.s5),
-          PishroCard(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [_DeckRow(text: r'منبع تأمین وجه</di')],
+          const SizedBox(height: Space.s4),
+          for (final check in eligibility.checks) ...[
+            PishroCard(
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      check.title,
+                      style: context.text.bodyMedium.copyWith(
+                        color: c.textPrimary,
+                      ),
+                    ),
+                  ),
+                  PishroBadge(
+                    label: check.status.label,
+                    tone: switch (check.status) {
+                      CheckStatus.verified => PishroBadgeTone.success,
+                      CheckStatus.pending => PishroBadgeTone.warning,
+                      CheckStatus.missing => PishroBadgeTone.danger,
+                    },
+                    icon: switch (check.status) {
+                      CheckStatus.verified => Icons.check_rounded,
+                      CheckStatus.pending => Icons.hourglass_top_rounded,
+                      CheckStatus.missing => Icons.error_outline_rounded,
+                    },
+                  ),
+                ],
+              ),
             ),
-          ),
-          const SizedBox(height: Space.s5),
-          PishroButton(
-            label: 'ادامه',
+            const SizedBox(height: Space.s3),
+          ],
+        ],
+      ),
+      bottomNavigationBar: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(Space.page),
+          child: PishroButton(
+            label: eligibility.isEligible ? 'ادامه' : 'تکمیل احراز هویت',
             onPressed: () {
-              if (context.canPop()) {
-                context.pop();
+              if (eligibility.isEligible) {
+                context.push(Routes.amountEntry);
+              } else {
+                context.push(Routes.kycOverview);
               }
             },
           ),
-        ],
-      ),
-    );
-  }
-}
-
-class _DeckRow extends StatelessWidget {
-  const _DeckRow({required this.text});
-  final String text;
-
-  @override
-  Widget build(BuildContext context) {
-    final c = context.colors;
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: Space.s2),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(Icons.circle, size: 6, color: c.actionPrimary),
-          const SizedBox(width: Space.s3),
-          Expanded(
-            child: Text(
-              text,
-              style: context.text.bodyMedium.copyWith(color: c.textSecondary),
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }

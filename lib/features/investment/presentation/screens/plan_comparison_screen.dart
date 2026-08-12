@@ -5,86 +5,95 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/tokens.dart';
+import '../../../../core/utils/formatters.dart';
+import '../../../../routing/routes.dart';
 import '../../../../shared/widgets/common.dart';
-import '../../../../shared/widgets/pishro_button.dart';
+import '../../../../shared/widgets/pishro_badge.dart';
+import '../../../../shared/widgets/states.dart';
+import '../../data/investment_models.dart';
+import '../../data/investment_repository.dart';
 
-/// Screen/Investment/PlanComparison — «مقایسه طرح‌ها».
-///
-/// Source: `../desighn/_capture/06-06-investment-part-1.dc.html` · Android 390dp · RTL.
+/// Screen/Investment/PlanComparison.
 class PlanComparisonScreen extends ConsumerWidget {
   const PlanComparisonScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final c = context.colors;
+    final plans = ref.watch(plansProvider);
+
     return Scaffold(
       appBar: AppBar(
-        titleSpacing: Space.s5,
         title: Text(
           'مقایسه طرح‌ها',
           style: context.text.h3.copyWith(color: c.textPrimary),
         ),
       ),
-      body: ListView(
-        padding: const EdgeInsets.fromLTRB(
-          Space.page,
-          Space.s4,
-          Space.page,
-          Space.s8,
+      body: plans.when(
+        loading: () => const Padding(
+          padding: EdgeInsets.all(Space.page),
+          child: Skeleton.box(height: 160),
         ),
-        children: [
-          Text(
-            'مقایسه طرح‌ها',
-            style: context.text.h2.copyWith(color: c.textPrimary),
-          ),
-          const SizedBox(height: Space.s2),
-          Text(
-            'پیاده‌سازی بر اساس دک طراحی · Screen/Investment/PlanComparison',
-            style: context.text.bodySmall.copyWith(color: c.textMuted),
-          ),
-          const SizedBox(height: Space.s5),
-          PishroCard(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [_DeckRow(text: r'اطلاع‌رسانی ریسک')],
-            ),
-          ),
-          const SizedBox(height: Space.s5),
-          PishroButton(
-            label: 'ادامه',
-            onPressed: () {
-              if (context.canPop()) {
-                context.pop();
-              }
-            },
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _DeckRow extends StatelessWidget {
-  const _DeckRow({required this.text});
-  final String text;
-
-  @override
-  Widget build(BuildContext context) {
-    final c = context.colors;
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: Space.s2),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(Icons.circle, size: 6, color: c.actionPrimary),
-          const SizedBox(width: Space.s3),
-          Expanded(
-            child: Text(
-              text,
-              style: context.text.bodyMedium.copyWith(color: c.textSecondary),
-            ),
-          ),
-        ],
+        error: (_, __) =>
+            ErrorStateView(onRetry: () => ref.invalidate(plansProvider)),
+        data: (items) {
+          if (items.length < 2) {
+            return const EmptyState(title: 'برای مقایسه حداقل دو طرح لازم است');
+          }
+          return ListView(
+            scrollDirection: Axis.horizontal,
+            padding: const EdgeInsets.all(Space.page),
+            children: [
+              for (final p in items)
+                SizedBox(
+                  width: 260,
+                  child: Padding(
+                    padding: const EdgeInsetsDirectional.only(end: Space.s3),
+                    child: PishroCard(
+                      onTap: () => context.push(Routes.planDetails(p.id)),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          RiskBadge(p.riskLevel),
+                          const SizedBox(height: Space.s3),
+                          Text(
+                            p.name,
+                            style: context.text.h3.copyWith(
+                              color: c.textPrimary,
+                            ),
+                          ),
+                          const SizedBox(height: Space.s3),
+                          Text(
+                            p.isDynamic
+                                ? 'بازده: $kPerContract'
+                                : (p.monthlyRatePercent == null
+                                      ? kSampleValue
+                                      : 'برآورد ماهانه ${Fmt.fa(p.monthlyRatePercent!.toStringAsFixed(0))}٪'),
+                            style: context.text.bodySmall.copyWith(
+                              color: c.textSecondary,
+                            ),
+                          ),
+                          const SizedBox(height: Space.s2),
+                          Text(
+                            'حداقل ${Fmt.toman(p.minAmount)}',
+                            style: context.text.caption.copyWith(
+                              color: c.textMuted,
+                            ),
+                          ),
+                          Text(
+                            '${Fmt.fa('${p.minDurationMonths}')}–${Fmt.fa('${p.maxDurationMonths}')} ماه',
+                            style: context.text.caption.copyWith(
+                              color: c.textMuted,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+            ],
+          );
+        },
       ),
     );
   }

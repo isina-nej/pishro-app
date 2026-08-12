@@ -2,15 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/network/api_exception.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/tokens.dart';
+import '../../../../core/utils/formatters.dart';
+import '../../../../routing/routes.dart';
 import '../../../../shared/widgets/common.dart';
-import '../../../../shared/widgets/pishro_button.dart';
+import '../../../../shared/widgets/states.dart';
+import '../../data/courses_models.dart';
+import '../../data/courses_repository.dart';
 
-/// Screen/Course/Chapters — «سرفصل‌های دوره».
-///
-/// Source: `../desighn/_capture/03-04-courses-part-2.dc.html` · Android 390dp · RTL.
+/// Screen/Course/Chapters — هفت حالت درس با آیکون + متن.
 class ChaptersScreen extends ConsumerWidget {
   const ChaptersScreen({super.key, this.id = ''});
 
@@ -19,86 +22,131 @@ class ChaptersScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final c = context.colors;
+    final curriculum = ref.watch(curriculumProvider(id));
+
     return Scaffold(
       appBar: AppBar(
-        titleSpacing: Space.s5,
         title: Text(
-          'سرفصل‌های دوره',
+          'فصل‌ها',
           style: context.text.h3.copyWith(color: c.textPrimary),
         ),
       ),
-      body: ListView(
-        padding: const EdgeInsets.fromLTRB(
-          Space.page,
-          Space.s4,
-          Space.page,
-          Space.s8,
+      body: curriculum.when(
+        loading: () => ListView(
+          padding: const EdgeInsets.all(Space.page),
+          children: const [
+            Skeleton.line(width: 180),
+            SizedBox(height: Space.s3),
+            Skeleton.box(height: 64),
+            SizedBox(height: Space.s2),
+            Skeleton.box(height: 64),
+          ],
         ),
-        children: [
-          Text(
-            'سرفصل‌های دوره',
-            style: context.text.h2.copyWith(color: c.textPrimary),
-          ),
-          const SizedBox(height: Space.s2),
-          Text(
-            'پیاده‌سازی بر اساس دک طراحی · Screen/Course/Chapters',
-            style: context.text.bodySmall.copyWith(color: c.textMuted),
-          ),
-          const SizedBox(height: Space.s5),
-          PishroCard(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                _DeckRow(
-                  text: r'مقدمه‌ای بر ساختار بازارهای مالی و بازیگران اصلی آن',
-                ),
-                _DeckRow(text: r'۸ دقیقه'),
-                _DeckRow(text: r'عرضه و تقاضا و تأثیر آن بر قیمت'),
-                _DeckRow(text: r'در حال پخش'),
-                _DeckRow(text: r'آشنایی با کارگزاری‌ها و انواع حساب معاملاتی'),
-                _DeckRow(text: r'۱۱ دقیقه'),
-                _DeckRow(text: r'تمرین شناسایی روند بازار'),
-                _DeckRow(text: r'دانلودشده'),
-                _DeckRow(text: r'جلسه جمع‌بندی فصل اول'),
-                _DeckRow(text: r'دانلود ناموفق بود — تلاش دوباره'),
-                _DeckRow(text: r'فصل ۲ — الگوهای قیمتی'),
-                _DeckRow(text: r'آشنایی با الگوهای بازگشتی و ادامه‌دهنده'),
-              ],
+        error: (e, _) => ErrorStateView(
+          message: e is ApiException ? e.message : 'سرفصل‌ها بارگذاری نشد.',
+          onRetry: () => ref.invalidate(curriculumProvider(id)),
+        ),
+        data: (curr) {
+          if (curr.chapters.isEmpty) {
+            return const EmptyState(title: 'سرفصلی برای این دوره نیست');
+          }
+          return ListView.builder(
+            padding: const EdgeInsets.fromLTRB(
+              Space.page,
+              Space.s3,
+              Space.page,
+              Space.s8,
             ),
-          ),
-          const SizedBox(height: Space.s5),
-          PishroButton(
-            label: 'ادامه',
-            onPressed: () {
-              if (context.canPop()) {
-                context.pop();
-              }
+            itemCount: curr.chapters.length,
+            itemBuilder: (_, i) {
+              final ch = curr.chapters[i];
+              return Padding(
+                padding: const EdgeInsets.only(bottom: Space.s4),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      ch.title,
+                      style: context.text.bodyMedium.copyWith(
+                        color: c.textPrimary,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    const SizedBox(height: Space.s1),
+                    Text(
+                      ch.summary,
+                      style: context.text.caption.copyWith(color: c.textMuted),
+                    ),
+                    const SizedBox(height: Space.s3),
+                    for (final lesson in ch.lessons)
+                      _LessonTile(
+                        lesson: lesson,
+                        onTap: lesson.state.isPlayable
+                            ? () => context.push(Routes.lesson(id, lesson.id))
+                            : null,
+                      ),
+                  ],
+                ),
+              );
             },
-          ),
-        ],
+          );
+        },
       ),
     );
   }
 }
 
-class _DeckRow extends StatelessWidget {
-  const _DeckRow({required this.text});
-  final String text;
+class _LessonTile extends StatelessWidget {
+  const _LessonTile({required this.lesson, this.onTap});
+
+  final Lesson lesson;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
     final c = context.colors;
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: Space.s2),
+    final (icon, color) = switch (lesson.state) {
+      LessonState.completed => (Icons.check_circle_rounded, c.success),
+      LessonState.current => (Icons.play_circle_fill_rounded, c.actionPrimary),
+      LessonState.available => (
+        Icons.play_circle_outline_rounded,
+        c.textSecondary,
+      ),
+      LessonState.downloaded => (Icons.download_done_rounded, c.info),
+      LessonState.locked => (Icons.lock_outline_rounded, c.textMuted),
+      LessonState.preview => (Icons.visibility_outlined, c.info),
+      LessonState.downloadFailed => (Icons.error_outline_rounded, c.danger),
+    };
+    return PishroCard(
+      onTap: onTap,
+      padding: const EdgeInsets.symmetric(
+        horizontal: Space.s3,
+        vertical: Space.s3,
+      ),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(Icons.circle, size: 6, color: c.actionPrimary),
+          Icon(icon, color: color, size: 22),
           const SizedBox(width: Space.s3),
           Expanded(
-            child: Text(
-              text,
-              style: context.text.bodyMedium.copyWith(color: c.textSecondary),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  lesson.title,
+                  style: context.text.bodySmall.copyWith(
+                    color: c.textPrimary,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  [
+                    Fmt.duration(lesson.duration),
+                    if (lesson.state.label.isNotEmpty) lesson.state.label,
+                  ].join(' · '),
+                  style: context.text.caption.copyWith(color: color),
+                ),
+              ],
             ),
           ),
         ],

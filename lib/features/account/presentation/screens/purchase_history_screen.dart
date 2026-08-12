@@ -1,110 +1,66 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/tokens.dart';
 import '../../../../shared/widgets/common.dart';
-import '../../../../shared/widgets/pishro_button.dart';
+import '../../../../shared/widgets/states.dart';
 
-/// Screen/Account/PurchaseHistory — «سوابق خرید».
-///
-/// Source: `../desighn/_capture/10-09-account-part-1.dc.html` · Android 390dp · RTL.
+import '../../../../core/utils/formatters.dart';
+import '../../../courses/data/checkout_repository.dart';
+
 class PurchaseHistoryScreen extends ConsumerWidget {
-  const PurchaseHistoryScreen({super.key, this.id = ''});
-
-  final String id;
-
+  const PurchaseHistoryScreen({super.key});
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final c = context.colors;
+    final orders = ref.watch(orderHistoryProvider);
     return Scaffold(
       appBar: AppBar(
-        titleSpacing: Space.s5,
         title: Text(
-          'سوابق خرید',
+          'تاریخچه خرید',
           style: context.text.h3.copyWith(color: c.textPrimary),
         ),
       ),
-      body: ListView(
-        padding: const EdgeInsets.fromLTRB(
-          Space.page,
-          Space.s4,
-          Space.page,
-          Space.s8,
+      body: orders.when(
+        loading: () => const Padding(
+          padding: EdgeInsets.all(Space.page),
+          child: Skeleton.box(height: 80),
         ),
-        children: [
-          Text(
-            'سوابق خرید',
-            style: context.text.h2.copyWith(color: c.textPrimary),
-          ),
-          const SizedBox(height: Space.s2),
-          Text(
-            'پیاده‌سازی بر اساس دک طراحی · Screen/Account/PurchaseHistory',
-            style: context.text.bodySmall.copyWith(color: c.textMuted),
-          ),
-          const SizedBox(height: Space.s5),
-          PishroCard(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                _DeckRow(text: r'سوابق سرمایه‌گذاری'),
-                _DeckRow(text: r'همه'),
-                _DeckRow(text: r'فعال'),
-                _DeckRow(text: r'در انتظار'),
-                _DeckRow(text: r'نیازمند پیگیری'),
-                _DeckRow(text: r'دریافت ماهیانه ۸٪'),
-                _DeckRow(text: r'فعال'),
-                _DeckRow(
-                  text:
-                      r'مبلغ: ۵۰٬۰۰۰٬۰۰۰ تومان · فعال‌سازی: ۶ مرداد · INV-88213',
-                ),
-                _DeckRow(text: r'هولد داینامیک'),
-                _DeckRow(text: r'در انتظار فعال‌سازی'),
-                _DeckRow(
-                  text: r'مبلغ: ۲۰٬۰۰۰٬۰۰۰ تومان · ثبت: ۴ مرداد · REQ-3021',
-                ),
-                _DeckRow(text: r'داده بازده ثبت‌شده در دسترس نیست.'),
-              ],
-            ),
-          ),
-          const SizedBox(height: Space.s5),
-          PishroButton(
-            label: 'ادامه',
-            onPressed: () {
-              if (context.canPop()) {
-                context.pop();
-              }
-            },
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _DeckRow extends StatelessWidget {
-  const _DeckRow({required this.text});
-  final String text;
-
-  @override
-  Widget build(BuildContext context) {
-    final c = context.colors;
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: Space.s2),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(Icons.circle, size: 6, color: c.actionPrimary),
-          const SizedBox(width: Space.s3),
-          Expanded(
-            child: Text(
-              text,
-              style: context.text.bodyMedium.copyWith(color: c.textSecondary),
-            ),
-          ),
-        ],
+        error: (_, __) =>
+            ErrorStateView(onRetry: () => ref.invalidate(orderHistoryProvider)),
+        data: (items) => items.isEmpty
+            ? const EmptyState(title: 'خریدی ثبت نشده')
+            : ListView.separated(
+                padding: const EdgeInsets.all(Space.page),
+                itemCount: items.length,
+                separatorBuilder: (_, __) => const SizedBox(height: Space.s3),
+                itemBuilder: (_, i) {
+                  final o = items[i];
+                  return PishroCard(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          o.titles.isEmpty ? 'سفارش' : o.titles.join('، '),
+                          style: context.text.bodyMedium.copyWith(
+                            color: c.textPrimary,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        const SizedBox(height: Space.s2),
+                        Text(
+                          '${Fmt.toman(o.total)} · ${o.status}',
+                          style: context.text.caption.copyWith(
+                            color: c.textMuted,
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              ),
       ),
     );
   }

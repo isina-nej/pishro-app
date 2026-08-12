@@ -5,87 +5,89 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/tokens.dart';
-import '../../../../shared/widgets/common.dart';
+import '../../../../routing/routes.dart';
 import '../../../../shared/widgets/pishro_button.dart';
+import '../../../../shared/widgets/pishro_text_field.dart';
+import '../../../../shared/widgets/states.dart';
 
-/// Screen/Account/Security — «امنیت حساب».
-///
-/// Source: `../desighn/_capture/11-09-account-part-2.dc.html` · Android 390dp · RTL.
-class AccountSecurityScreen extends ConsumerWidget {
+import '../../../../core/network/api_exception.dart';
+import '../../data/account_repository.dart';
+
+class AccountSecurityScreen extends ConsumerStatefulWidget {
   const AccountSecurityScreen({super.key});
-
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final c = context.colors;
-    return Scaffold(
-      appBar: AppBar(
-        titleSpacing: Space.s5,
-        title: Text(
-          'امنیت حساب',
-          style: context.text.h3.copyWith(color: c.textPrimary),
-        ),
-      ),
-      body: ListView(
-        padding: const EdgeInsets.fromLTRB(
-          Space.page,
-          Space.s4,
-          Space.page,
-          Space.s8,
-        ),
-        children: [
-          Text(
-            'امنیت حساب',
-            style: context.text.h2.copyWith(color: c.textPrimary),
-          ),
-          const SizedBox(height: Space.s2),
-          Text(
-            'پیاده‌سازی بر اساس دک طراحی · Screen/Account/Security',
-            style: context.text.bodySmall.copyWith(color: c.textMuted),
-          ),
-          const SizedBox(height: Space.s5),
-          PishroCard(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                _DeckRow(text: r'حریم خصوصی'),
-                _DeckRow(text: r'پردازش ضروری'),
-              ],
-            ),
-          ),
-          const SizedBox(height: Space.s5),
-          PishroButton(
-            label: 'ادامه',
-            onPressed: () {
-              if (context.canPop()) {
-                context.pop();
-              }
-            },
-          ),
-        ],
-      ),
-    );
-  }
+  ConsumerState<AccountSecurityScreen> createState() =>
+      _AccountSecurityScreenState();
 }
 
-class _DeckRow extends StatelessWidget {
-  const _DeckRow({required this.text});
-  final String text;
+class _AccountSecurityScreenState extends ConsumerState<AccountSecurityScreen> {
+  final _current = TextEditingController();
+  final _next = TextEditingController();
+  var _loading = false;
+  String? _error;
+  String? _ok;
+
+  @override
+  void dispose() {
+    _current.dispose();
+    _next.dispose();
+    super.dispose();
+  }
+
+  Future<void> _save() async {
+    setState(() {
+      _loading = true;
+      _error = null;
+      _ok = null;
+    });
+    try {
+      await ref
+          .read(accountRepositoryProvider)
+          .changePassword(
+            currentPassword: _current.text,
+            newPassword: _next.text,
+          );
+      setState(() => _ok = 'رمز عبور به‌روز شد.');
+      _current.clear();
+      _next.clear();
+    } on ApiException catch (e) {
+      setState(() => _error = e.message);
+    } finally {
+      if (mounted) setState(() => _loading = false);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     final c = context.colors;
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: Space.s2),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(
+          'امنیت',
+          style: context.text.h3.copyWith(color: c.textPrimary),
+        ),
+      ),
+      body: ListView(
+        padding: const EdgeInsets.all(Space.page),
         children: [
-          Icon(Icons.circle, size: 6, color: c.actionPrimary),
-          const SizedBox(width: Space.s3),
-          Expanded(
-            child: Text(
-              text,
-              style: context.text.bodyMedium.copyWith(color: c.textSecondary),
-            ),
+          if (_error != null)
+            NoticeBanner(message: _error!, tone: NoticeTone.danger),
+          if (_ok != null)
+            NoticeBanner(message: _ok!, tone: NoticeTone.success),
+          PishroTextField(
+            controller: _current,
+            label: 'رمز فعلی',
+            obscure: true,
+          ),
+          const SizedBox(height: Space.s4),
+          PishroTextField(controller: _next, label: 'رمز جدید', obscure: true),
+          const SizedBox(height: Space.s5),
+          PishroButton(label: 'تغییر رمز', loading: _loading, onPressed: _save),
+          ListTile(
+            contentPadding: EdgeInsets.zero,
+            title: const Text('دستگاه‌های فعال'),
+            trailing: const Icon(Icons.chevron_left_rounded),
+            onTap: () => context.push(Routes.devices),
           ),
         ],
       ),

@@ -5,105 +5,91 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/tokens.dart';
+import '../../../../core/utils/formatters.dart';
+import '../../../../routing/routes.dart';
 import '../../../../shared/widgets/common.dart';
-import '../../../../shared/widgets/pishro_button.dart';
+import '../../../../shared/widgets/states.dart';
+import '../../data/news_repository.dart';
+import '../widgets/article_card.dart';
 
-/// Screen/News/Saved — «ذخیره‌شده‌ها».
-///
-/// Source: `../desighn/_capture/05-05-news.dc.html` · Android 390dp · RTL.
+/// Screen/News/Saved.
 class NewsSavedScreen extends ConsumerWidget {
   const NewsSavedScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final c = context.colors;
+    final saved = ref.watch(bookmarksProvider);
+
     return Scaffold(
       appBar: AppBar(
-        titleSpacing: Space.s5,
         title: Text(
-          'ذخیره‌شده‌ها',
+          'اخبار ذخیره‌شده',
           style: context.text.h3.copyWith(color: c.textPrimary),
         ),
       ),
-      body: ListView(
-        padding: const EdgeInsets.fromLTRB(
-          Space.page,
-          Space.s4,
-          Space.page,
-          Space.s8,
-        ),
-        children: [
-          Text(
-            'ذخیره‌شده‌ها',
-            style: context.text.h2.copyWith(color: c.textPrimary),
-          ),
-          const SizedBox(height: Space.s2),
-          Text(
-            'پیاده‌سازی بر اساس دک طراحی · Screen/News/Saved',
-            style: context.text.bodySmall.copyWith(color: c.textMuted),
-          ),
-          const SizedBox(height: Space.s5),
-          PishroCard(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                _DeckRow(text: r'اخبار ذخیره‌شده'),
-                _DeckRow(text: r'جدیدترین ذخیره‌شده'),
-                _DeckRow(text: r'جدیدترین خبر'),
-                _DeckRow(
-                  text: r'قیمت بیت‌کوین در معاملات امروز نوسان محدودی داشت',
+      body: NewsAsync(
+        value: saved,
+        onRetry: () => ref.invalidate(bookmarksProvider),
+        builder: (context, items) {
+          if (items.isEmpty) {
+            return EmptyState(
+              title: 'خبر ذخیره‌شده‌ای ندارید',
+              actionLabel: 'مشاهده اخبار',
+              onAction: () => context.go(Routes.news),
+            );
+          }
+          return ListView.separated(
+            padding: const EdgeInsets.all(Space.page),
+            itemCount: items.length,
+            separatorBuilder: (_, __) => const SizedBox(height: Space.s3),
+            itemBuilder: (_, i) {
+              final s = items[i];
+              return PishroCard(
+                onTap: () => context.push(Routes.newsDetails(s.slug)),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            s.title,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: context.text.bodyMedium.copyWith(
+                              color: c.textPrimary,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          const SizedBox(height: Space.s1),
+                          Text(
+                            [
+                              if (s.category != null) s.category!,
+                              if (s.savedAt != null) Fmt.relative(s.savedAt!),
+                            ].join(' · '),
+                            style: context.text.caption.copyWith(
+                              color: c.textMuted,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    IconButton(
+                      tooltip: 'حذف از ذخیره‌ها',
+                      onPressed: () =>
+                          ref.read(bookmarksProvider.notifier).removeSaved(s),
+                      icon: Icon(
+                        Icons.bookmark_rounded,
+                        color: c.actionPrimary,
+                      ),
+                    ),
+                  ],
                 ),
-                _DeckRow(text: r'ذخیره‌شده: ۲ روز پیش · انتشار: ۳ روز پیش'),
-                _DeckRow(
-                  text: r'جمع‌بندی هفتگی بازارهای جهانی و شاخص‌های اصلی',
-                ),
-                _DeckRow(text: r'ذخیره‌شده: ۵ روز پیش · انتشار: ۶ روز پیش'),
-                _DeckRow(text: r'۱۰ · ذخیره‌شده‌ها'),
-                _DeckRow(
-                  text: r'Overlay — ثبت دیدگاه، اشتراک‌گذاری و گزارش محتوا',
-                ),
-                _DeckRow(text: r'ثبت دیدگاه'),
-                _DeckRow(text: r'دیدگاه خود را بنویسید…'),
-                _DeckRow(text: r'۰ از ۳۰۰ نویسه'),
-              ],
-            ),
-          ),
-          const SizedBox(height: Space.s5),
-          PishroButton(
-            label: 'ادامه',
-            onPressed: () {
-              if (context.canPop()) {
-                context.pop();
-              }
+              );
             },
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _DeckRow extends StatelessWidget {
-  const _DeckRow({required this.text});
-  final String text;
-
-  @override
-  Widget build(BuildContext context) {
-    final c = context.colors;
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: Space.s2),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(Icons.circle, size: 6, color: c.actionPrimary),
-          const SizedBox(width: Space.s3),
-          Expanded(
-            child: Text(
-              text,
-              style: context.text.bodyMedium.copyWith(color: c.textSecondary),
-            ),
-          ),
-        ],
+          );
+        },
       ),
     );
   }

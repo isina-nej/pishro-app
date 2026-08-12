@@ -5,101 +5,140 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/tokens.dart';
-import '../../../../shared/widgets/common.dart';
+import '../../../../routing/routes.dart';
 import '../../../../shared/widgets/pishro_button.dart';
+import '../../../../shared/widgets/pishro_chip.dart';
+import '../../../../shared/widgets/pishro_text_field.dart';
+import '../../../../shared/widgets/states.dart';
 
-/// Screen/Community/CreateAnalysis — «ایجاد تحلیل».
-///
-/// Source: `../desighn/_capture/09-08-community.dc.html` · Android 390dp · RTL.
+import '../../data/community_models.dart';
+import '../../data/community_repository.dart';
+
 class CreateAnalysisScreen extends ConsumerWidget {
-  const CreateAnalysisScreen({super.key, this.id = ''});
-
-  final String id;
-
+  const CreateAnalysisScreen({super.key});
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final c = context.colors;
+    final draft = ref.watch(analysisDraftProvider);
+    final assets = ref.watch(communityAssetsProvider);
     return Scaffold(
       appBar: AppBar(
-        titleSpacing: Space.s5,
         title: Text(
-          'ایجاد تحلیل',
+          'تحلیل جدید',
           style: context.text.h3.copyWith(color: c.textPrimary),
         ),
       ),
       body: ListView(
-        padding: const EdgeInsets.fromLTRB(
-          Space.page,
-          Space.s4,
-          Space.page,
-          Space.s8,
-        ),
+        padding: const EdgeInsets.all(Space.page),
         children: [
           Text(
-            'ایجاد تحلیل',
-            style: context.text.h2.copyWith(color: c.textPrimary),
+            'نوع تحلیل',
+            style: context.text.bodySmall.copyWith(color: c.textSecondary),
           ),
-          const SizedBox(height: Space.s2),
-          Text(
-            'پیاده‌سازی بر اساس دک طراحی · Screen/Community/CreateAnalysis',
-            style: context.text.bodySmall.copyWith(color: c.textMuted),
+          Wrap(
+            spacing: Space.s2,
+            children: [
+              for (final k in AnalysisKind.values)
+                PishroChip(
+                  label: k.label,
+                  selected: draft.kind == k,
+                  onTap: () => ref
+                      .read(analysisDraftProvider.notifier)
+                      .update((d) => d.copyWith(kind: k)),
+                ),
+            ],
           ),
-          const SizedBox(height: Space.s5),
-          PishroCard(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
+          const SizedBox(height: Space.s4),
+          assets.when(
+            loading: () => const Skeleton.line(),
+            error: (_, __) => const SizedBox.shrink(),
+            data: (list) => Wrap(
+              spacing: Space.s2,
               children: [
-                _DeckRow(text: r'ذخیره خودکار شد'),
-                _DeckRow(text: r'پیش‌نمایش'),
-                _DeckRow(text: r'بررسی سطوح حمایت کوتاه‌مدت بیت‌کوین'),
-                _DeckRow(text: r'خلاصه'),
-                _DeckRow(text: r'در حال نوشتن…'),
-                _DeckRow(text: r'متن تحلیل'),
-                _DeckRow(text: r'متن اصلی تحلیل در این بخش نوشته می‌شود…'),
-                _DeckRow(text: r'سناریوها'),
-                _DeckRow(text: r'شرط بی‌اعتبارشدن'),
-                _DeckRow(text: r'منابع داده'),
-                _DeckRow(text: r'۱۲۰ نویسه'),
-                _DeckRow(text: r'۱۲ · ویرایشگر تحلیل'),
+                for (final a in list)
+                  PishroChip(
+                    label: a.symbol,
+                    selected: draft.asset?.symbol == a.symbol,
+                    onTap: () => ref
+                        .read(analysisDraftProvider.notifier)
+                        .update((d) => d.copyWith(asset: a)),
+                  ),
               ],
             ),
           ),
-          const SizedBox(height: Space.s5),
-          PishroButton(
-            label: 'ادامه',
-            onPressed: () {
-              if (context.canPop()) {
-                context.pop();
-              }
-            },
+          const SizedBox(height: Space.s4),
+          PishroTextField(
+            label: 'عنوان',
+            hint: 'بدون توصیه خرید/فروش',
+            onChanged: (v) => ref
+                .read(analysisDraftProvider.notifier)
+                .update((d) => d.copyWith(title: v)),
+          ),
+          const SizedBox(height: Space.s4),
+          Text(
+            'افشای منافع — بدون پیش‌انتخاب',
+            style: context.text.bodySmall.copyWith(color: c.textSecondary),
+          ),
+          const SizedBox(height: Space.s2),
+          Text(
+            'آیا در این دارایی موقعیت دارید؟',
+            style: context.text.caption.copyWith(color: c.textMuted),
+          ),
+          Wrap(
+            spacing: Space.s2,
+            children: [
+              PishroChip(
+                label: 'بله',
+                selected: draft.holdsAsset == true,
+                onTap: () => ref
+                    .read(analysisDraftProvider.notifier)
+                    .update((d) => d.copyWith(holdsAsset: true)),
+              ),
+              PishroChip(
+                label: 'خیر',
+                selected: draft.holdsAsset == false,
+                onTap: () => ref
+                    .read(analysisDraftProvider.notifier)
+                    .update((d) => d.copyWith(holdsAsset: false)),
+              ),
+            ],
+          ),
+          const SizedBox(height: Space.s3),
+          Text(
+            'آیا اسپانسر دارد؟',
+            style: context.text.caption.copyWith(color: c.textMuted),
+          ),
+          Wrap(
+            spacing: Space.s2,
+            children: [
+              PishroChip(
+                label: 'بله',
+                selected: draft.isSponsored == true,
+                onTap: () => ref
+                    .read(analysisDraftProvider.notifier)
+                    .update((d) => d.copyWith(isSponsored: true)),
+              ),
+              PishroChip(
+                label: 'خیر',
+                selected: draft.isSponsored == false,
+                onTap: () => ref
+                    .read(analysisDraftProvider.notifier)
+                    .update((d) => d.copyWith(isSponsored: false)),
+              ),
+            ],
           ),
         ],
       ),
-    );
-  }
-}
-
-class _DeckRow extends StatelessWidget {
-  const _DeckRow({required this.text});
-  final String text;
-
-  @override
-  Widget build(BuildContext context) {
-    final c = context.colors;
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: Space.s2),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(Icons.circle, size: 6, color: c.actionPrimary),
-          const SizedBox(width: Space.s3),
-          Expanded(
-            child: Text(
-              text,
-              style: context.text.bodyMedium.copyWith(color: c.textSecondary),
-            ),
+      bottomNavigationBar: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(Space.page),
+          child: PishroButton(
+            label: 'ادامه به ویرایشگر',
+            onPressed: draft.canContinue
+                ? () => context.push(Routes.analysisEditor)
+                : null,
           ),
-        ],
+        ),
       ),
     );
   }

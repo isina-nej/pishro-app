@@ -5,83 +5,78 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/tokens.dart';
-import '../../../../shared/widgets/common.dart';
-import '../../../../shared/widgets/pishro_button.dart';
+import '../../../../routing/routes.dart';
+import '../../../../shared/widgets/pishro_chip.dart';
+import '../../../../shared/widgets/pishro_text_field.dart';
+import '../../../../shared/widgets/states.dart';
 
-/// Screen/Community/Search — «جستجو در جامعه».
-///
-/// Source: `../desighn/_capture/09-08-community.dc.html` · Android 390dp · RTL.
-class CommunitySearchScreen extends ConsumerWidget {
+import '../../data/community_models.dart';
+import '../../data/community_repository.dart';
+
+class CommunitySearchScreen extends ConsumerStatefulWidget {
   const CommunitySearchScreen({super.key});
-
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final c = context.colors;
-    return Scaffold(
-      appBar: AppBar(
-        titleSpacing: Space.s5,
-        title: Text(
-          'جستجو در جامعه',
-          style: context.text.h3.copyWith(color: c.textPrimary),
-        ),
-      ),
-      body: ListView(
-        padding: const EdgeInsets.fromLTRB(
-          Space.page,
-          Space.s4,
-          Space.page,
-          Space.s8,
-        ),
-        children: [
-          Text(
-            'جستجو در جامعه',
-            style: context.text.h2.copyWith(color: c.textPrimary),
-          ),
-          const SizedBox(height: Space.s2),
-          Text(
-            'پیاده‌سازی بر اساس دک طراحی · Screen/Community/Search',
-            style: context.text.bodySmall.copyWith(color: c.textMuted),
-          ),
-          const SizedBox(height: Space.s5),
-          PishroCard(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [_DeckRow(text: r'جستجو در جامعه')],
-            ),
-          ),
-          const SizedBox(height: Space.s5),
-          PishroButton(
-            label: 'ادامه',
-            onPressed: () {
-              if (context.canPop()) {
-                context.pop();
-              }
-            },
-          ),
-        ],
-      ),
-    );
-  }
+  ConsumerState<CommunitySearchScreen> createState() =>
+      _CommunitySearchScreenState();
 }
 
-class _DeckRow extends StatelessWidget {
-  const _DeckRow({required this.text});
-  final String text;
-
+class _CommunitySearchScreenState extends ConsumerState<CommunitySearchScreen> {
+  var _q = '';
+  var _scope = SearchScope.all;
   @override
   Widget build(BuildContext context) {
     final c = context.colors;
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: Space.s2),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(
+          'جستجوی جامعه',
+          style: context.text.h3.copyWith(color: c.textPrimary),
+        ),
+      ),
+      body: Column(
         children: [
-          Icon(Icons.circle, size: 6, color: c.actionPrimary),
-          const SizedBox(width: Space.s3),
+          Padding(
+            padding: const EdgeInsets.all(Space.page),
+            child: PishroTextField(
+              label: 'جستجو',
+              hint: 'تحلیلگر یا عنوان',
+              onChanged: (v) => setState(() => _q = v.trim()),
+            ),
+          ),
+          PishroChipBar(
+            labels: [for (final s in SearchScope.values) s.label],
+            selectedIndex: _scope.index,
+            onSelected: (i) => setState(() => _scope = SearchScope.values[i]),
+          ),
           Expanded(
-            child: Text(
-              text,
-              style: context.text.bodyMedium.copyWith(color: c.textSecondary),
+            child: FutureBuilder(
+              future: ref
+                  .read(communityRepositoryProvider)
+                  .search(_q, scope: _scope),
+              builder: (context, snap) {
+                if (!snap.hasData) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+                final r = snap.data!;
+                if (r.isEmpty) return const EmptyState(title: 'نتیجه‌ای نیست');
+                return ListView(
+                  padding: const EdgeInsets.all(Space.page),
+                  children: [
+                    for (final a in r.analysts)
+                      ListTile(
+                        title: Text(a.displayName),
+                        subtitle: Text(a.specialty),
+                        onTap: () => context.push(Routes.analystProfile(a.id)),
+                      ),
+                    for (final a in r.analyses)
+                      ListTile(
+                        title: Text(a.title),
+                        subtitle: Text(a.assetSymbol),
+                        onTap: () => context.push(Routes.analysisDetails(a.id)),
+                      ),
+                  ],
+                );
+              },
             ),
           ),
         ],

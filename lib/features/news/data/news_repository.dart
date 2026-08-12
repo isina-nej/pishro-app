@@ -254,6 +254,9 @@ final recentSearchesProvider = Provider<RecentSearches>(
   (ref) => const RecentSearches(),
 );
 
+/// Shared filter + search identity for Search / Filters / Results.
+final newsQueryProvider = StateProvider<NewsQuery>((ref) => latestNews);
+
 /// The feed for one [NewsQuery]. Sort and range are applied to the loaded page.
 final newsFeedProvider = FutureProvider.family<List<NewsArticle>, NewsQuery>((
   ref,

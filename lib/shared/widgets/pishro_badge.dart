@@ -25,28 +25,28 @@ class PishroBadge extends StatelessWidget {
 
   /// «★ VIP»
   const PishroBadge.vip({super.key})
-      : label = 'VIP',
-        tone = PishroBadgeTone.premium,
-        icon = Icons.star_rounded;
+    : label = 'VIP',
+      tone = PishroBadgeTone.premium,
+      icon = Icons.star_rounded;
 
   /// «عادی»
   const PishroBadge.regular({super.key})
-      : label = 'عادی',
-        tone = PishroBadgeTone.neutral,
-        icon = null;
+    : label = 'عادی',
+      tone = PishroBadgeTone.neutral,
+      icon = null;
 
   /// «✓ تأییدشده»
   const PishroBadge.verified({super.key})
-      : label = 'تأییدشده',
-        tone = PishroBadgeTone.success,
-        icon = Icons.check_rounded;
+    : label = 'تأییدشده',
+      tone = PishroBadgeTone.success,
+      icon = Icons.check_rounded;
 
   /// Sample/placeholder data marker — the decks show it wherever numbers are
   /// illustrative rather than live, and it must survive into the real app.
   const PishroBadge.sampleData({super.key})
-      : label = 'داده نمونه',
-        tone = PishroBadgeTone.neutral,
-        icon = null;
+    : label = 'داده نمونه',
+      tone = PishroBadgeTone.neutral,
+      icon = null;
 
   final String label;
   final PishroBadgeTone tone;
@@ -105,20 +105,20 @@ class RiskBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => PishroBadge(
-        label: switch (level) {
-          RiskLevel.low => 'ریسک کم',
-          RiskLevel.medium => 'ریسک متوسط',
-          RiskLevel.high => 'ریسک بالا',
-        },
-        tone: switch (level) {
-          RiskLevel.low => PishroBadgeTone.success,
-          RiskLevel.medium => PishroBadgeTone.warning,
-          RiskLevel.high => PishroBadgeTone.danger,
-        },
-        icon: switch (level) {
-          RiskLevel.low => Icons.shield_outlined,
-          RiskLevel.medium => Icons.info_outline_rounded,
-          RiskLevel.high => Icons.warning_amber_rounded,
-        },
-      );
+    label: switch (level) {
+      RiskLevel.low => 'ریسک کم',
+      RiskLevel.medium => 'ریسک متوسط',
+      RiskLevel.high => 'ریسک بالا',
+    },
+    tone: switch (level) {
+      RiskLevel.low => PishroBadgeTone.success,
+      RiskLevel.medium => PishroBadgeTone.warning,
+      RiskLevel.high => PishroBadgeTone.danger,
+    },
+    icon: switch (level) {
+      RiskLevel.low => Icons.shield_outlined,
+      RiskLevel.medium => Icons.info_outline_rounded,
+      RiskLevel.high => Icons.warning_amber_rounded,
+    },
+  );
 }

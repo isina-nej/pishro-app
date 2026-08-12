@@ -5,91 +5,139 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/tokens.dart';
+import '../../../../core/utils/formatters.dart';
 import '../../../../shared/widgets/common.dart';
 import '../../../../shared/widgets/pishro_button.dart';
+import '../../../../shared/widgets/pishro_text_field.dart';
+import '../../../../shared/widgets/states.dart';
+import '../../data/checkout_repository.dart';
 
-/// Screen/Checkout/DiscountAndCoin — «تخفیف و کوین».
-///
-/// Source: `../desighn/_capture/03-04-courses-part-2.dc.html` · Android 390dp · RTL.
-class DiscountAndCoinScreen extends ConsumerWidget {
-  const DiscountAndCoinScreen({super.key, this.id = ''});
-
-  final String id;
+/// Screen/Checkout/DiscountAndCoin — کد تخفیف + کوین غیرقابل برداشت.
+class DiscountAndCoinScreen extends ConsumerStatefulWidget {
+  const DiscountAndCoinScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final c = context.colors;
-    return Scaffold(
-      appBar: AppBar(
-        titleSpacing: Space.s5,
-        title: Text(
-          'تخفیف و کوین',
-          style: context.text.h3.copyWith(color: c.textPrimary),
-        ),
-      ),
-      body: ListView(
-        padding: const EdgeInsets.fromLTRB(
-          Space.page,
-          Space.s4,
-          Space.page,
-          Space.s8,
-        ),
-        children: [
-          Text(
-            'تخفیف و کوین',
-            style: context.text.h2.copyWith(color: c.textPrimary),
-          ),
-          const SizedBox(height: Space.s2),
-          Text(
-            'پیاده‌سازی بر اساس دک طراحی · Screen/Checkout/DiscountAndCoin',
-            style: context.text.bodySmall.copyWith(color: c.textMuted),
-          ),
-          const SizedBox(height: Space.s5),
-          PishroCard(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                _DeckRow(text: r'پرداخت با موفقیت انجام شد'),
-                _DeckRow(text: r'دسترسی به دوره برای شما فعال شد.'),
-              ],
-            ),
-          ),
-          const SizedBox(height: Space.s5),
-          PishroButton(
-            label: 'ادامه',
-            onPressed: () {
-              if (context.canPop()) {
-                context.pop();
-              }
-            },
-          ),
-        ],
-      ),
-    );
-  }
+  ConsumerState<DiscountAndCoinScreen> createState() =>
+      _DiscountAndCoinScreenState();
 }
 
-class _DeckRow extends StatelessWidget {
-  const _DeckRow({required this.text});
-  final String text;
+class _DiscountAndCoinScreenState extends ConsumerState<DiscountAndCoinScreen> {
+  final _code = TextEditingController();
+
+  @override
+  void dispose() {
+    _code.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     final c = context.colors;
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: Space.s2),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
+    final draft = ref.watch(checkoutProvider);
+    final coin = ref.watch(coinBalanceProvider);
+    if (draft == null) {
+      return Scaffold(
+        appBar: AppBar(),
+        body: const EmptyState(title: 'سفارشی در جریان نیست'),
+      );
+    }
+
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(
+          'تخفیف و پیشرو کوین',
+          style: context.text.h3.copyWith(color: c.textPrimary),
+        ),
+      ),
+      body: ListView(
+        padding: const EdgeInsets.all(Space.page),
         children: [
-          Icon(Icons.circle, size: 6, color: c.actionPrimary),
-          const SizedBox(width: Space.s3),
-          Expanded(
-            child: Text(
-              text,
-              style: context.text.bodyMedium.copyWith(color: c.textSecondary),
+          PishroTextField(
+            controller: _code,
+            label: 'کد تخفیف',
+            hint: 'مثلاً PSX10',
+            errorText: draft.discountError,
+            onChanged: (_) {},
+          ),
+          const SizedBox(height: Space.s3),
+          PishroButton(
+            label: draft.discount == null ? 'اعمال کد' : 'حذف کد',
+            variant: PishroButtonVariant.secondary,
+            loading: draft.applyingDiscount,
+            onPressed: () {
+              if (draft.discount != null) {
+                ref.read(checkoutProvider.notifier).removeDiscount();
+                _code.clear();
+                return;
+              }
+              ref.read(checkoutProvider.notifier).applyDiscount(_code.text);
+            },
+          ),
+          if (draft.discount != null) ...[
+            const SizedBox(height: Space.s3),
+            NoticeBanner(
+              message:
+                  'کد ${draft.discount!.code} · ${Fmt.fa('${draft.discount!.percent}')}٪ تخفیف',
+              tone: NoticeTone.success,
+            ),
+          ],
+          const SizedBox(height: Space.s6),
+          PishroCard(
+            child: coin.when(
+              loading: () => const Skeleton.line(width: 160),
+              error: (_, __) => Text(
+                'موجودی کوین در دسترس نیست.',
+                style: context.text.bodySmall.copyWith(color: c.textMuted),
+              ),
+              data: (b) => Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'پیشرو کوین',
+                    style: context.text.bodyMedium.copyWith(
+                      color: c.textPrimary,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const SizedBox(height: Space.s2),
+                  Text(
+                    'موجودی: ${Fmt.fa('${b.amount}')} کوین',
+                    style: context.text.bodySmall.copyWith(
+                      color: c.textSecondary,
+                    ),
+                  ),
+                  const SizedBox(height: Space.s2),
+                  const NoticeBanner(
+                    message:
+                        'پیشرو کوین غیرقابل برداشت است و نرخ تبدیل ثابتی ندارد.',
+                    tone: NoticeTone.info,
+                  ),
+                  SwitchListTile(
+                    contentPadding: EdgeInsets.zero,
+                    title: Text(
+                      'استفاده از کوین در این خرید',
+                      style: context.text.bodySmall.copyWith(
+                        color: c.textPrimary,
+                      ),
+                    ),
+                    value: draft.useCoin,
+                    onChanged: (v) =>
+                        ref.read(checkoutProvider.notifier).toggleCoin(v),
+                  ),
+                ],
+              ),
             ),
           ),
         ],
+      ),
+      bottomNavigationBar: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(Space.page),
+          child: PishroButton(
+            label: 'بازگشت به خلاصه',
+            onPressed: () => context.pop(),
+          ),
+        ),
       ),
     );
   }

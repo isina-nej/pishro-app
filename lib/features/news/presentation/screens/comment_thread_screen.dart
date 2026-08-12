@@ -1,109 +1,71 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/tokens.dart';
-import '../../../../shared/widgets/common.dart';
-import '../../../../shared/widgets/pishro_button.dart';
+import '../../../../shared/widgets/states.dart';
+import '../../data/news_models.dart';
+import '../../data/news_repository.dart';
+import '../widgets/article_card.dart';
+import '../widgets/comment_tile.dart';
 
-/// Screen/News/CommentThread — «رشته پاسخ».
-///
-/// Source: `../desighn/_capture/05-05-news.dc.html` · Android 390dp · RTL.
+/// Screen/News/CommentThread — رشته پاسخ.
 class NewsCommentThreadScreen extends ConsumerWidget {
-  const NewsCommentThreadScreen({super.key, this.id = ''});
+  const NewsCommentThreadScreen({super.key, this.id = '', this.commentId = ''});
 
   final String id;
+  final String commentId;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final c = context.colors;
+    final comments = ref.watch(newsCommentsProvider(id));
+
     return Scaffold(
       appBar: AppBar(
-        titleSpacing: Space.s5,
         title: Text(
           'رشته پاسخ',
           style: context.text.h3.copyWith(color: c.textPrimary),
         ),
       ),
-      body: ListView(
-        padding: const EdgeInsets.fromLTRB(
-          Space.page,
-          Space.s4,
-          Space.page,
-          Space.s8,
-        ),
-        children: [
-          Text(
-            'رشته پاسخ',
-            style: context.text.h2.copyWith(color: c.textPrimary),
-          ),
-          const SizedBox(height: Space.s2),
-          Text(
-            'پیاده‌سازی بر اساس دک طراحی · Screen/News/CommentThread',
-            style: context.text.bodySmall.copyWith(color: c.textMuted),
-          ),
-          const SizedBox(height: Space.s5),
-          PishroCard(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                _DeckRow(text: r'اخبار ذخیره‌شده'),
-                _DeckRow(text: r'جدیدترین ذخیره‌شده'),
-                _DeckRow(text: r'جدیدترین خبر'),
-                _DeckRow(
-                  text: r'قیمت بیت‌کوین در معاملات امروز نوسان محدودی داشت',
+      body: NewsAsync(
+        value: comments,
+        onRetry: () => ref.invalidate(newsCommentsProvider(id)),
+        builder: (context, items) {
+          NewsComment? parent;
+          for (final x in items) {
+            if (x.id == commentId) parent = x;
+          }
+          if (parent == null) {
+            return const EmptyState(title: 'این دیدگاه پیدا نشد');
+          }
+          return ListView(
+            padding: const EdgeInsets.all(Space.page),
+            children: [
+              CommentTile(comment: parent),
+              const SizedBox(height: Space.s4),
+              Text(
+                'پاسخ‌ها',
+                style: context.text.bodySmall.copyWith(
+                  color: c.textSecondary,
+                  fontWeight: FontWeight.w600,
                 ),
-                _DeckRow(text: r'ذخیره‌شده: ۲ روز پیش · انتشار: ۳ روز پیش'),
-                _DeckRow(
-                  text: r'جمع‌بندی هفتگی بازارهای جهانی و شاخص‌های اصلی',
-                ),
-                _DeckRow(text: r'ذخیره‌شده: ۵ روز پیش · انتشار: ۶ روز پیش'),
-                _DeckRow(text: r'۱۰ · ذخیره‌شده‌ها'),
-                _DeckRow(
-                  text: r'Overlay — ثبت دیدگاه، اشتراک‌گذاری و گزارش محتوا',
-                ),
-                _DeckRow(text: r'ثبت دیدگاه'),
-              ],
-            ),
-          ),
-          const SizedBox(height: Space.s5),
-          PishroButton(
-            label: 'ادامه',
-            onPressed: () {
-              if (context.canPop()) {
-                context.pop();
-              }
-            },
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _DeckRow extends StatelessWidget {
-  const _DeckRow({required this.text});
-  final String text;
-
-  @override
-  Widget build(BuildContext context) {
-    final c = context.colors;
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: Space.s2),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(Icons.circle, size: 6, color: c.actionPrimary),
-          const SizedBox(width: Space.s3),
-          Expanded(
-            child: Text(
-              text,
-              style: context.text.bodyMedium.copyWith(color: c.textSecondary),
-            ),
-          ),
-        ],
+              ),
+              const SizedBox(height: Space.s3),
+              if (parent.replies.isEmpty)
+                Text(
+                  'هنوز پاسخی ثبت نشده است.',
+                  style: context.text.caption.copyWith(color: c.textMuted),
+                )
+              else
+                for (final r in parent.replies) ...[
+                  CommentTile(comment: r, compact: true),
+                  const SizedBox(height: Space.s3),
+                ],
+            ],
+          );
+        },
       ),
     );
   }

@@ -5,106 +5,77 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/tokens.dart';
+import '../../../../routing/routes.dart';
 import '../../../../shared/widgets/common.dart';
-import '../../../../shared/widgets/pishro_button.dart';
+import '../../../../shared/widgets/pishro_badge.dart';
+import '../../../../shared/widgets/states.dart';
 
-/// Screen/Account/InvestmentHistory — «سوابق سرمایه‌گذاری».
-///
-/// Source: `../desighn/_capture/10-09-account-part-1.dc.html` · Android 390dp · RTL.
+import '../../../../core/utils/formatters.dart';
+import '../../../investment/data/investment_repository.dart';
+
 class InvestmentHistoryScreen extends ConsumerWidget {
-  const InvestmentHistoryScreen({super.key, this.id = ''});
-
-  final String id;
-
+  const InvestmentHistoryScreen({super.key});
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final c = context.colors;
+    final txs = ref.watch(transactionsProvider);
     return Scaffold(
       appBar: AppBar(
-        titleSpacing: Space.s5,
         title: Text(
-          'سوابق سرمایه‌گذاری',
+          'تاریخچه سرمایه‌گذاری',
           style: context.text.h3.copyWith(color: c.textPrimary),
         ),
       ),
-      body: ListView(
-        padding: const EdgeInsets.fromLTRB(
-          Space.page,
-          Space.s4,
-          Space.page,
-          Space.s8,
-        ),
-        children: [
-          Text(
-            'سوابق سرمایه‌گذاری',
-            style: context.text.h2.copyWith(color: c.textPrimary),
-          ),
-          const SizedBox(height: Space.s2),
-          Text(
-            'پیاده‌سازی بر اساس دک طراحی · Screen/Account/InvestmentHistory',
-            style: context.text.bodySmall.copyWith(color: c.textMuted),
-          ),
-          const SizedBox(height: Space.s5),
-          PishroCard(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                _DeckRow(text: r'سوابق سرمایه‌گذاری'),
-                _DeckRow(text: r'همه'),
-                _DeckRow(text: r'فعال'),
-                _DeckRow(text: r'در انتظار'),
-                _DeckRow(text: r'نیازمند پیگیری'),
-                _DeckRow(text: r'دریافت ماهیانه ۸٪'),
-                _DeckRow(text: r'فعال'),
-                _DeckRow(
-                  text:
-                      r'مبلغ: ۵۰٬۰۰۰٬۰۰۰ تومان · فعال‌سازی: ۶ مرداد · INV-88213',
-                ),
-                _DeckRow(text: r'هولد داینامیک'),
-                _DeckRow(text: r'در انتظار فعال‌سازی'),
-                _DeckRow(
-                  text: r'مبلغ: ۲۰٬۰۰۰٬۰۰۰ تومان · ثبت: ۴ مرداد · REQ-3021',
-                ),
-                _DeckRow(text: r'داده بازده ثبت‌شده در دسترس نیست.'),
-              ],
-            ),
-          ),
-          const SizedBox(height: Space.s5),
-          PishroButton(
-            label: 'ادامه',
-            onPressed: () {
-              if (context.canPop()) {
-                context.pop();
-              }
-            },
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _DeckRow extends StatelessWidget {
-  const _DeckRow({required this.text});
-  final String text;
-
-  @override
-  Widget build(BuildContext context) {
-    final c = context.colors;
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: Space.s2),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(Icons.circle, size: 6, color: c.actionPrimary),
-          const SizedBox(width: Space.s3),
-          Expanded(
-            child: Text(
-              text,
-              style: context.text.bodyMedium.copyWith(color: c.textSecondary),
-            ),
-          ),
-        ],
+      body: txs.when(
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (_, __) =>
+            ErrorStateView(onRetry: () => ref.invalidate(transactionsProvider)),
+        data: (items) => items.isEmpty
+            ? EmptyState(
+                title: 'رکوردی نیست',
+                actionLabel: 'طرح‌ها',
+                onAction: () => context.push(Routes.planCatalog),
+              )
+            : ListView.separated(
+                padding: const EdgeInsets.all(Space.page),
+                itemCount: items.length,
+                separatorBuilder: (_, __) => const SizedBox(height: Space.s3),
+                itemBuilder: (_, i) {
+                  final t = items[i];
+                  return PishroCard(
+                    onTap: () => context.push(Routes.investmentDetails(t.id)),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                t.title,
+                                style: context.text.bodyMedium.copyWith(
+                                  color: c.textPrimary,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                              Text(
+                                '${Fmt.toman(t.amount)} · ${Fmt.jalaliDate(t.createdAt)}',
+                                style: context.text.caption.copyWith(
+                                  color: c.textMuted,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        PishroBadge(
+                          label: t.investmentStatusLabel,
+                          tone: PishroBadgeTone.neutral,
+                          icon: Icons.info_outline_rounded,
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              ),
       ),
     );
   }

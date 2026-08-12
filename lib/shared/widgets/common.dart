@@ -24,7 +24,12 @@ class SectionHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     final c = context.colors;
     return Padding(
-      padding: const EdgeInsets.fromLTRB(Space.page, Space.s5, Space.page, Space.s3),
+      padding: const EdgeInsets.fromLTRB(
+        Space.page,
+        Space.s5,
+        Space.page,
+        Space.s3,
+      ),
       child: Row(
         children: [
           Text(title, style: context.text.h3.copyWith(color: c.textPrimary)),
@@ -73,7 +78,8 @@ class MarketDelta extends StatelessWidget {
     final text = Fmt.percentDelta(percent);
 
     return Semantics(
-      label: '${up ? 'رشد' : 'افت'} ${Fmt.fa(percent.abs().toStringAsFixed(2))} درصد',
+      label:
+          '${up ? 'رشد' : 'افت'} ${Fmt.fa(percent.abs().toStringAsFixed(2))} درصد',
       excludeSemantics: true,
       child: Container(
         padding: compact
@@ -187,10 +193,7 @@ class PagePadding extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Padding(
-        padding: EdgeInsets.symmetric(
-          horizontal: Space.page,
-          vertical: vertical,
-        ),
-        child: child,
-      );
+    padding: EdgeInsets.symmetric(horizontal: Space.page, vertical: vertical),
+    child: child,
+  );
 }

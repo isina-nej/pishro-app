@@ -2,101 +2,81 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/network/api_exception.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/tokens.dart';
-import '../../../../shared/widgets/common.dart';
-import '../../../../shared/widgets/pishro_button.dart';
+import '../../../../routing/routes.dart';
+import '../../data/checkout_repository.dart';
 
-/// Screen/Checkout/PaymentProcessing — «در حال پردازش».
-///
-/// Source: `../desighn/_capture/03-04-courses-part-2.dc.html` · Android 390dp · RTL.
-class PaymentProcessingScreen extends ConsumerWidget {
+/// Screen/Checkout/PaymentProcessing — ارسال یک‌باره، بدون ثبت تکراری.
+class PaymentProcessingScreen extends ConsumerStatefulWidget {
   const PaymentProcessingScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final c = context.colors;
-    return Scaffold(
-      appBar: AppBar(
-        titleSpacing: Space.s5,
-        title: Text(
-          'در حال پردازش',
-          style: context.text.h3.copyWith(color: c.textPrimary),
-        ),
-      ),
-      body: ListView(
-        padding: const EdgeInsets.fromLTRB(
-          Space.page,
-          Space.s4,
-          Space.page,
-          Space.s8,
-        ),
-        children: [
-          Text(
-            'در حال پردازش',
-            style: context.text.h2.copyWith(color: c.textPrimary),
-          ),
-          const SizedBox(height: Space.s2),
-          Text(
-            'پیاده‌سازی بر اساس دک طراحی · Screen/Checkout/PaymentProcessing',
-            style: context.text.bodySmall.copyWith(color: c.textMuted),
-          ),
-          const SizedBox(height: Space.s5),
-          PishroCard(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                _DeckRow(text: r'پرداخت با موفقیت انجام شد'),
-                _DeckRow(text: r'دسترسی به دوره برای شما فعال شد.'),
-                _DeckRow(text: r'دوره'),
-                _DeckRow(text: r'تحلیل تکنیکال از صفر تا معامله‌گری'),
-                _DeckRow(text: r'شماره پیگیری'),
-                _DeckRow(text: r'TXN-2K9-۸۸۲۱'),
-                _DeckRow(text: r'مبلغ پرداخت‌شده'),
-                _DeckRow(text: r'۲٬۴۹۰٬۰۰۰ تومان'),
-                _DeckRow(text: r'تاریخ'),
-                _DeckRow(text: r'۶ مرداد ۱۴۰۵'),
-                _DeckRow(text: r'شروع یادگیری'),
-              ],
-            ),
-          ),
-          const SizedBox(height: Space.s5),
-          PishroButton(
-            label: 'ادامه',
-            onPressed: () {
-              if (context.canPop()) {
-                context.pop();
-              }
-            },
-          ),
-        ],
-      ),
-    );
-  }
+  ConsumerState<PaymentProcessingScreen> createState() =>
+      _PaymentProcessingScreenState();
 }
 
-class _DeckRow extends StatelessWidget {
-  const _DeckRow({required this.text});
-  final String text;
+class _PaymentProcessingScreenState
+    extends ConsumerState<PaymentProcessingScreen> {
+  var _started = false;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _run());
+  }
+
+  Future<void> _run() async {
+    if (_started) return;
+    _started = true;
+    final draft = ref.read(checkoutProvider);
+    if (draft == null) {
+      if (mounted) context.go(Routes.courses);
+      return;
+    }
+    try {
+      await ref.read(checkoutProvider.notifier).submit();
+      if (!mounted) return;
+      context.go(Routes.checkoutSuccess);
+    } on NetworkException {
+      if (!mounted) return;
+      context.go(Routes.checkoutNetworkError);
+    } on UnauthorizedException {
+      if (!mounted) return;
+      context.go(Routes.login);
+    } catch (_) {
+      if (!mounted) return;
+      context.go(Routes.checkoutFailure);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     final c = context.colors;
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: Space.s2),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(Icons.circle, size: 6, color: c.actionPrimary),
-          const SizedBox(width: Space.s3),
-          Expanded(
-            child: Text(
-              text,
-              style: context.text.bodyMedium.copyWith(color: c.textSecondary),
-            ),
+    return Scaffold(
+      body: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(Space.s8),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              CircularProgressIndicator(color: c.actionPrimary),
+              const SizedBox(height: Space.s5),
+              Text(
+                'در حال اتصال به درگاه…',
+                style: context.text.h3.copyWith(color: c.textPrimary),
+              ),
+              const SizedBox(height: Space.s2),
+              Text(
+                'لطفاً صفحه را نبندید. ارسال مجدد مسدود است.',
+                textAlign: TextAlign.center,
+                style: context.text.bodySmall.copyWith(color: c.textMuted),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }

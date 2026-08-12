@@ -5,6 +5,7 @@ import 'presentation/screens/active_investments_screen.dart';
 import 'presentation/screens/amount_entry_screen.dart';
 import 'presentation/screens/calculator_screen.dart';
 import 'presentation/screens/contract_confirmation_screen.dart';
+import 'presentation/screens/dynamic_hold_plan_details_screen.dart';
 import 'presentation/screens/eligibility_kyc_screen.dart';
 import 'presentation/screens/final_review_screen.dart';
 import 'presentation/screens/fixed_monthly_plan_details_screen.dart';
@@ -29,9 +30,14 @@ final List<RouteBase> investmentRoutes = [
         routes: [
           GoRoute(
             path: ':id',
-            builder: (context, state) => FixedMonthlyPlanDetailsScreen(
-              id: state.pathParameters['id'] ?? '',
-            ),
+            builder: (context, state) {
+              final id = state.pathParameters['id'] ?? '';
+              if (id.toLowerCase().contains('hold') ||
+                  id.toLowerCase().contains('dynamic')) {
+                return DynamicHoldPlanDetailsScreen(id: id);
+              }
+              return FixedMonthlyPlanDetailsScreen(id: id);
+            },
           ),
         ],
       ),

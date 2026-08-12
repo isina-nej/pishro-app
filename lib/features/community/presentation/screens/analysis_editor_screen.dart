@@ -5,88 +5,110 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/tokens.dart';
-import '../../../../shared/widgets/common.dart';
+import '../../../../routing/routes.dart';
+import '../../../../shared/widgets/pishro_badge.dart';
 import '../../../../shared/widgets/pishro_button.dart';
+import '../../../../shared/widgets/pishro_chip.dart';
+import '../../../../shared/widgets/pishro_text_field.dart';
 
-/// Screen/Community/AnalysisEditor — «ویرایشگر تحلیل».
-///
-/// Source: `../desighn/_capture/09-08-community.dc.html` · Android 390dp · RTL.
+import '../../data/community_models.dart';
+import '../../data/community_repository.dart';
+
 class AnalysisEditorScreen extends ConsumerWidget {
-  const AnalysisEditorScreen({super.key, this.id = ''});
-
-  final String id;
-
+  const AnalysisEditorScreen({super.key});
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final c = context.colors;
+    final draft = ref.watch(analysisDraftProvider);
     return Scaffold(
       appBar: AppBar(
-        titleSpacing: Space.s5,
         title: Text(
           'ویرایشگر تحلیل',
           style: context.text.h3.copyWith(color: c.textPrimary),
         ),
       ),
       body: ListView(
-        padding: const EdgeInsets.fromLTRB(
-          Space.page,
-          Space.s4,
-          Space.page,
-          Space.s8,
-        ),
+        padding: const EdgeInsets.all(Space.page),
         children: [
+          PishroTextField(
+            label: 'خلاصه',
+            onChanged: (v) => ref
+                .read(analysisDraftProvider.notifier)
+                .update((d) => d.copyWith(summary: v)),
+          ),
+          const SizedBox(height: Space.s4),
+          PishroTextField(
+            label: 'متن',
+            onChanged: (v) => ref
+                .read(analysisDraftProvider.notifier)
+                .update((d) => d.copyWith(body: v)),
+          ),
+          const SizedBox(height: Space.s4),
+          PishroTextField(
+            label: 'شرط بی‌اعتبار شدن',
+            onChanged: (v) => ref
+                .read(analysisDraftProvider.notifier)
+                .update((d) => d.copyWith(invalidation: v)),
+          ),
+          const SizedBox(height: Space.s4),
           Text(
-            'ویرایشگر تحلیل',
-            style: context.text.h2.copyWith(color: c.textPrimary),
+            'افق زمانی',
+            style: context.text.caption.copyWith(color: c.textMuted),
           ),
-          const SizedBox(height: Space.s2),
+          Wrap(
+            spacing: Space.s2,
+            children: [
+              for (final t in Timeframe.values)
+                PishroChip(
+                  label: t.label,
+                  selected: draft.timeframe == t,
+                  onTap: () => ref
+                      .read(analysisDraftProvider.notifier)
+                      .update((d) => d.copyWith(timeframe: t)),
+                ),
+            ],
+          ),
+          const SizedBox(height: Space.s3),
           Text(
-            'پیاده‌سازی بر اساس دک طراحی · Screen/Community/AnalysisEditor',
-            style: context.text.bodySmall.copyWith(color: c.textMuted),
+            'ریسک',
+            style: context.text.caption.copyWith(color: c.textMuted),
           ),
-          const SizedBox(height: Space.s5),
-          PishroCard(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [_DeckRow(text: r'ویرایشگر تحلیل')],
-            ),
-          ),
-          const SizedBox(height: Space.s5),
-          PishroButton(
-            label: 'ادامه',
-            onPressed: () {
-              if (context.canPop()) {
-                context.pop();
-              }
-            },
+          Wrap(
+            spacing: Space.s2,
+            children: [
+              PishroChip(
+                label: 'کم',
+                selected: draft.risk == RiskLevel.low,
+                onTap: () => ref
+                    .read(analysisDraftProvider.notifier)
+                    .update((d) => d.copyWith(risk: RiskLevel.low)),
+              ),
+              PishroChip(
+                label: 'متوسط',
+                selected: draft.risk == RiskLevel.medium,
+                onTap: () => ref
+                    .read(analysisDraftProvider.notifier)
+                    .update((d) => d.copyWith(risk: RiskLevel.medium)),
+              ),
+              PishroChip(
+                label: 'بالا',
+                selected: draft.risk == RiskLevel.high,
+                onTap: () => ref
+                    .read(analysisDraftProvider.notifier)
+                    .update((d) => d.copyWith(risk: RiskLevel.high)),
+              ),
+            ],
           ),
         ],
       ),
-    );
-  }
-}
-
-class _DeckRow extends StatelessWidget {
-  const _DeckRow({required this.text});
-  final String text;
-
-  @override
-  Widget build(BuildContext context) {
-    final c = context.colors;
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: Space.s2),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(Icons.circle, size: 6, color: c.actionPrimary),
-          const SizedBox(width: Space.s3),
-          Expanded(
-            child: Text(
-              text,
-              style: context.text.bodyMedium.copyWith(color: c.textSecondary),
-            ),
+      bottomNavigationBar: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(Space.page),
+          child: PishroButton(
+            label: 'پیش‌نمایش',
+            onPressed: () => context.push(Routes.analysisPreview),
           ),
-        ],
+        ),
       ),
     );
   }

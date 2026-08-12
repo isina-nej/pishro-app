@@ -36,11 +36,7 @@ abstract final class AppTheme {
         outline: c.borderDefault,
       ),
 
-      dividerTheme: DividerThemeData(
-        color: c.divider,
-        thickness: 1,
-        space: 1,
-      ),
+      dividerTheme: DividerThemeData(color: c.divider, thickness: 1, space: 1),
 
       appBarTheme: AppBarTheme(
         backgroundColor: c.backgroundApp,
@@ -75,7 +71,9 @@ abstract final class AppTheme {
         showDragHandle: true,
         dragHandleColor: c.borderDefault,
         shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(top: Radius.circular(Radii.sheet)),
+          borderRadius: BorderRadius.vertical(
+            top: Radius.circular(Radii.sheet),
+          ),
         ),
       ),
 

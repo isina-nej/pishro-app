@@ -2,102 +2,101 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/network/api_exception.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/tokens.dart';
+import '../../../../core/utils/formatters.dart';
+import '../../../../routing/routes.dart';
 import '../../../../shared/widgets/common.dart';
-import '../../../../shared/widgets/pishro_button.dart';
+import '../../../../shared/widgets/pishro_badge.dart';
+import '../../../../shared/widgets/states.dart';
+import '../../data/investment_models.dart';
+import '../../data/investment_repository.dart';
 
-/// Screen/Investment/ActiveInvestments — «سرمایه‌گذاری‌های من».
-///
-/// Source: `../desighn/_capture/07-06-investment-part-2.dc.html` · Android 390dp · RTL.
+/// Screen/Investment/ActiveInvestments — از تراکنش‌ها؛ بدون طرح جعلی.
 class ActiveInvestmentsScreen extends ConsumerWidget {
   const ActiveInvestmentsScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final c = context.colors;
+    final txs = ref.watch(transactionsProvider);
+
     return Scaffold(
       appBar: AppBar(
-        titleSpacing: Space.s5,
         title: Text(
-          'سرمایه‌گذاری‌های من',
+          'سرمایه‌گذاری‌های فعال',
           style: context.text.h3.copyWith(color: c.textPrimary),
         ),
       ),
-      body: ListView(
-        padding: const EdgeInsets.fromLTRB(
-          Space.page,
-          Space.s4,
-          Space.page,
-          Space.s8,
+      body: txs.when(
+        loading: () => const Padding(
+          padding: EdgeInsets.all(Space.page),
+          child: Skeleton.box(height: 80),
         ),
-        children: [
-          Text(
-            'سرمایه‌گذاری‌های من',
-            style: context.text.h2.copyWith(color: c.textPrimary),
-          ),
-          const SizedBox(height: Space.s2),
-          Text(
-            'پیاده‌سازی بر اساس دک طراحی · Screen/Investment/ActiveInvestments',
-            style: context.text.bodySmall.copyWith(color: c.textMuted),
-          ),
-          const SizedBox(height: Space.s5),
-          PishroCard(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                _DeckRow(text: r'دریافت ماهیانه ۸٪'),
-                _DeckRow(text: r'فعال'),
-                _DeckRow(text: r'مبلغ سرمایه‌گذاری'),
-                _DeckRow(text: r'۵۰٬۰۰۰٬۰۰۰ تومان'),
-                _DeckRow(text: r'تاریخ فعال‌سازی'),
-                _DeckRow(text: r'۶ مرداد ۱۴۰۵'),
-                _DeckRow(text: r'نرخ اعلام‌شده'),
-                _DeckRow(text: r'۸٪ ماهیانه'),
-                _DeckRow(text: r'دریافتی تاکنون'),
-                _DeckRow(text: r'۴٬۰۰۰٬۰۰۰ تومان'),
-                _DeckRow(text: r'پرداخت بعدی'),
-                _DeckRow(text: r'۱ شهریور ۱۴۰۵'),
-              ],
-            ),
-          ),
-          const SizedBox(height: Space.s5),
-          PishroButton(
-            label: 'ادامه',
-            onPressed: () {
-              if (context.canPop()) {
-                context.pop();
-              }
+        error: (e, _) => ErrorStateView(
+          message: e is ApiException ? e.message : 'فهرست بارگذاری نشد.',
+          onRetry: () => ref.invalidate(transactionsProvider),
+        ),
+        data: (items) {
+          if (items.isEmpty) {
+            return EmptyState(
+              title: 'هنوز سرمایه‌گذاری ثبت نشده',
+              actionLabel: 'مشاهده طرح‌ها',
+              onAction: () => context.push(Routes.planCatalog),
+            );
+          }
+          return ListView.separated(
+            padding: const EdgeInsets.all(Space.page),
+            itemCount: items.length,
+            separatorBuilder: (_, __) => const SizedBox(height: Space.s3),
+            itemBuilder: (_, i) {
+              final t = items[i];
+              return PishroCard(
+                onTap: () => context.push(Routes.investmentDetails(t.id)),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            t.title,
+                            style: context.text.bodyMedium.copyWith(
+                              color: c.textPrimary,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          const SizedBox(height: Space.s1),
+                          Text(
+                            '${Fmt.toman(t.amount)} · ${Fmt.jalaliDate(t.createdAt)}',
+                            style: context.text.caption.copyWith(
+                              color: c.textMuted,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    PishroBadge(
+                      label: t.investmentStatusLabel,
+                      tone: switch (t.status) {
+                        TxStatus.success => PishroBadgeTone.success,
+                        TxStatus.pending => PishroBadgeTone.warning,
+                        TxStatus.failed => PishroBadgeTone.danger,
+                      },
+                      icon: switch (t.status) {
+                        TxStatus.success => Icons.check_rounded,
+                        TxStatus.pending => Icons.hourglass_top_rounded,
+                        TxStatus.failed => Icons.error_outline_rounded,
+                      },
+                    ),
+                  ],
+                ),
+              );
             },
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _DeckRow extends StatelessWidget {
-  const _DeckRow({required this.text});
-  final String text;
-
-  @override
-  Widget build(BuildContext context) {
-    final c = context.colors;
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: Space.s2),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(Icons.circle, size: 6, color: c.actionPrimary),
-          const SizedBox(width: Space.s3),
-          Expanded(
-            child: Text(
-              text,
-              style: context.text.bodyMedium.copyWith(color: c.textSecondary),
-            ),
-          ),
-        ],
+          );
+        },
       ),
     );
   }

@@ -16,9 +16,9 @@ class SessionState {
   /// Before the stored token has been read, the router must not redirect —
   /// otherwise a signed-in user flashes the welcome screen on cold start.
   const SessionState.unresolved()
-      : isResolved = false,
-        isAuthenticated = false,
-        userId = null;
+    : isResolved = false,
+      isAuthenticated = false,
+      userId = null;
 
   final bool isResolved;
   final bool isAuthenticated;
@@ -44,7 +44,11 @@ class SessionNotifier extends StateNotifier<SessionState> {
     String? userId,
   }) async {
     await _tokens.save(accessToken: accessToken, refreshToken: refreshToken);
-    state = SessionState(isResolved: true, isAuthenticated: true, userId: userId);
+    state = SessionState(
+      isResolved: true,
+      isAuthenticated: true,
+      userId: userId,
+    );
   }
 
   Future<void> signOut() async {
@@ -53,7 +57,6 @@ class SessionNotifier extends StateNotifier<SessionState> {
   }
 }
 
-final sessionProvider =
-    StateNotifierProvider<SessionNotifier, SessionState>(
+final sessionProvider = StateNotifierProvider<SessionNotifier, SessionState>(
   (ref) => SessionNotifier(ref.watch(tokenStorageProvider)),
 );

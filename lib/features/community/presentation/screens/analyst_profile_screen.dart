@@ -5,88 +5,95 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/tokens.dart';
-import '../../../../shared/widgets/common.dart';
+import '../../../../routing/routes.dart';
+import '../../../../shared/widgets/pishro_badge.dart';
 import '../../../../shared/widgets/pishro_button.dart';
+import '../../../../shared/widgets/states.dart';
 
-/// Screen/Community/AnalystProfile — «پروفایل تحلیلگر».
-///
-/// Source: `../desighn/_capture/09-08-community.dc.html` · Android 390dp · RTL.
+import '../../data/community_repository.dart';
+
 class AnalystProfileScreen extends ConsumerWidget {
   const AnalystProfileScreen({super.key, this.id = ''});
-
   final String id;
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final c = context.colors;
+    final analyst = ref.watch(analystProvider(id));
     return Scaffold(
       appBar: AppBar(
-        titleSpacing: Space.s5,
         title: Text(
           'پروفایل تحلیلگر',
           style: context.text.h3.copyWith(color: c.textPrimary),
         ),
       ),
-      body: ListView(
-        padding: const EdgeInsets.fromLTRB(
-          Space.page,
-          Space.s4,
-          Space.page,
-          Space.s8,
-        ),
-        children: [
-          Text(
-            'پروفایل تحلیلگر',
-            style: context.text.h2.copyWith(color: c.textPrimary),
-          ),
-          const SizedBox(height: Space.s2),
-          Text(
-            'پیاده‌سازی بر اساس دک طراحی · Screen/Community/AnalystProfile',
-            style: context.text.bodySmall.copyWith(color: c.textMuted),
-          ),
-          const SizedBox(height: Space.s5),
-          PishroCard(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [_DeckRow(text: r'پروفایل تحلیلگر')],
-            ),
-          ),
-          const SizedBox(height: Space.s5),
-          PishroButton(
-            label: 'ادامه',
-            onPressed: () {
-              if (context.canPop()) {
-                context.pop();
-              }
-            },
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _DeckRow extends StatelessWidget {
-  const _DeckRow({required this.text});
-  final String text;
-
-  @override
-  Widget build(BuildContext context) {
-    final c = context.colors;
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: Space.s2),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(Icons.circle, size: 6, color: c.actionPrimary),
-          const SizedBox(width: Space.s3),
-          Expanded(
-            child: Text(
-              text,
-              style: context.text.bodyMedium.copyWith(color: c.textSecondary),
-            ),
-          ),
-        ],
+      body: analyst.when(
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (_, __) =>
+            ErrorStateView(onRetry: () => ref.invalidate(analystProvider(id))),
+        data: (a) {
+          if (a == null) return const EmptyState(title: 'تحلیلگر یافت نشد');
+          return ListView(
+            padding: const EdgeInsets.all(Space.page),
+            children: [
+              Text(
+                a.displayName,
+                style: context.text.h2.copyWith(color: c.textPrimary),
+              ),
+              Text(
+                a.specialty,
+                style: context.text.bodySmall.copyWith(color: c.textMuted),
+              ),
+              const SizedBox(height: Space.s3),
+              Wrap(
+                spacing: Space.s2,
+                runSpacing: Space.s2,
+                children: [
+                  for (final b in a.badges)
+                    PishroBadge(
+                      label: b.text,
+                      tone: b.granted
+                          ? PishroBadgeTone.success
+                          : PishroBadgeTone.warning,
+                      icon: b.granted
+                          ? Icons.verified_outlined
+                          : Icons.info_outline_rounded,
+                    ),
+                ],
+              ),
+              const SizedBox(height: Space.s4),
+              Text(
+                a.bio,
+                style: context.text.bodySmall.copyWith(
+                  color: c.textSecondary,
+                  height: 1.8,
+                ),
+              ),
+              const SizedBox(height: Space.s3),
+              Text(
+                a.disclosure,
+                style: context.text.caption.copyWith(color: c.textMuted),
+              ),
+              const SizedBox(height: Space.s4),
+              PishroButton(
+                label: a.isFollowing ? 'لغو دنبال' : 'دنبال کردن',
+                variant: PishroButtonVariant.secondary,
+                onPressed: () async {
+                  await ref
+                      .read(communityRepositoryProvider)
+                      .toggleFollow(a.id);
+                  ref.invalidate(analystProvider(id));
+                  ref.invalidate(recommendedAnalystsProvider);
+                },
+              ),
+              const SizedBox(height: Space.s3),
+              PishroButton(
+                label: 'امتیازها',
+                variant: PishroButtonVariant.ghost,
+                onPressed: () => context.push(Routes.analystRatings(id)),
+              ),
+            ],
+          );
+        },
       ),
     );
   }

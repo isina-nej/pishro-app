@@ -5,89 +5,48 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/tokens.dart';
+import '../../../../routing/routes.dart';
 import '../../../../shared/widgets/common.dart';
-import '../../../../shared/widgets/pishro_button.dart';
+import '../../../../shared/widgets/states.dart';
 
-/// Screen/Account/SavedItems — «ذخیره‌شده‌ها».
-///
-/// Source: `../desighn/_capture/11-09-account-part-2.dc.html` · Android 390dp · RTL.
+import '../../../news/data/news_repository.dart';
+
 class SavedItemsScreen extends ConsumerWidget {
   const SavedItemsScreen({super.key});
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final c = context.colors;
+    final saved = ref.watch(bookmarksProvider);
     return Scaffold(
       appBar: AppBar(
-        titleSpacing: Space.s5,
         title: Text(
           'ذخیره‌شده‌ها',
           style: context.text.h3.copyWith(color: c.textPrimary),
         ),
       ),
-      body: ListView(
-        padding: const EdgeInsets.fromLTRB(
-          Space.page,
-          Space.s4,
-          Space.page,
-          Space.s8,
-        ),
-        children: [
-          Text(
-            'ذخیره‌شده‌ها',
-            style: context.text.h2.copyWith(color: c.textPrimary),
-          ),
-          const SizedBox(height: Space.s2),
-          Text(
-            'پیاده‌سازی بر اساس دک طراحی · Screen/Account/SavedItems',
-            style: context.text.bodySmall.copyWith(color: c.textMuted),
-          ),
-          const SizedBox(height: Space.s5),
-          PishroCard(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                _DeckRow(text: r'امنیت حساب'),
-                _DeckRow(text: r'رمز عبور'),
-              ],
-            ),
-          ),
-          const SizedBox(height: Space.s5),
-          PishroButton(
-            label: 'ادامه',
-            onPressed: () {
-              if (context.canPop()) {
-                context.pop();
-              }
-            },
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _DeckRow extends StatelessWidget {
-  const _DeckRow({required this.text});
-  final String text;
-
-  @override
-  Widget build(BuildContext context) {
-    final c = context.colors;
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: Space.s2),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(Icons.circle, size: 6, color: c.actionPrimary),
-          const SizedBox(width: Space.s3),
-          Expanded(
-            child: Text(
-              text,
-              style: context.text.bodyMedium.copyWith(color: c.textSecondary),
-            ),
-          ),
-        ],
+      body: saved.when(
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (_, __) =>
+            ErrorStateView(onRetry: () => ref.invalidate(bookmarksProvider)),
+        data: (items) => items.isEmpty
+            ? const EmptyState(title: 'مورد ذخیره‌شده‌ای نیست')
+            : ListView.separated(
+                padding: const EdgeInsets.all(Space.page),
+                itemCount: items.length,
+                separatorBuilder: (_, __) => const SizedBox(height: Space.s3),
+                itemBuilder: (_, i) {
+                  final s = items[i];
+                  return PishroCard(
+                    onTap: () => context.push(Routes.newsDetails(s.slug)),
+                    child: Text(
+                      s.title,
+                      style: context.text.bodyMedium.copyWith(
+                        color: c.textPrimary,
+                      ),
+                    ),
+                  );
+                },
+              ),
       ),
     );
   }

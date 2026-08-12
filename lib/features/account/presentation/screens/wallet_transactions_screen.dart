@@ -1,105 +1,78 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/tokens.dart';
 import '../../../../shared/widgets/common.dart';
-import '../../../../shared/widgets/pishro_button.dart';
+import '../../../../shared/widgets/states.dart';
 
-/// Screen/Account/WalletTransactions — «تراکنش‌های کیف پول».
-///
-/// Source: `../desighn/_capture/10-09-account-part-1.dc.html` · Android 390dp · RTL.
+import '../../../../core/utils/formatters.dart';
+import '../../../investment/data/investment_repository.dart';
+
 class WalletTransactionsScreen extends ConsumerWidget {
   const WalletTransactionsScreen({super.key});
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final c = context.colors;
+    final txs = ref.watch(transactionsProvider);
     return Scaffold(
       appBar: AppBar(
-        titleSpacing: Space.s5,
         title: Text(
           'تراکنش‌های کیف پول',
           style: context.text.h3.copyWith(color: c.textPrimary),
         ),
       ),
-      body: ListView(
-        padding: const EdgeInsets.fromLTRB(
-          Space.page,
-          Space.s4,
-          Space.page,
-          Space.s8,
+      body: txs.when(
+        loading: () => const Padding(
+          padding: EdgeInsets.all(Space.page),
+          child: Skeleton.box(height: 80),
         ),
-        children: [
-          Text(
-            'تراکنش‌های کیف پول',
-            style: context.text.h2.copyWith(color: c.textPrimary),
-          ),
-          const SizedBox(height: Space.s2),
-          Text(
-            'پیاده‌سازی بر اساس دک طراحی · Screen/Account/WalletTransactions',
-            style: context.text.bodySmall.copyWith(color: c.textMuted),
-          ),
-          const SizedBox(height: Space.s5),
-          PishroCard(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                _DeckRow(text: r'کوین پیشرو'),
-                _DeckRow(text: r'موجودی کوین'),
-                _DeckRow(text: r'غیرقابل برداشت'),
-                _DeckRow(text: r'۳٬۲۵۰'),
-                _DeckRow(
-                  text: r'کوین پیشرو یک امتیاز داخلی و غیرقابل برداشت است.',
-                ),
-                _DeckRow(text: r'دریافت‌شده'),
-                _DeckRow(text: r'۴٬۱۰۰'),
-                _DeckRow(text: r'استفاده‌شده'),
-                _DeckRow(text: r'در حال انقضا'),
-                _DeckRow(text: r'فعالیت اخیر'),
-                _DeckRow(text: r'تکمیل دوره — دریافت‌شده'),
-                _DeckRow(text: r'+۱۰۰'),
-              ],
-            ),
-          ),
-          const SizedBox(height: Space.s5),
-          PishroButton(
-            label: 'ادامه',
-            onPressed: () {
-              if (context.canPop()) {
-                context.pop();
-              }
-            },
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _DeckRow extends StatelessWidget {
-  const _DeckRow({required this.text});
-  final String text;
-
-  @override
-  Widget build(BuildContext context) {
-    final c = context.colors;
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: Space.s2),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(Icons.circle, size: 6, color: c.actionPrimary),
-          const SizedBox(width: Space.s3),
-          Expanded(
-            child: Text(
-              text,
-              style: context.text.bodyMedium.copyWith(color: c.textSecondary),
-            ),
-          ),
-        ],
+        error: (_, __) =>
+            ErrorStateView(onRetry: () => ref.invalidate(transactionsProvider)),
+        data: (items) => items.isEmpty
+            ? const EmptyState(title: 'تراکنشی نیست')
+            : ListView.separated(
+                padding: const EdgeInsets.all(Space.page),
+                itemCount: items.length,
+                separatorBuilder: (_, __) => const SizedBox(height: Space.s3),
+                itemBuilder: (_, i) {
+                  final t = items[i];
+                  return PishroCard(
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                t.title,
+                                style: context.text.bodyMedium.copyWith(
+                                  color: c.textPrimary,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                              Text(
+                                Fmt.jalaliDate(t.createdAt),
+                                style: context.text.caption.copyWith(
+                                  color: c.textMuted,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Text(
+                          Fmt.toman(t.amount),
+                          style: context.text.bodySmall.copyWith(
+                            color: c.textPrimary,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              ),
       ),
     );
   }

@@ -5,83 +5,67 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/tokens.dart';
-import '../../../../shared/widgets/common.dart';
-import '../../../../shared/widgets/pishro_button.dart';
+import '../../../../routing/routes.dart';
+import '../../../../shared/widgets/pishro_chip.dart';
+import '../../../../shared/widgets/states.dart';
+import '../../data/market_models.dart';
+import '../../data/market_repository.dart';
+import '../widgets/asset_row.dart';
+import '../widgets/market_async.dart';
 
-/// Screen/Market/TopLosers — «بیشترین کاهش».
-///
-/// Source: `../desighn/_capture/08-07-market.dc.html` · Android 390dp · RTL.
-class TopLosersScreen extends ConsumerWidget {
+/// Screen/Market/TopLosers.
+class TopLosersScreen extends ConsumerStatefulWidget {
   const TopLosersScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final c = context.colors;
-    return Scaffold(
-      appBar: AppBar(
-        titleSpacing: Space.s5,
-        title: Text(
-          'بیشترین کاهش',
-          style: context.text.h3.copyWith(color: c.textPrimary),
-        ),
-      ),
-      body: ListView(
-        padding: const EdgeInsets.fromLTRB(
-          Space.page,
-          Space.s4,
-          Space.page,
-          Space.s8,
-        ),
-        children: [
-          Text(
-            'بیشترین کاهش',
-            style: context.text.h2.copyWith(color: c.textPrimary),
-          ),
-          const SizedBox(height: Space.s2),
-          Text(
-            'پیاده‌سازی بر اساس دک طراحی · Screen/Market/TopLosers',
-            style: context.text.bodySmall.copyWith(color: c.textMuted),
-          ),
-          const SizedBox(height: Space.s5),
-          PishroCard(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [_DeckRow(text: r'بیشترین کاهش')],
-            ),
-          ),
-          const SizedBox(height: Space.s5),
-          PishroButton(
-            label: 'ادامه',
-            onPressed: () {
-              if (context.canPop()) {
-                context.pop();
-              }
-            },
-          ),
-        ],
-      ),
-    );
-  }
+  ConsumerState<TopLosersScreen> createState() => _TopLosersScreenState();
 }
 
-class _DeckRow extends StatelessWidget {
-  const _DeckRow({required this.text});
-  final String text;
+class _TopLosersScreenState extends ConsumerState<TopLosersScreen> {
+  var _window = ChangeWindow.h24;
 
   @override
   Widget build(BuildContext context) {
     final c = context.colors;
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: Space.s2),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
+    final snap = ref.watch(marketSnapshotProvider);
+
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(
+          'بیشترین افت',
+          style: context.text.h3.copyWith(color: c.textPrimary),
+        ),
+      ),
+      body: Column(
         children: [
-          Icon(Icons.circle, size: 6, color: c.actionPrimary),
-          const SizedBox(width: Space.s3),
+          PishroChipBar(
+            labels: [for (final w in ChangeWindow.values) w.label],
+            selectedIndex: ChangeWindow.values.indexOf(_window),
+            onSelected: (i) => setState(() => _window = ChangeWindow.values[i]),
+          ),
           Expanded(
-            child: Text(
-              text,
-              style: context.text.bodyMedium.copyWith(color: c.textSecondary),
+            child: MarketAsync(
+              value: snap,
+              onRetry: () => ref.invalidate(marketSnapshotProvider),
+              builder: (context, data) {
+                final items = data.ranked(_window, losers: true);
+                if (items.isEmpty) {
+                  return const EmptyState(title: 'افتی در این بازه ثبت نشده');
+                }
+                return ListView.separated(
+                  padding: const EdgeInsets.all(Space.page),
+                  itemCount: items.length,
+                  separatorBuilder: (_, __) => const SizedBox(height: Space.s3),
+                  itemBuilder: (_, i) {
+                    final a = items[i];
+                    return AssetRow(
+                      asset: a,
+                      window: _window,
+                      onTap: () => context.push(Routes.coinDetails(a.id)),
+                    );
+                  },
+                );
+              },
             ),
           ),
         ],

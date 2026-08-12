@@ -1,6 +1,7 @@
 import 'package:go_router/go_router.dart';
 
 import '../../routing/routes.dart';
+import 'presentation/screens/comment_thread_screen.dart';
 import 'presentation/screens/comments_screen.dart';
 import 'presentation/screens/details_screen.dart';
 import 'presentation/screens/filters_screen.dart';
@@ -59,6 +60,15 @@ final List<RouteBase> newsRoutes = [
             path: 'comments',
             builder: (context, state) =>
                 NewsCommentsScreen(id: state.pathParameters['slug'] ?? ''),
+            routes: [
+              GoRoute(
+                path: ':commentId',
+                builder: (context, state) => NewsCommentThreadScreen(
+                  id: state.pathParameters['slug'] ?? '',
+                  commentId: state.pathParameters['commentId'] ?? '',
+                ),
+              ),
+            ],
           ),
         ],
       ),

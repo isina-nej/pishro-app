@@ -50,16 +50,15 @@ class AppTextStyles extends ThemeExtension<AppTextStyles> {
     double size,
     double lineHeight, {
     FontWeight weight = FontWeight.w400,
-  }) =>
-      TextStyle(
-        fontFamily: AppFonts.persian,
-        fontFamilyFallback: AppFonts.fallback,
-        fontSize: size,
-        height: lineHeight / size,
-        fontWeight: weight,
-        // Persian has no uppercase and must never be letter-spaced.
-        letterSpacing: 0,
-      );
+  }) => TextStyle(
+    fontFamily: AppFonts.persian,
+    fontFamilyFallback: AppFonts.fallback,
+    fontSize: size,
+    height: lineHeight / size,
+    fontWeight: weight,
+    // Persian has no uppercase and must never be letter-spaced.
+    letterSpacing: 0,
+  );
 
   static final base = AppTextStyles(
     displayLarge: _s(32, 44, weight: FontWeight.w800),

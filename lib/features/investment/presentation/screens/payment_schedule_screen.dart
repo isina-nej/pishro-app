@@ -1,16 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/tokens.dart';
+import '../../../../core/utils/formatters.dart';
 import '../../../../shared/widgets/common.dart';
-import '../../../../shared/widgets/pishro_button.dart';
+import '../../../../shared/widgets/pishro_badge.dart';
+import '../../../../shared/widgets/states.dart';
+import '../../data/investment_models.dart';
+import '../../data/investment_repository.dart';
 
-/// Screen/Investment/PaymentSchedule — «برنامه پرداخت».
-///
-/// Source: `../desighn/_capture/07-06-investment-part-2.dc.html` · Android 390dp · RTL.
+/// Screen/Investment/PaymentSchedule — فقط وضعیت تراکنش؛ بدون اقساط جعلی.
 class PaymentScheduleScreen extends ConsumerWidget {
   const PaymentScheduleScreen({super.key, this.id = ''});
 
@@ -19,87 +20,80 @@ class PaymentScheduleScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final c = context.colors;
+    final tx = ref.watch(transactionProvider(id));
+
     return Scaffold(
       appBar: AppBar(
-        titleSpacing: Space.s5,
         title: Text(
           'برنامه پرداخت',
           style: context.text.h3.copyWith(color: c.textPrimary),
         ),
       ),
-      body: ListView(
-        padding: const EdgeInsets.fromLTRB(
-          Space.page,
-          Space.s4,
-          Space.page,
-          Space.s8,
+      body: tx.when(
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (_, __) => ErrorStateView(
+          onRetry: () => ref.invalidate(transactionProvider(id)),
         ),
-        children: [
-          Text(
-            'برنامه پرداخت',
-            style: context.text.h2.copyWith(color: c.textPrimary),
-          ),
-          const SizedBox(height: Space.s2),
-          Text(
-            'پیاده‌سازی بر اساس دک طراحی · Screen/Investment/PaymentSchedule',
-            style: context.text.bodySmall.copyWith(color: c.textMuted),
-          ),
-          const SizedBox(height: Space.s5),
-          PishroCard(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                _DeckRow(text: r'برنامه پرداخت'),
-                _DeckRow(text: r'دریافت ماهیانه ۸٪ · ۵۰٬۰۰۰٬۰۰۰ تومان'),
-                _DeckRow(text: r'۱ مرداد ۱۴۰۵'),
-                _DeckRow(text: r'مرجع: PAY-1042'),
-                _DeckRow(text: r'۴٬۰۰۰٬۰۰۰ تومان'),
-                _DeckRow(text: r'پرداخت‌شده'),
-                _DeckRow(text: r'۱ شهریور ۱۴۰۵'),
-                _DeckRow(text: r'در حال بررسی'),
-                _DeckRow(text: r'۴٬۰۰۰٬۰۰۰ تومان'),
-                _DeckRow(text: r'در حال بررسی'),
-                _DeckRow(text: r'۱ مهر ۱۴۰۵'),
-                _DeckRow(text: r'مبلغ برنامه‌ریزی‌شده'),
-              ],
-            ),
-          ),
-          const SizedBox(height: Space.s5),
-          PishroButton(
-            label: 'ادامه',
-            onPressed: () {
-              if (context.canPop()) {
-                context.pop();
-              }
-            },
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _DeckRow extends StatelessWidget {
-  const _DeckRow({required this.text});
-  final String text;
-
-  @override
-  Widget build(BuildContext context) {
-    final c = context.colors;
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: Space.s2),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(Icons.circle, size: 6, color: c.actionPrimary),
-          const SizedBox(width: Space.s3),
-          Expanded(
-            child: Text(
-              text,
-              style: context.text.bodyMedium.copyWith(color: c.textSecondary),
-            ),
-          ),
-        ],
+        data: (t) {
+          if (t == null) {
+            return const EmptyState(title: 'رکوردی یافت نشد');
+          }
+          return ListView(
+            padding: const EdgeInsets.all(Space.page),
+            children: [
+              const NoticeBanner(
+                message:
+                    'جدول اقساط از سرور نمی‌آید؛ فقط وضعیت همین پرداخت نمایش داده می‌شود.',
+                tone: NoticeTone.info,
+              ),
+              const SizedBox(height: Space.s4),
+              PishroCard(
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            Fmt.toman(t.amount),
+                            style: context.text.bodyMedium.copyWith(
+                              color: c.textPrimary,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                          Text(
+                            Fmt.jalaliLong(t.createdAt),
+                            style: context.text.caption.copyWith(
+                              color: c.textMuted,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    PishroBadge(
+                      label: t.scheduleStatusLabel,
+                      tone: switch (t.status) {
+                        TxStatus.success => PishroBadgeTone.success,
+                        TxStatus.pending => PishroBadgeTone.warning,
+                        TxStatus.failed => PishroBadgeTone.danger,
+                      },
+                      icon: switch (t.status) {
+                        TxStatus.success => Icons.check_rounded,
+                        TxStatus.pending => Icons.hourglass_top_rounded,
+                        TxStatus.failed => Icons.error_outline_rounded,
+                      },
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: Space.s3),
+              Text(
+                'پرداخت بعدی: $kPerContractSchedule',
+                style: context.text.caption.copyWith(color: c.textMuted),
+              ),
+            ],
+          );
+        },
       ),
     );
   }

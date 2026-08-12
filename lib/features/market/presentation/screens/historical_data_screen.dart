@@ -1,16 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/tokens.dart';
+import '../../../../core/utils/formatters.dart';
 import '../../../../shared/widgets/common.dart';
-import '../../../../shared/widgets/pishro_button.dart';
+import '../../../../shared/widgets/states.dart';
+import '../../data/market_models.dart';
+import '../../data/market_repository.dart';
+import '../widgets/market_async.dart';
 
-/// Screen/Market/HistoricalData — «داده‌های تاریخی».
-///
-/// Source: `../desighn/_capture/08-07-market.dc.html` · Android 390dp · RTL.
+/// Screen/Market/HistoricalData — OHLC روزانه از اسپارک‌لاین ساعتی.
 class HistoricalDataScreen extends ConsumerWidget {
   const HistoricalDataScreen({super.key, this.id = ''});
 
@@ -19,86 +20,61 @@ class HistoricalDataScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final c = context.colors;
+    final detail = ref.watch(assetDetailProvider(id));
+
     return Scaffold(
       appBar: AppBar(
-        titleSpacing: Space.s5,
         title: Text(
-          'داده‌های تاریخی',
+          'تاریخچه',
           style: context.text.h3.copyWith(color: c.textPrimary),
         ),
       ),
-      body: ListView(
-        padding: const EdgeInsets.fromLTRB(
-          Space.page,
-          Space.s4,
-          Space.page,
-          Space.s8,
-        ),
-        children: [
-          Text(
-            'داده‌های تاریخی',
-            style: context.text.h2.copyWith(color: c.textPrimary),
-          ),
-          const SizedBox(height: Space.s2),
-          Text(
-            'پیاده‌سازی بر اساس دک طراحی · Screen/Market/HistoricalData',
-            style: context.text.bodySmall.copyWith(color: c.textMuted),
-          ),
-          const SizedBox(height: Space.s5),
-          PishroCard(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                _DeckRow(text: r'هشدارهای قیمت'),
-                _DeckRow(text: r'Bitcoin — بیشتر از ۳٬۵۰۰٬۰۰۰٬۰۰۰ تومان'),
-                _DeckRow(text: r'فعلی: ۳٬۴۲۰٬۰۰۰٬۰۰۰ · ایجاد: ۳ روز پیش'),
-                _DeckRow(text: r'Ethereum — کمتر از ۱۸۰٬۰۰۰٬۰۰۰ تومان'),
-                _DeckRow(text: r'غیرفعال · ایجاد: ۱ هفته پیش'),
-                _DeckRow(
-                  text: r'هشدار قیمت به معنای انجام خودکار معامله نیست.',
+      body: MarketAsync(
+        value: detail,
+        onRetry: () => ref.invalidate(assetDetailProvider(id)),
+        builder: (context, data) {
+          final candles = dailyCandles(data.asset.sparkline, data.generatedAt);
+          if (candles.isEmpty) {
+            return const EmptyState(title: 'تاریخچه‌ای برای نمایش نیست');
+          }
+          return ListView(
+            padding: const EdgeInsets.all(Space.page),
+            children: [
+              const NoticeBanner(
+                message:
+                    'کندل روزانه از اسپارک‌لاین ۷روزه ساخته شده؛ داده نمونه کامل نیست.',
+                tone: NoticeTone.info,
+              ),
+              const SizedBox(height: Space.s4),
+              for (final candle in candles) ...[
+                PishroCard(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        Fmt.jalaliLong(candle.day),
+                        style: context.text.bodySmall.copyWith(
+                          color: c.textPrimary,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      const SizedBox(height: Space.s2),
+                      Text(
+                        'باز ${faToman(candle.open)} · بالا ${faToman(candle.high)} · پایین ${faToman(candle.low)} · بسته ${faToman(candle.close)}',
+                        style: context.text.caption.copyWith(
+                          color: c.textMuted,
+                        ),
+                      ),
+                      const SizedBox(height: Space.s2),
+                      MarketDelta(candle.changePercent, compact: true),
+                    ],
+                  ),
                 ),
-                _DeckRow(text: r'ساخت هشدار'),
-                _DeckRow(text: r'۱۲ · هشدارهای قیمت'),
-                _DeckRow(text: r'Overlay مصور'),
+                const SizedBox(height: Space.s3),
               ],
-            ),
-          ),
-          const SizedBox(height: Space.s5),
-          PishroButton(
-            label: 'ادامه',
-            onPressed: () {
-              if (context.canPop()) {
-                context.pop();
-              }
-            },
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _DeckRow extends StatelessWidget {
-  const _DeckRow({required this.text});
-  final String text;
-
-  @override
-  Widget build(BuildContext context) {
-    final c = context.colors;
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: Space.s2),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(Icons.circle, size: 6, color: c.actionPrimary),
-          const SizedBox(width: Space.s3),
-          Expanded(
-            child: Text(
-              text,
-              style: context.text.bodyMedium.copyWith(color: c.textSecondary),
-            ),
-          ),
-        ],
+            ],
+          );
+        },
       ),
     );
   }

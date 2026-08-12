@@ -1,101 +1,65 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/tokens.dart';
-import '../../../../shared/widgets/common.dart';
-import '../../../../shared/widgets/pishro_button.dart';
+import '../../../../shared/widgets/pishro_chip.dart';
+import '../../../../shared/widgets/states.dart';
 
-/// Screen/Account/Preferences — «تنظیمات».
-///
-/// Source: `../desighn/_capture/11-09-account-part-2.dc.html` · Android 390dp · RTL.
+import '../../../../shared/providers/theme_provider.dart';
+
 class AccountPreferencesScreen extends ConsumerWidget {
   const AccountPreferencesScreen({super.key});
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final c = context.colors;
+    final mode = ref.watch(themeModeProvider);
     return Scaffold(
       appBar: AppBar(
-        titleSpacing: Space.s5,
         title: Text(
-          'تنظیمات',
+          'ترجیحات',
           style: context.text.h3.copyWith(color: c.textPrimary),
         ),
       ),
       body: ListView(
-        padding: const EdgeInsets.fromLTRB(
-          Space.page,
-          Space.s4,
-          Space.page,
-          Space.s8,
-        ),
+        padding: const EdgeInsets.all(Space.page),
         children: [
           Text(
-            'تنظیمات',
-            style: context.text.h2.copyWith(color: c.textPrimary),
-          ),
-          const SizedBox(height: Space.s2),
-          Text(
-            'پیاده‌سازی بر اساس دک طراحی · Screen/Account/Preferences',
-            style: context.text.bodySmall.copyWith(color: c.textMuted),
-          ),
-          const SizedBox(height: Space.s5),
-          PishroCard(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                _DeckRow(text: r'اسناد و قوانین'),
-                _DeckRow(text: r'قوانین و شرایط استفاده'),
-                _DeckRow(text: r'نسخه ۲٫۱ · ۱ تیر ۱۴۰۵'),
-                _DeckRow(text: r'پذیرفته‌شده'),
-                _DeckRow(text: r'شرایط طرح سرمایه‌گذاری و ریسک'),
-                _DeckRow(text: r'نسخه جدید نیازمند بررسی و تأیید است.'),
-                _DeckRow(text: r'سیاست حریم خصوصی'),
-                _DeckRow(text: r'نسخه ۱٫۴ · ۱۵ خرداد ۱۴۰۵'),
-                _DeckRow(text: r'پذیرفته‌شده'),
-                _DeckRow(text: r'قوانین کوین پیشرو'),
-                _DeckRow(text: r'نسخه ۱٫۰'),
-                _DeckRow(text: r'۲۰ · اسناد و قوانین'),
-              ],
+            'ظاهر برنامه',
+            style: context.text.bodySmall.copyWith(
+              color: c.textSecondary,
+              fontWeight: FontWeight.w600,
             ),
           ),
-          const SizedBox(height: Space.s5),
-          PishroButton(
-            label: 'ادامه',
-            onPressed: () {
-              if (context.canPop()) {
-                context.pop();
-              }
-            },
+          const SizedBox(height: Space.s3),
+          Wrap(
+            spacing: Space.s2,
+            children: [
+              PishroChip(
+                label: 'تاریک',
+                selected: mode == ThemeMode.dark,
+                onTap: () =>
+                    ref.read(themeModeProvider.notifier).set(ThemeMode.dark),
+              ),
+              PishroChip(
+                label: 'روشن',
+                selected: mode == ThemeMode.light,
+                onTap: () =>
+                    ref.read(themeModeProvider.notifier).set(ThemeMode.light),
+              ),
+              PishroChip(
+                label: 'سیستم',
+                selected: mode == ThemeMode.system,
+                onTap: () =>
+                    ref.read(themeModeProvider.notifier).set(ThemeMode.system),
+              ),
+            ],
           ),
-        ],
-      ),
-    );
-  }
-}
-
-class _DeckRow extends StatelessWidget {
-  const _DeckRow({required this.text});
-  final String text;
-
-  @override
-  Widget build(BuildContext context) {
-    final c = context.colors;
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: Space.s2),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(Icons.circle, size: 6, color: c.actionPrimary),
-          const SizedBox(width: Space.s3),
-          Expanded(
-            child: Text(
-              text,
-              style: context.text.bodyMedium.copyWith(color: c.textSecondary),
-            ),
+          const SizedBox(height: Space.s4),
+          const NoticeBanner(
+            message: 'رنگ اکشن برند قابل تغییر نیست؛ فقط حالت روشن/تاریک.',
+            tone: NoticeTone.info,
           ),
         ],
       ),

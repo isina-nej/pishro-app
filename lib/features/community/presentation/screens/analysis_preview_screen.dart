@@ -5,101 +5,75 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/tokens.dart';
-import '../../../../shared/widgets/common.dart';
+import '../../../../routing/routes.dart';
+import '../../../../shared/widgets/pishro_badge.dart';
 import '../../../../shared/widgets/pishro_button.dart';
+import '../../../../shared/widgets/states.dart';
 
-/// Screen/Community/AnalysisPreview — «پیش‌نمایش تحلیل».
-///
-/// Source: `../desighn/_capture/09-08-community.dc.html` · Android 390dp · RTL.
+import '../../data/community_repository.dart';
+
 class AnalysisPreviewScreen extends ConsumerWidget {
-  const AnalysisPreviewScreen({super.key, this.id = ''});
-
-  final String id;
-
+  const AnalysisPreviewScreen({super.key});
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final c = context.colors;
+    final d = ref.watch(analysisDraftProvider);
     return Scaffold(
       appBar: AppBar(
-        titleSpacing: Space.s5,
         title: Text(
-          'پیش‌نمایش تحلیل',
+          'پیش‌نمایش',
           style: context.text.h3.copyWith(color: c.textPrimary),
         ),
       ),
       body: ListView(
-        padding: const EdgeInsets.fromLTRB(
-          Space.page,
-          Space.s4,
-          Space.page,
-          Space.s8,
-        ),
+        padding: const EdgeInsets.all(Space.page),
         children: [
           Text(
-            'پیش‌نمایش تحلیل',
-            style: context.text.h2.copyWith(color: c.textPrimary),
+            d.title.isEmpty ? 'بدون عنوان' : d.title,
+            style: context.text.h3.copyWith(color: c.textPrimary),
           ),
-          const SizedBox(height: Space.s2),
           Text(
-            'پیاده‌سازی بر اساس دک طراحی · Screen/Community/AnalysisPreview',
-            style: context.text.bodySmall.copyWith(color: c.textMuted),
+            '${d.asset?.symbol ?? '—'} · ${d.kind.label} · ${d.timeframe.label}',
+            style: context.text.caption.copyWith(color: c.textMuted),
           ),
-          const SizedBox(height: Space.s5),
-          PishroCard(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                _DeckRow(text: r'تحلیل منتشر شد'),
-                _DeckRow(text: r'عنوان'),
-                _DeckRow(text: r'بررسی سطوح حمایت...'),
-                _DeckRow(text: r'زمان انتشار'),
-                _DeckRow(text: r'اکنون'),
-                _DeckRow(text: r'نمایانی'),
-                _DeckRow(text: r'عمومی'),
-                _DeckRow(text: r'شناسه تحلیل'),
-                _DeckRow(text: r'مشاهده تحلیل'),
-                _DeckRow(text: r'ایجاد تحلیل دیگر'),
-                _DeckRow(text: r'۱۴ · نتیجه انتشار'),
-                _DeckRow(text: r'Screen/Community/PublishResult · بدون کانفتی'),
-              ],
+          const SizedBox(height: Space.s3),
+          RiskBadge(d.risk),
+          const SizedBox(height: Space.s4),
+          Text(
+            d.summary.isEmpty ? 'خلاصه‌ای نوشته نشده' : d.summary,
+            style: context.text.bodySmall.copyWith(color: c.textSecondary),
+          ),
+          const SizedBox(height: Space.s3),
+          Text(
+            d.body,
+            style: context.text.bodySmall.copyWith(
+              color: c.textSecondary,
+              height: 1.8,
             ),
           ),
-          const SizedBox(height: Space.s5),
-          PishroButton(
-            label: 'ادامه',
-            onPressed: () {
-              if (context.canPop()) {
-                context.pop();
-              }
-            },
-          ),
+          if (d.invalidation.isNotEmpty) ...[
+            const SizedBox(height: Space.s3),
+            NoticeBanner(
+              message: 'شرط بی‌اعتبار شدن: ${d.invalidation}',
+              tone: NoticeTone.warning,
+            ),
+          ],
         ],
       ),
-    );
-  }
-}
-
-class _DeckRow extends StatelessWidget {
-  const _DeckRow({required this.text});
-  final String text;
-
-  @override
-  Widget build(BuildContext context) {
-    final c = context.colors;
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: Space.s2),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(Icons.circle, size: 6, color: c.actionPrimary),
-          const SizedBox(width: Space.s3),
-          Expanded(
-            child: Text(
-              text,
-              style: context.text.bodyMedium.copyWith(color: c.textSecondary),
-            ),
+      bottomNavigationBar: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(Space.page),
+          child: PishroButton(
+            label: 'ارسال برای بررسی',
+            onPressed: () async {
+              final out = await ref
+                  .read(communityRepositoryProvider)
+                  .publish(d);
+              ref.read(publishOutcomeProvider.notifier).state = out;
+              if (context.mounted) context.go(Routes.publishResult);
+            },
           ),
-        ],
+        ),
       ),
     );
   }

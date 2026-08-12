@@ -5,104 +5,106 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/tokens.dart';
-import '../../../../shared/widgets/common.dart';
+import '../../../../routing/routes.dart';
+import '../../../../shared/widgets/pishro_badge.dart';
 import '../../../../shared/widgets/pishro_button.dart';
+import '../../../../shared/widgets/states.dart';
 
-/// Screen/Community/AnalysisDetails — «جزئیات تحلیل».
-///
-/// Source: `../desighn/_capture/09-08-community.dc.html` · Android 390dp · RTL.
+import '../../../../core/utils/formatters.dart';
+import '../../data/community_repository.dart';
+
 class AnalysisDetailsScreen extends ConsumerWidget {
   const AnalysisDetailsScreen({super.key, this.id = ''});
-
   final String id;
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final c = context.colors;
+    final analysis = ref.watch(analysisProvider(id));
     return Scaffold(
       appBar: AppBar(
-        titleSpacing: Space.s5,
         title: Text(
           'جزئیات تحلیل',
           style: context.text.h3.copyWith(color: c.textPrimary),
         ),
       ),
-      body: ListView(
-        padding: const EdgeInsets.fromLTRB(
-          Space.page,
-          Space.s4,
-          Space.page,
-          Space.s8,
-        ),
-        children: [
-          Text(
-            'جزئیات تحلیل',
-            style: context.text.h2.copyWith(color: c.textPrimary),
-          ),
-          const SizedBox(height: Space.s2),
-          Text(
-            'پیاده‌سازی بر اساس دک طراحی · Screen/Community/AnalysisDetails',
-            style: context.text.bodySmall.copyWith(color: c.textMuted),
-          ),
-          const SizedBox(height: Space.s5),
-          PishroCard(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                _DeckRow(text: r'سیگنال‌های اشتراکی'),
-                _DeckRow(
-                  text:
-                      r'محتوای اشتراکی دیدگاه شخصی تحلیلگر است، نه دستور معاملاتی خودکار.',
-                ),
-                _DeckRow(text: r'تحلیلگر نمونه ۲'),
-                _DeckRow(text: r'اشتراکی'),
-                _DeckRow(text: r'پوشش: BTC، ETH · نوع: هفتگی · بازه: میان‌مدت'),
-                _DeckRow(text: r'داده عملکرد تأییدشده در دسترس نیست.'),
-                _DeckRow(text: r'۴۹۰٬۰۰۰'),
-                _DeckRow(text: r'تومان / ماهانه'),
-                _DeckRow(text: r'مشاهده جزئیات'),
-                _DeckRow(text: r'تحلیلگر نمونه ۵'),
-                _DeckRow(text: r'مشترک هستید'),
-                _DeckRow(text: r'پوشش: آنچین · نوع: روزانه'),
+      body: analysis.when(
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (_, __) =>
+            ErrorStateView(onRetry: () => ref.invalidate(analysisProvider(id))),
+        data: (a) {
+          if (a == null) return const EmptyState(title: 'تحلیل یافت نشد');
+          if (a.isLocked) {
+            return EmptyState(
+              title: 'این تحلیل مخصوص مشترکان است',
+              actionLabel: 'اشتراک‌ها',
+              onAction: () => context.push(Routes.subscriptions),
+            );
+          }
+          return ListView(
+            padding: const EdgeInsets.all(Space.page),
+            children: [
+              Text(
+                a.title,
+                style: context.text.h2.copyWith(color: c.textPrimary),
+              ),
+              Text(
+                '${a.assetSymbol} · ${a.author.displayName} · ${Fmt.relative(a.publishedAt)}',
+                style: context.text.caption.copyWith(color: c.textMuted),
+              ),
+              if (a.risk != null) ...[
+                const SizedBox(height: Space.s3),
+                RiskBadge(a.risk!),
               ],
-            ),
-          ),
-          const SizedBox(height: Space.s5),
-          PishroButton(
-            label: 'ادامه',
-            onPressed: () {
-              if (context.canPop()) {
-                context.pop();
-              }
-            },
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _DeckRow extends StatelessWidget {
-  const _DeckRow({required this.text});
-  final String text;
-
-  @override
-  Widget build(BuildContext context) {
-    final c = context.colors;
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: Space.s2),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(Icons.circle, size: 6, color: c.actionPrimary),
-          const SizedBox(width: Space.s3),
-          Expanded(
-            child: Text(
-              text,
-              style: context.text.bodyMedium.copyWith(color: c.textSecondary),
-            ),
-          ),
-        ],
+              if (a.summary != null) ...[
+                const SizedBox(height: Space.s4),
+                Text(
+                  a.summary!,
+                  style: context.text.bodySmall.copyWith(
+                    color: c.textSecondary,
+                  ),
+                ),
+              ],
+              if (a.body != null) ...[
+                const SizedBox(height: Space.s3),
+                Text(
+                  a.body!,
+                  style: context.text.bodySmall.copyWith(
+                    color: c.textSecondary,
+                    height: 1.8,
+                  ),
+                ),
+              ],
+              if (a.scenarios.isNotEmpty) ...[
+                const SizedBox(height: Space.s4),
+                Text(
+                  'سناریوها (هم‌وزن)',
+                  style: context.text.bodySmall.copyWith(
+                    color: c.textSecondary,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                for (final s in a.scenarios)
+                  Text(
+                    '• ${s.label}${s.note == null ? '' : ' — ${s.note}'}',
+                    style: context.text.caption.copyWith(color: c.textMuted),
+                  ),
+              ],
+              if (a.invalidation != null) ...[
+                const SizedBox(height: Space.s4),
+                NoticeBanner(
+                  message: a.invalidation!,
+                  tone: NoticeTone.warning,
+                ),
+              ],
+              const SizedBox(height: Space.s5),
+              PishroButton(
+                label: 'دیدگاه‌ها',
+                variant: PishroButtonVariant.secondary,
+                onPressed: () => context.push(Routes.analysisComments(id)),
+              ),
+            ],
+          );
+        },
       ),
     );
   }

@@ -5,12 +5,13 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/tokens.dart';
-import '../../../../shared/widgets/common.dart';
+import '../../../../routing/routes.dart';
+import '../../../../shared/widgets/pishro_badge.dart';
 import '../../../../shared/widgets/pishro_button.dart';
+import '../../../../shared/widgets/states.dart';
+import '../../data/courses_repository.dart';
 
-/// Screen/Course/VIPInstructorChat — «گفت‌وگوی VIP».
-///
-/// Source: `../desighn/_capture/04-04-courses-part-3.dc.html` · Android 390dp · RTL.
+/// Screen/Course/VIPInstructorChat — فقط بسته VIP؛ طلا برای نشان VIP.
 class VIPInstructorChatScreen extends ConsumerWidget {
   const VIPInstructorChatScreen({super.key, this.id = ''});
 
@@ -19,87 +20,125 @@ class VIPInstructorChatScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final c = context.colors;
+    final enrollment = ref.watch(enrollmentProvider(id));
+
     return Scaffold(
       appBar: AppBar(
-        titleSpacing: Space.s5,
         title: Text(
-          'گفت‌وگوی VIP',
+          'گفت‌وگو با مدرس',
           style: context.text.h3.copyWith(color: c.textPrimary),
         ),
-      ),
-      body: ListView(
-        padding: const EdgeInsets.fromLTRB(
-          Space.page,
-          Space.s4,
-          Space.page,
-          Space.s8,
-        ),
-        children: [
-          Text(
-            'گفت‌وگوی VIP',
-            style: context.text.h2.copyWith(color: c.textPrimary),
-          ),
-          const SizedBox(height: Space.s2),
-          Text(
-            'پیاده‌سازی بر اساس دک طراحی · Screen/Course/VIPInstructorChat',
-            style: context.text.bodySmall.copyWith(color: c.textMuted),
-          ),
-          const SizedBox(height: Space.s5),
-          PishroCard(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                _DeckRow(text: r'دوره را با موفقیت به پایان رساندید'),
-                _DeckRow(text: r'تحلیل تکنیکال از صفر تا معامله‌گری'),
-                _DeckRow(text: r'جلسات تکمیل‌شده'),
-                _DeckRow(text: r'۱۲ از ۱۲'),
-                _DeckRow(text: r'زمان کل صرف‌شده'),
-                _DeckRow(text: r'۸ ساعت و ۱۰ دقیقه'),
-                _DeckRow(text: r'تاریخ تکمیل'),
-                _DeckRow(text: r'۶ مرداد ۱۴۰۵'),
-                _DeckRow(text: r'یادداشت‌های ثبت‌شده'),
-                _DeckRow(text: r'۵ یادداشت'),
-                _DeckRow(text: r'فایل‌های دانلودشده'),
-                _DeckRow(text: r'۳ فایل'),
-              ],
-            ),
-          ),
-          const SizedBox(height: Space.s5),
-          PishroButton(
-            label: 'ادامه',
-            onPressed: () {
-              if (context.canPop()) {
-                context.pop();
-              }
-            },
+        actions: const [
+          Padding(
+            padding: EdgeInsetsDirectional.only(end: Space.s4),
+            child: PishroBadge.vip(),
           ),
         ],
+      ),
+      body: enrollment.when(
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (_, __) => ErrorStateView(
+          onRetry: () => ref.invalidate(enrollmentProvider(id)),
+        ),
+        data: (enrolled) {
+          if (enrolled == null || !enrolled.hasInstructorChat) {
+            return Padding(
+              padding: const EdgeInsets.all(Space.page),
+              child: Column(
+                children: [
+                  const Spacer(),
+                  Icon(
+                    Icons.lock_outline_rounded,
+                    size: 40,
+                    color: c.textMuted,
+                  ),
+                  const SizedBox(height: Space.s4),
+                  Text(
+                    'گفت‌وگوی مدرس فقط روی دوره VIP',
+                    textAlign: TextAlign.center,
+                    style: context.text.h3.copyWith(color: c.textPrimary),
+                  ),
+                  const SizedBox(height: Space.s2),
+                  Text(
+                    'با ارتقا به بسته VIP می‌توانید مستقیم از مدرس بپرسید.',
+                    textAlign: TextAlign.center,
+                    style: context.text.bodySmall.copyWith(
+                      color: c.textSecondary,
+                    ),
+                  ),
+                  const Spacer(),
+                  PishroButton(
+                    label: 'مشاهده بسته‌ها',
+                    variant: PishroButtonVariant.premium,
+                    onPressed: () => context.push(Routes.packageComparison(id)),
+                  ),
+                ],
+              ),
+            );
+          }
+          return ListView(
+            padding: const EdgeInsets.all(Space.page),
+            children: [
+              const NoticeBanner(
+                message: 'پیام‌ها معمولاً تا یک روز کاری پاسخ داده می‌شوند.',
+                tone: NoticeTone.info,
+              ),
+              const SizedBox(height: Space.s5),
+              _Bubble(
+                mine: false,
+                text: 'سلام، از کدام بخش شروع کنم؟',
+                name: enrolled.course.instructorName,
+              ),
+              const SizedBox(height: Space.s3),
+              const _Bubble(
+                mine: true,
+                text: 'فصل ۱ را تمام کردم؛ برای الگوهای قیمتی آماده‌ام.',
+                name: 'شما',
+              ),
+            ],
+          );
+        },
       ),
     );
   }
 }
 
-class _DeckRow extends StatelessWidget {
-  const _DeckRow({required this.text});
+class _Bubble extends StatelessWidget {
+  const _Bubble({required this.mine, required this.text, required this.name});
+
+  final bool mine;
   final String text;
+  final String name;
 
   @override
   Widget build(BuildContext context) {
     final c = context.colors;
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: Space.s2),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(Icons.circle, size: 6, color: c.actionPrimary),
-          const SizedBox(width: Space.s3),
-          Expanded(
-            child: Text(
-              text,
-              style: context.text.bodyMedium.copyWith(color: c.textSecondary),
-            ),
+    return Align(
+      alignment: mine ? Alignment.centerLeft : Alignment.centerRight,
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 280),
+        child: Container(
+          padding: const EdgeInsets.all(Space.s3),
+          decoration: BoxDecoration(
+            color: mine ? c.surfaceSelected : c.surfaceSecondary,
+            borderRadius: BorderRadius.circular(Radii.md),
+            border: Border.all(color: c.borderDefault),
           ),
-        ],
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                name,
+                style: context.text.micro.copyWith(color: c.textMuted),
+              ),
+              const SizedBox(height: Space.s1),
+              Text(
+                text,
+                style: context.text.bodySmall.copyWith(color: c.textPrimary),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

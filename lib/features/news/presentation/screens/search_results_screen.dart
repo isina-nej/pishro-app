@@ -5,89 +5,65 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/tokens.dart';
-import '../../../../shared/widgets/common.dart';
-import '../../../../shared/widgets/pishro_button.dart';
+import '../../../../core/utils/formatters.dart';
+import '../../../../routing/routes.dart';
+import '../../../../shared/widgets/states.dart';
+import '../../data/news_repository.dart';
+import '../widgets/article_card.dart';
 
-/// Screen/News/SearchResults — «نتایج جستجو».
-///
-/// Source: `../desighn/_capture/05-05-news.dc.html` · Android 390dp · RTL.
+/// Screen/News/SearchResults.
 class NewsSearchResultsScreen extends ConsumerWidget {
   const NewsSearchResultsScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final c = context.colors;
+    final query = ref.watch(newsQueryProvider);
+    final feed = ref.watch(newsFeedProvider(query));
+
     return Scaffold(
       appBar: AppBar(
-        titleSpacing: Space.s5,
         title: Text(
-          'نتایج جستجو',
+          query.search?.isNotEmpty == true ? query.search! : 'نتایج اخبار',
           style: context.text.h3.copyWith(color: c.textPrimary),
         ),
+        actions: [
+          IconButton(
+            tooltip: 'فیلترها',
+            onPressed: () => context.push(Routes.newsFilters),
+            icon: const Icon(Icons.tune_rounded),
+          ),
+        ],
       ),
-      body: ListView(
-        padding: const EdgeInsets.fromLTRB(
-          Space.page,
-          Space.s4,
-          Space.page,
-          Space.s8,
-        ),
-        children: [
-          Text(
-            'نتایج جستجو',
-            style: context.text.h2.copyWith(color: c.textPrimary),
-          ),
-          const SizedBox(height: Space.s2),
-          Text(
-            'پیاده‌سازی بر اساس دک طراحی · Screen/News/SearchResults',
-            style: context.text.bodySmall.copyWith(color: c.textMuted),
-          ),
-          const SizedBox(height: Space.s5),
-          PishroCard(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                _DeckRow(text: r'دیدگاه‌ها'),
-                _DeckRow(text: r'۲۸ دیدگاه'),
-              ],
-            ),
-          ),
-          const SizedBox(height: Space.s5),
-          PishroButton(
-            label: 'ادامه',
-            onPressed: () {
-              if (context.canPop()) {
-                context.pop();
+      body: NewsAsync(
+        value: feed,
+        onRetry: () => ref.invalidate(newsFeedProvider(query)),
+        builder: (context, items) {
+          if (items.isEmpty) {
+            return const EmptyState(
+              title: 'خبری مطابق جستجو پیدا نشد',
+              icon: Icons.search_off_rounded,
+            );
+          }
+          return ListView.separated(
+            padding: const EdgeInsets.all(Space.page),
+            itemCount: items.length + 1,
+            separatorBuilder: (_, __) => const SizedBox(height: Space.s3),
+            itemBuilder: (context, i) {
+              if (i == 0) {
+                return Text(
+                  '${Fmt.fa('${items.length}')} خبر',
+                  style: context.text.caption.copyWith(color: c.textMuted),
+                );
               }
+              final a = items[i - 1];
+              return CompactArticleCard(
+                article: a,
+                onTap: () => context.push(Routes.newsDetails(a.slug)),
+              );
             },
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _DeckRow extends StatelessWidget {
-  const _DeckRow({required this.text});
-  final String text;
-
-  @override
-  Widget build(BuildContext context) {
-    final c = context.colors;
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: Space.s2),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(Icons.circle, size: 6, color: c.actionPrimary),
-          const SizedBox(width: Space.s3),
-          Expanded(
-            child: Text(
-              text,
-              style: context.text.bodyMedium.copyWith(color: c.textSecondary),
-            ),
-          ),
-        ],
+          );
+        },
       ),
     );
   }

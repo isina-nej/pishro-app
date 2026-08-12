@@ -5,91 +5,51 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/tokens.dart';
-import '../../../../shared/widgets/common.dart';
-import '../../../../shared/widgets/pishro_button.dart';
+import '../../../../routing/routes.dart';
+import '../../../../shared/widgets/states.dart';
+import '../../data/market_repository.dart';
+import '../widgets/asset_row.dart';
+import '../widgets/market_async.dart';
 
-/// Screen/Market/AllAssets — «همه ارزها».
-///
-/// Source: `../desighn/_capture/08-07-market.dc.html` · Android 390dp · RTL.
+/// Screen/Market/AllAssets.
 class AllAssetsScreen extends ConsumerWidget {
   const AllAssetsScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final c = context.colors;
+    final snap = ref.watch(marketSnapshotProvider);
+
     return Scaffold(
       appBar: AppBar(
-        titleSpacing: Space.s5,
         title: Text(
           'همه ارزها',
           style: context.text.h3.copyWith(color: c.textPrimary),
         ),
       ),
-      body: ListView(
-        padding: const EdgeInsets.fromLTRB(
-          Space.page,
-          Space.s4,
-          Space.page,
-          Space.s8,
-        ),
-        children: [
-          Text(
-            'همه ارزها',
-            style: context.text.h2.copyWith(color: c.textPrimary),
-          ),
-          const SizedBox(height: Space.s2),
-          Text(
-            'پیاده‌سازی بر اساس دک طراحی · Screen/Market/AllAssets',
-            style: context.text.bodySmall.copyWith(color: c.textMuted),
-          ),
-          const SizedBox(height: Space.s5),
-          PishroCard(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                _DeckRow(text: r'ارزهای پرطرفدار'),
-                _DeckRow(text: r'امروز'),
-                _DeckRow(text: r'۷ روز'),
-                _DeckRow(text: r'۳۰ روز'),
-              ],
+      body: MarketAsync(
+        value: snap,
+        onRetry: () => ref.invalidate(marketSnapshotProvider),
+        builder: (context, data) {
+          if (data.assets.isEmpty) {
+            return const EmptyState(title: 'ارزی برای نمایش نیست');
+          }
+          return RefreshIndicator(
+            onRefresh: () async => ref.invalidate(marketSnapshotProvider),
+            child: ListView.separated(
+              padding: const EdgeInsets.all(Space.page),
+              itemCount: data.assets.length,
+              separatorBuilder: (_, __) => const SizedBox(height: Space.s3),
+              itemBuilder: (_, i) {
+                final a = data.assets[i];
+                return AssetRow(
+                  asset: a,
+                  onTap: () => context.push(Routes.coinDetails(a.id)),
+                );
+              },
             ),
-          ),
-          const SizedBox(height: Space.s5),
-          PishroButton(
-            label: 'ادامه',
-            onPressed: () {
-              if (context.canPop()) {
-                context.pop();
-              }
-            },
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _DeckRow extends StatelessWidget {
-  const _DeckRow({required this.text});
-  final String text;
-
-  @override
-  Widget build(BuildContext context) {
-    final c = context.colors;
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: Space.s2),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(Icons.circle, size: 6, color: c.actionPrimary),
-          const SizedBox(width: Space.s3),
-          Expanded(
-            child: Text(
-              text,
-              style: context.text.bodyMedium.copyWith(color: c.textSecondary),
-            ),
-          ),
-        ],
+          );
+        },
       ),
     );
   }

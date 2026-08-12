@@ -4,7 +4,18 @@ import 'package:shamsi_date/shamsi_date.dart';
 /// «اعداد فارسی در متن، لاتین در نماد» — Persian digits in prose, Latin in
 /// tickers and code-like values.
 abstract final class Fmt {
-  static const _persianDigits = ['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹'];
+  static const _persianDigits = [
+    '۰',
+    '۱',
+    '۲',
+    '۳',
+    '۴',
+    '۵',
+    '۶',
+    '۷',
+    '۸',
+    '۹',
+  ];
 
   /// ASCII digits -> Persian digits. Leaves every other character alone.
   static String fa(String input) {
@@ -71,8 +82,18 @@ abstract final class Fmt {
   }
 
   static const _monthNames = [
-    'فروردین', 'اردیبهشت', 'خرداد', 'تیر', 'مرداد', 'شهریور',
-    'مهر', 'آبان', 'آذر', 'دی', 'بهمن', 'اسفند',
+    'فروردین',
+    'اردیبهشت',
+    'خرداد',
+    'تیر',
+    'مرداد',
+    'شهریور',
+    'مهر',
+    'آبان',
+    'آذر',
+    'دی',
+    'بهمن',
+    'اسفند',
   ];
 
   /// «۲۰ مرداد ۱۴۰۵»
@@ -98,7 +119,9 @@ abstract final class Fmt {
   static String maskPhone(String phone) {
     final digits = toAscii(phone).replaceAll(RegExp(r'\D'), '');
     if (digits.length < 8) return fa(digits);
-    return fa('${digits.substring(0, 4)}•••${digits.substring(digits.length - 4)}');
+    return fa(
+      '${digits.substring(0, 4)}•••${digits.substring(digits.length - 4)}',
+    );
   }
 
   /// «۱۲ ساعت» / «۴۵ دقیقه» for course and lesson durations.

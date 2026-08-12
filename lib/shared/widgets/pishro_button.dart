@@ -53,11 +53,14 @@ class PishroButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final c = context.colors;
-    final height = size == PishroButtonSize.regular ? 52.0 : Layout.minTapTarget;
-    final textStyle = (size == PishroButtonSize.regular
-            ? context.text.bodyLarge
-            : context.text.bodySmall)
-        .copyWith(fontWeight: FontWeight.w600);
+    final height = size == PishroButtonSize.regular
+        ? 52.0
+        : Layout.minTapTarget;
+    final textStyle =
+        (size == PishroButtonSize.regular
+                ? context.text.bodyLarge
+                : context.text.bodySmall)
+            .copyWith(fontWeight: FontWeight.w600);
 
     final (bg, fg, border) = _palette(c);
 
@@ -106,7 +109,9 @@ class PishroButton extends StatelessWidget {
                 border: border == null ? null : Border.all(color: border),
               ),
               padding: EdgeInsets.symmetric(
-                horizontal: size == PishroButtonSize.regular ? Space.s5 : Space.s4,
+                horizontal: size == PishroButtonSize.regular
+                    ? Space.s5
+                    : Space.s4,
               ),
               child: Center(child: child),
             ),
@@ -119,25 +124,21 @@ class PishroButton extends StatelessWidget {
   /// Returns (background, foreground, border?).
   (Color, Color, Color?) _palette(AppColors c) {
     if (!_enabled) {
-      return (
-        c.actionDisabled.withValues(alpha: 0.25),
-        c.actionDisabled,
-        null,
-      );
+      return (c.actionDisabled.withValues(alpha: 0.25), c.actionDisabled, null);
     }
     return switch (variant) {
       PishroButtonVariant.primary => (c.actionPrimary, c.onAction, null),
       PishroButtonVariant.secondary => (
-          Colors.transparent,
-          c.textPrimary,
-          c.borderDefault,
-        ),
+        Colors.transparent,
+        c.textPrimary,
+        c.borderDefault,
+      ),
       PishroButtonVariant.ghost => (Colors.transparent, c.actionPrimary, null),
       PishroButtonVariant.danger => (
-          Colors.transparent,
-          c.danger,
-          c.danger.withValues(alpha: 0.5),
-        ),
+        Colors.transparent,
+        c.danger,
+        c.danger.withValues(alpha: 0.5),
+      ),
       // Gold text sits on dark only — the deck forbids gold text on light
       // surfaces, so the label uses the darkest neutral instead.
       PishroButtonVariant.premium => (c.premium, Neutral.n1000, null),

@@ -5,96 +5,146 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/tokens.dart';
-import '../../../../shared/widgets/common.dart';
+import '../../../../routing/routes.dart';
 import '../../../../shared/widgets/pishro_button.dart';
+import '../../../../shared/widgets/pishro_chip.dart';
+import '../../data/courses_models.dart';
+import '../../data/courses_repository.dart';
 
-/// Screen/Courses/Filters — «فیلترها».
-///
-/// Source: `../desighn/_capture/02-04-courses-part-1.dc.html` · Android 390dp · RTL.
+/// Screen/Courses/Filters — «نوع بسته · سطح · بازه قیمت · مرتب‌سازی».
 class CoursesFiltersScreen extends ConsumerWidget {
   const CoursesFiltersScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final c = context.colors;
+    final filters = ref.watch(courseFiltersProvider);
+    final notifier = ref.read(courseFiltersProvider.notifier);
+
     return Scaffold(
       appBar: AppBar(
-        titleSpacing: Space.s5,
         title: Text(
           'فیلترها',
           style: context.text.h3.copyWith(color: c.textPrimary),
         ),
+        actions: [
+          if (!filters.isEmpty)
+            TextButton(
+              onPressed: () => notifier.state = const CourseFilters(),
+              child: const Text('حذف همه'),
+            ),
+        ],
       ),
       body: ListView(
         padding: const EdgeInsets.fromLTRB(
           Space.page,
           Space.s4,
           Space.page,
-          Space.s8,
+          Space.s16,
         ),
         children: [
-          Text(
-            'فیلترها',
-            style: context.text.h2.copyWith(color: c.textPrimary),
-          ),
-          const SizedBox(height: Space.s2),
-          Text(
-            'پیاده‌سازی بر اساس دک طراحی · Screen/Courses/Filters',
-            style: context.text.bodySmall.copyWith(color: c.textMuted),
-          ),
-          const SizedBox(height: Space.s5),
-          PishroCard(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                _DeckRow(text: r'نتایج دوره‌ها'),
-                _DeckRow(text: r'«تحلیل تکنیکال» · ۴۸ نتیجه'),
-                _DeckRow(text: r'صافی'),
-                _DeckRow(text: r'مرتب‌سازی'),
-                _DeckRow(text: r'عادی'),
-                _DeckRow(
-                  text: r'۴ ستاره و بیشتر<svg width="11" height="11" viewBox',
+          _Label('نوع بسته'),
+          Wrap(
+            spacing: Space.s2,
+            runSpacing: Space.s2,
+            children: [
+              PishroChip(
+                label: 'همه',
+                selected: filters.packageType == null,
+                onTap: () =>
+                    notifier.state = filters.copyWith(clearPackageType: true),
+              ),
+              for (final p in PackageType.values)
+                PishroChip(
+                  label: p.label,
+                  selected: filters.packageType == p,
+                  onTap: () =>
+                      notifier.state = filters.copyWith(packageType: p),
                 ),
-              ],
-            ),
+            ],
           ),
-          const SizedBox(height: Space.s5),
-          PishroButton(
-            label: 'ادامه',
-            onPressed: () {
-              if (context.canPop()) {
-                context.pop();
-              }
-            },
+          const SizedBox(height: Space.s6),
+          _Label('سطح'),
+          Wrap(
+            spacing: Space.s2,
+            runSpacing: Space.s2,
+            children: [
+              PishroChip(
+                label: 'همه',
+                selected: filters.level == null,
+                onTap: () =>
+                    notifier.state = filters.copyWith(clearLevel: true),
+              ),
+              for (final l in [
+                CourseLevel.beginner,
+                CourseLevel.intermediate,
+                CourseLevel.advanced,
+              ])
+                PishroChip(
+                  label: l.label,
+                  selected: filters.level == l,
+                  onTap: () => notifier.state = filters.copyWith(level: l),
+                ),
+            ],
+          ),
+          const SizedBox(height: Space.s6),
+          _Label('بازه قیمت'),
+          Wrap(
+            spacing: Space.s2,
+            runSpacing: Space.s2,
+            children: [
+              for (final b in PriceBand.values)
+                PishroChip(
+                  label: b.label,
+                  selected: filters.priceBand == b,
+                  onTap: () => notifier.state = filters.copyWith(priceBand: b),
+                ),
+            ],
+          ),
+          const SizedBox(height: Space.s6),
+          _Label('مرتب‌سازی'),
+          Wrap(
+            spacing: Space.s2,
+            runSpacing: Space.s2,
+            children: [
+              for (final s in CourseSort.values)
+                PishroChip(
+                  label: s.label,
+                  selected: filters.sort == s,
+                  onTap: () => notifier.state = filters.copyWith(sort: s),
+                ),
+            ],
           ),
         ],
+      ),
+      bottomNavigationBar: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(Space.page),
+          child: PishroButton(
+            label: filters.isEmpty
+                ? 'مشاهده نتایج'
+                : 'اعمال ${filters.selectedCount} فیلتر',
+            onPressed: () => context.go(Routes.courseSearchResults),
+          ),
+        ),
       ),
     );
   }
 }
 
-class _DeckRow extends StatelessWidget {
-  const _DeckRow({required this.text});
+class _Label extends StatelessWidget {
+  const _Label(this.text);
   final String text;
 
   @override
-  Widget build(BuildContext context) {
-    final c = context.colors;
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: Space.s2),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(Icons.circle, size: 6, color: c.actionPrimary),
-          const SizedBox(width: Space.s3),
-          Expanded(
-            child: Text(
-              text,
-              style: context.text.bodyMedium.copyWith(color: c.textSecondary),
-            ),
-          ),
-        ],
+  Widget build(BuildContext context) => Padding(
+    padding: const EdgeInsets.only(bottom: Space.s3),
+    child: Text(
+      text,
+      style: context.text.bodySmall.copyWith(
+        color: context.colors.textSecondary,
+        fontWeight: FontWeight.w600,
       ),
-    );
-  }
+    ),
+  );
 }

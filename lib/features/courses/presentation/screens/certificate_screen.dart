@@ -1,16 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/tokens.dart';
-import '../../../../shared/widgets/common.dart';
-import '../../../../shared/widgets/pishro_button.dart';
+import '../../../../core/utils/formatters.dart';
+import '../../../../shared/widgets/pishro_badge.dart';
+import '../../../../shared/widgets/states.dart';
+import '../../data/courses_repository.dart';
 
-/// Screen/Course/Certificate — «گواهی».
-///
-/// Source: `../desighn/_capture/04-04-courses-part-3.dc.html` · Android 390dp · RTL.
+/// Screen/Course/Certificate — قاب سبز + طلا فقط برای نشان گواهی.
 class CertificateScreen extends ConsumerWidget {
   const CertificateScreen({super.key, this.id = ''});
 
@@ -19,88 +18,76 @@ class CertificateScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final c = context.colors;
+    final enrollment = ref.watch(enrollmentProvider(id));
+    final e = enrollment.valueOrNull;
+
     return Scaffold(
       appBar: AppBar(
-        titleSpacing: Space.s5,
         title: Text(
-          'گواهی',
+          'گواهی پایان دوره',
           style: context.text.h3.copyWith(color: c.textPrimary),
         ),
       ),
-      body: ListView(
-        padding: const EdgeInsets.fromLTRB(
-          Space.page,
-          Space.s4,
-          Space.page,
-          Space.s8,
-        ),
-        children: [
-          Text('گواهی', style: context.text.h2.copyWith(color: c.textPrimary)),
-          const SizedBox(height: Space.s2),
-          Text(
-            'پیاده‌سازی بر اساس دک طراحی · Screen/Course/Certificate',
-            style: context.text.bodySmall.copyWith(color: c.textMuted),
-          ),
-          const SizedBox(height: Space.s5),
-          PishroCard(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
+      body: e == null
+          ? const EmptyState(title: 'گواهی در دسترس نیست')
+          : ListView(
+              padding: const EdgeInsets.all(Space.page),
               children: [
-                _DeckRow(text: r'گواهی پایان دوره'),
-                _DeckRow(text: r'پیشرو سرمایه'),
-                _DeckRow(text: r'این گواهی تقدیم می‌شود به'),
-                _DeckRow(text: r'نام کاربر نمونه'),
-                _DeckRow(text: r'برای گذراندن موفق دوره'),
-                _DeckRow(text: r'تحلیل تکنیکال از صفر تا معامله‌گری'),
-                _DeckRow(text: r'تاریخ صدور'),
-                _DeckRow(text: r'۶ مرداد ۱۴۰۵'),
-                _DeckRow(text: r'شناسه گواهی'),
-                _DeckRow(text: r'دانلود گواهی'),
-                _DeckRow(text: r'۰۵ · گواهی'),
-                _DeckRow(
-                  text:
-                      r'Screen/Course/Certificate · قاب سبز، تزئین طلایی کم‌مصرف',
+                Container(
+                  padding: const EdgeInsets.all(Space.s6),
+                  decoration: BoxDecoration(
+                    color: c.surfacePrimary,
+                    borderRadius: BorderRadius.circular(Radii.card),
+                    border: Border.all(color: c.actionPrimary, width: 2),
+                  ),
+                  child: Column(
+                    children: [
+                      Icon(
+                        Icons.workspace_premium_rounded,
+                        size: 40,
+                        color: c.premium,
+                      ),
+                      const SizedBox(height: Space.s2),
+                      const PishroBadge(
+                        label: 'گواهی پیشرو سرمایه',
+                        tone: PishroBadgeTone.premium,
+                        icon: Icons.star_rounded,
+                      ),
+                      const SizedBox(height: Space.s4),
+                      Text(
+                        'این گواهی پایان دوره را تأیید می‌کند',
+                        textAlign: TextAlign.center,
+                        style: context.text.caption.copyWith(
+                          color: c.textMuted,
+                        ),
+                      ),
+                      const SizedBox(height: Space.s3),
+                      Text(
+                        e.course.title,
+                        textAlign: TextAlign.center,
+                        style: context.text.h3.copyWith(color: c.textPrimary),
+                      ),
+                      const SizedBox(height: Space.s2),
+                      Text(
+                        e.course.instructorName,
+                        style: context.text.bodySmall.copyWith(
+                          color: c.textSecondary,
+                        ),
+                      ),
+                      if (e.completedAt != null) ...[
+                        const SizedBox(height: Space.s3),
+                        Text(
+                          Fmt.jalaliLong(e.completedAt!),
+                          style: context.text.caption.copyWith(
+                            color: c.textMuted,
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
                 ),
               ],
             ),
-          ),
-          const SizedBox(height: Space.s5),
-          PishroButton(
-            label: 'ادامه',
-            onPressed: () {
-              if (context.canPop()) {
-                context.pop();
-              }
-            },
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _DeckRow extends StatelessWidget {
-  const _DeckRow({required this.text});
-  final String text;
-
-  @override
-  Widget build(BuildContext context) {
-    final c = context.colors;
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: Space.s2),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(Icons.circle, size: 6, color: c.actionPrimary),
-          const SizedBox(width: Space.s3),
-          Expanded(
-            child: Text(
-              text,
-              style: context.text.bodyMedium.copyWith(color: c.textSecondary),
-            ),
-          ),
-        ],
-      ),
     );
   }
 }

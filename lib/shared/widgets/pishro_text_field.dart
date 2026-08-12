@@ -34,19 +34,18 @@ class PishroTextField extends StatelessWidget {
     String? errorText,
     ValueChanged<String>? onChanged,
     bool enabled = true,
-  }) =>
-      PishroTextField(
-        key: key,
-        label: 'شماره موبایل',
-        controller: controller,
-        hint: '۰۹۱۲۳۴۵۶۷۸۹',
-        errorText: errorText,
-        enabled: enabled,
-        keyboardType: TextInputType.phone,
-        maxLength: 11,
-        inputFormatters: [_PersianDigitNormaliser()],
-        onChanged: onChanged,
-      );
+  }) => PishroTextField(
+    key: key,
+    label: 'شماره موبایل',
+    controller: controller,
+    hint: '۰۹۱۲۳۴۵۶۷۸۹',
+    errorText: errorText,
+    enabled: enabled,
+    keyboardType: TextInputType.phone,
+    maxLength: 11,
+    inputFormatters: [_PersianDigitNormaliser()],
+    onChanged: onChanged,
+  );
 
   /// Amount entry with a «تومان» suffix and live thousands grouping.
   factory PishroTextField.amount({
@@ -56,19 +55,18 @@ class PishroTextField extends StatelessWidget {
     String? helper,
     String? errorText,
     ValueChanged<String>? onChanged,
-  }) =>
-      PishroTextField(
-        key: key,
-        label: label,
-        controller: controller,
-        hint: '۱۰۰٬۰۰۰٬۰۰۰',
-        helper: helper,
-        errorText: errorText,
-        suffix: 'تومان',
-        keyboardType: TextInputType.number,
-        inputFormatters: [_PersianDigitNormaliser()],
-        onChanged: onChanged,
-      );
+  }) => PishroTextField(
+    key: key,
+    label: label,
+    controller: controller,
+    hint: '۱۰۰٬۰۰۰٬۰۰۰',
+    helper: helper,
+    errorText: errorText,
+    suffix: 'تومان',
+    keyboardType: TextInputType.number,
+    inputFormatters: [_PersianDigitNormaliser()],
+    onChanged: onChanged,
+  );
 
   final String label;
   final TextEditingController? controller;
@@ -122,7 +120,9 @@ class PishroTextField extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(horizontal: Space.s3),
                     child: Text(
                       suffix!,
-                      style: context.text.bodySmall.copyWith(color: c.textMuted),
+                      style: context.text.bodySmall.copyWith(
+                        color: c.textMuted,
+                      ),
                     ),
                   ),
             suffixIconConstraints: const BoxConstraints(minWidth: 0),

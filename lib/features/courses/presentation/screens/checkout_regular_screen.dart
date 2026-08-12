@@ -5,99 +5,90 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/tokens.dart';
-import '../../../../shared/widgets/common.dart';
+import '../../../../routing/routes.dart';
 import '../../../../shared/widgets/pishro_button.dart';
+import '../../../../shared/widgets/states.dart';
+import '../../../auth/presentation/widgets/consent_checkbox.dart';
+import '../../data/checkout_repository.dart';
+import '../widgets/checkout_summary.dart';
 
-/// Screen/Checkout/Course-Regular — «پرداخت بسته عادی».
-///
-/// Source: `../desighn/_capture/02-04-courses-part-1.dc.html` · Android 390dp · RTL.
+/// Screen/Checkout/Course-Regular — خلاصه سفارش بسته عادی.
 class CourseRegularScreen extends ConsumerWidget {
   const CourseRegularScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final c = context.colors;
+    final draft = ref.watch(checkoutProvider);
+    if (draft == null) {
+      return Scaffold(
+        appBar: AppBar(),
+        body: EmptyState(
+          title: 'سفارشی در جریان نیست',
+          message: 'ابتدا یک دوره را برای خرید انتخاب کنید.',
+          actionLabel: 'بازگشت به دوره‌ها',
+          onAction: () => context.go(Routes.courses),
+        ),
+      );
+    }
+
     return Scaffold(
       appBar: AppBar(
-        titleSpacing: Space.s5,
         title: Text(
           'پرداخت بسته عادی',
           style: context.text.h3.copyWith(color: c.textPrimary),
         ),
       ),
       body: ListView(
-        padding: const EdgeInsets.fromLTRB(
-          Space.page,
-          Space.s4,
-          Space.page,
-          Space.s8,
-        ),
+        padding: const EdgeInsets.all(Space.page),
         children: [
-          Text(
-            'پرداخت بسته عادی',
-            style: context.text.h2.copyWith(color: c.textPrimary),
-          ),
-          const SizedBox(height: Space.s2),
-          Text(
-            'پیاده‌سازی بر اساس دک طراحی · Screen/Checkout/Course-Regular',
-            style: context.text.bodySmall.copyWith(color: c.textMuted),
-          ),
+          CheckoutSummaryCard(draft: draft),
           const SizedBox(height: Space.s5),
-          PishroCard(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                _DeckRow(text: r'تکمیل خرید VIP'),
-                _DeckRow(text: r'تحلیل تکنیکال از صفر تا معامله‌گری'),
-                _DeckRow(text: r'بسته VIP'),
-                _DeckRow(text: r'دسترسی گفت‌وگو با مدرس'),
-                _DeckRow(text: r'مدت دسترسی به گفت‌وگو'),
-                _DeckRow(text: r'اطلاعات تکمیلی طرح'),
-                _DeckRow(text: r'سیاست پاسخ‌گویی'),
-                _DeckRow(text: r'طبق شرایط دوره'),
-                _DeckRow(text: r'خدمات تکمیلی VIP'),
-                _DeckRow(text: r'در صورت ارائه توسط مدرس'),
-                _DeckRow(text: r'گفت‌وگوی مستقیم با مدرس'),
-                _DeckRow(text: r'اولویت پاسخ‌گویی به پرسش‌ها'),
-              ],
+          ListTile(
+            contentPadding: EdgeInsets.zero,
+            title: Text(
+              'روش پرداخت',
+              style: context.text.bodyMedium.copyWith(color: c.textPrimary),
             ),
+            subtitle: Text(
+              draft.method.label,
+              style: context.text.caption.copyWith(color: c.textMuted),
+            ),
+            trailing: const Icon(Icons.chevron_left_rounded),
+            onTap: () => context.push(Routes.checkoutPaymentMethod),
           ),
-          const SizedBox(height: Space.s5),
-          PishroButton(
-            label: 'ادامه',
-            onPressed: () {
-              if (context.canPop()) {
-                context.pop();
-              }
-            },
+          const SizedBox(height: Space.s4),
+          ConsentCheckbox(
+            value: draft.consentAccepted,
+            showRequired: draft.showConsentError,
+            onChanged: (v) => ref.read(checkoutProvider.notifier).setConsent(v),
+            label: 'قوانین خرید و استرداد را خوانده و می‌پذیرم.',
           ),
+          if (draft.showConsentError)
+            Padding(
+              padding: const EdgeInsets.only(top: Space.s2),
+              child: Text(
+                'برای ادامه، پذیرش قوانین خرید الزامی است.',
+                style: context.text.caption.copyWith(color: c.danger),
+              ),
+            ),
         ],
       ),
-    );
-  }
-}
-
-class _DeckRow extends StatelessWidget {
-  const _DeckRow({required this.text});
-  final String text;
-
-  @override
-  Widget build(BuildContext context) {
-    final c = context.colors;
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: Space.s2),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(Icons.circle, size: 6, color: c.actionPrimary),
-          const SizedBox(width: Space.s3),
-          Expanded(
-            child: Text(
-              text,
-              style: context.text.bodyMedium.copyWith(color: c.textSecondary),
-            ),
+      bottomNavigationBar: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(Space.page),
+          child: PishroButton(
+            label: draft.payLabel,
+            loading: draft.submitting,
+            onPressed: () {
+              if (!draft.consentAccepted) {
+                ref.read(checkoutProvider.notifier).flagConsentMissing();
+                return;
+              }
+              context.push(Routes.checkoutProcessing);
+            },
           ),
-        ],
+        ),
       ),
     );
   }

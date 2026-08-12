@@ -1,16 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 
+import '../../../../core/network/api_exception.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/tokens.dart';
+import '../../../../core/utils/formatters.dart';
 import '../../../../shared/widgets/common.dart';
-import '../../../../shared/widgets/pishro_button.dart';
+import '../../../../shared/widgets/states.dart';
+import '../../data/courses_models.dart';
+import '../../data/courses_repository.dart';
 
-/// Screen/Course/DownloadsAndResources — «دانلودها و منابع».
-///
-/// Source: `../desighn/_capture/04-04-courses-part-3.dc.html` · Android 390dp · RTL.
+/// Screen/Course/DownloadsAndResources — جلسات دانلودشده + منابع.
 class DownloadsAndResourcesScreen extends ConsumerWidget {
   const DownloadsAndResourcesScreen({super.key, this.id = ''});
 
@@ -19,85 +20,103 @@ class DownloadsAndResourcesScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final c = context.colors;
+    final curriculum = ref.watch(curriculumProvider(id));
+
     return Scaffold(
       appBar: AppBar(
-        titleSpacing: Space.s5,
         title: Text(
           'دانلودها و منابع',
           style: context.text.h3.copyWith(color: c.textPrimary),
         ),
       ),
-      body: ListView(
-        padding: const EdgeInsets.fromLTRB(
-          Space.page,
-          Space.s4,
-          Space.page,
-          Space.s8,
+      body: curriculum.when(
+        loading: () => const Padding(
+          padding: EdgeInsets.all(Space.page),
+          child: Skeleton.box(height: 80),
         ),
-        children: [
-          Text(
-            'دانلودها و منابع',
-            style: context.text.h2.copyWith(color: c.textPrimary),
-          ),
-          const SizedBox(height: Space.s2),
-          Text(
-            'پیاده‌سازی بر اساس دک طراحی · Screen/Course/DownloadsAndResources',
-            style: context.text.bodySmall.copyWith(color: c.textMuted),
-          ),
-          const SizedBox(height: Space.s5),
-          PishroCard(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                _DeckRow(text: r'تیم آموزشی پیشرو سرمایه'),
-                _DeckRow(text: r'میانگین زمان پاسخ‌گویی: کمتر از یک روز کاری'),
-                _DeckRow(text: r'این گفت‌وگو بخشی از بسته VIP شماست.'),
-                _DeckRow(text: r'امروز'),
-                _DeckRow(
-                  text:
-                      r'سلام، در ارتباط با تعیین حد ضرر در فصل دوم سؤال داشتم.',
+        error: (e, _) => ErrorStateView(
+          message: e is ApiException ? e.message : 'منابع بارگذاری نشد.',
+          onRetry: () => ref.invalidate(curriculumProvider(id)),
+        ),
+        data: (curr) {
+          final downloaded = [
+            for (final l in curr.lessons)
+              if (l.state == LessonState.downloaded ||
+                  l.state == LessonState.downloadFailed)
+                l,
+          ];
+          return ListView(
+            padding: const EdgeInsets.all(Space.page),
+            children: [
+              Text(
+                'جلسات ذخیره‌شده',
+                style: context.text.h3.copyWith(color: c.textPrimary),
+              ),
+              const SizedBox(height: Space.s3),
+              if (downloaded.isEmpty)
+                const EmptyState(
+                  title: 'هنوز جلسه‌ای دانلود نشده',
+                  icon: Icons.download_outlined,
+                )
+              else
+                for (final l in downloaded)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: Space.s3),
+                    child: PishroCard(
+                      child: Row(
+                        children: [
+                          Icon(
+                            l.state == LessonState.downloadFailed
+                                ? Icons.error_outline_rounded
+                                : Icons.download_done_rounded,
+                            color: l.state == LessonState.downloadFailed
+                                ? c.danger
+                                : c.success,
+                          ),
+                          const SizedBox(width: Space.s3),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  l.title,
+                                  style: context.text.bodySmall.copyWith(
+                                    color: c.textPrimary,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                                Text(
+                                  l.state.label.isEmpty
+                                      ? Fmt.duration(l.duration)
+                                      : '${Fmt.duration(l.duration)} · ${l.state.label}',
+                                  style: context.text.caption.copyWith(
+                                    color: c.textMuted,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+              const SizedBox(height: Space.s5),
+              Text(
+                'منابع دوره',
+                style: context.text.h3.copyWith(color: c.textPrimary),
+              ),
+              const SizedBox(height: Space.s3),
+              PishroCard(
+                child: Text(
+                  'فایل‌های پیوست از سرور دوره هنوز منتشر نشده‌اند. به‌محض فعال‌شدن، همین‌جا فهرست می‌شوند.',
+                  style: context.text.bodySmall.copyWith(
+                    color: c.textSecondary,
+                  ),
                 ),
-                _DeckRow(text: r'حتماً، الان ارسال می‌کنم.'),
-                _DeckRow(text: r'پیام خود را بنویسید…'),
-              ],
-            ),
-          ),
-          const SizedBox(height: Space.s5),
-          PishroButton(
-            label: 'ادامه',
-            onPressed: () {
-              if (context.canPop()) {
-                context.pop();
-              }
-            },
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _DeckRow extends StatelessWidget {
-  const _DeckRow({required this.text});
-  final String text;
-
-  @override
-  Widget build(BuildContext context) {
-    final c = context.colors;
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: Space.s2),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(Icons.circle, size: 6, color: c.actionPrimary),
-          const SizedBox(width: Space.s3),
-          Expanded(
-            child: Text(
-              text,
-              style: context.text.bodyMedium.copyWith(color: c.textSecondary),
-            ),
-          ),
-        ],
+              ),
+            ],
+          );
+        },
       ),
     );
   }

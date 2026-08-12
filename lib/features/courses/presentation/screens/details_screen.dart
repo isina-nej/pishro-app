@@ -2,15 +2,22 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/network/api_exception.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/tokens.dart';
+import '../../../../core/utils/formatters.dart';
+import '../../../../routing/routes.dart';
 import '../../../../shared/widgets/common.dart';
+import '../../../../shared/widgets/pishro_badge.dart';
 import '../../../../shared/widgets/pishro_button.dart';
+import '../../../../shared/widgets/states.dart';
+import '../../data/checkout_repository.dart';
+import '../../data/courses_models.dart';
+import '../../data/courses_repository.dart';
+import '../widgets/course_widgets.dart';
 
-/// Screen/Course/Details — «جزئیات دوره».
-///
-/// Source: `../desighn/_capture/02-04-courses-part-1.dc.html` · Android 390dp · RTL.
+/// Screen/Course/Details — کاور، متا، توضیح، نوار خرید چسبان.
 class CourseDetailsScreen extends ConsumerWidget {
   const CourseDetailsScreen({super.key, this.id = ''});
 
@@ -19,85 +26,202 @@ class CourseDetailsScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final c = context.colors;
-    return Scaffold(
-      appBar: AppBar(
-        titleSpacing: Space.s5,
-        title: Text(
-          'جزئیات دوره',
-          style: context.text.h3.copyWith(color: c.textPrimary),
+    final course = ref.watch(courseProvider(id));
+    final enrollment = ref.watch(enrollmentProvider(id));
+
+    return course.when(
+      loading: () => const Scaffold(
+        body: Padding(
+          padding: EdgeInsets.all(Space.page),
+          child: Column(
+            children: [
+              Skeleton.cover(),
+              SizedBox(height: Space.s4),
+              Skeleton.line(width: 220),
+              SizedBox(height: Space.s2),
+              Skeleton.line(),
+            ],
+          ),
         ),
       ),
-      body: ListView(
-        padding: const EdgeInsets.fromLTRB(
-          Space.page,
-          Space.s4,
-          Space.page,
-          Space.s8,
+      error: (e, _) => Scaffold(
+        appBar: AppBar(),
+        body: ErrorStateView(
+          message: e is ApiException ? e.message : 'دوره بارگذاری نشد.',
+          onRetry: () => ref.invalidate(courseProvider(id)),
         ),
-        children: [
-          Text(
-            'جزئیات دوره',
-            style: context.text.h2.copyWith(color: c.textPrimary),
+      ),
+      data: (course) {
+        final enrolled = enrollment.valueOrNull;
+        return Scaffold(
+          appBar: AppBar(
+            title: Text(
+              course.title,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: context.text.h3.copyWith(color: c.textPrimary),
+            ),
           ),
-          const SizedBox(height: Space.s2),
-          Text(
-            'پیاده‌سازی بر اساس دک طراحی · Screen/Course/Details',
-            style: context.text.bodySmall.copyWith(color: c.textMuted),
-          ),
-          const SizedBox(height: Space.s5),
-          PishroCard(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                _DeckRow(text: r'انتخاب بسته دوره'),
-                _DeckRow(text: r'تحلیل تکنیکال از صفر تا معامله‌گری'),
-                _DeckRow(text: r'بسته عادی'),
-                _DeckRow(text: r'۲٬۴۹۰٬۰۰۰'),
-                _DeckRow(text: r'تومان'),
-                _DeckRow(text: r'دسترسی کامل به ویدیوهای دوره'),
-                _DeckRow(text: r'فایل‌ها و منابع آموزشی'),
-                _DeckRow(text: r'گواهی پایان دوره، در صورت ارائه'),
-                _DeckRow(text: r'بدون گفت‌وگوی مستقیم با مدرس'),
+          body: ListView(
+            padding: const EdgeInsets.fromLTRB(
+              Space.page,
+              Space.s3,
+              Space.page,
+              120,
+            ),
+            children: [
+              CourseCover(course: course),
+              const SizedBox(height: Space.s4),
+              Row(
+                children: [
+                  if (course.hasVip)
+                    const PishroBadge.vip()
+                  else
+                    const PishroBadge.regular(),
+                  const SizedBox(width: Space.s2),
+                  Text(
+                    course.level.label,
+                    style: context.text.caption.copyWith(color: c.textMuted),
+                  ),
+                ],
+              ),
+              const SizedBox(height: Space.s3),
+              Text(
+                course.title,
+                style: context.text.h2.copyWith(color: c.textPrimary),
+              ),
+              const SizedBox(height: Space.s2),
+              Text(
+                course.instructorName,
+                style: context.text.bodySmall.copyWith(color: c.textSecondary),
+              ),
+              const SizedBox(height: Space.s4),
+              Row(
+                children: [
+                  Expanded(
+                    child: CourseMetaItem(
+                      label: 'مدت',
+                      value: course.durationLabel ?? '—',
+                    ),
+                  ),
+                  Expanded(
+                    child: CourseMetaItem(
+                      label: 'جلسات',
+                      value: course.videosCount == null
+                          ? '—'
+                          : Fmt.fa('${course.videosCount}'),
+                    ),
+                  ),
+                  Expanded(
+                    child: CourseMetaItem(
+                      label: 'دانشجو',
+                      value: course.students == null
+                          ? '—'
+                          : Fmt.fa('${course.students}'),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: Space.s3),
+              RatingLabel(course.rating, count: course.ratingCount),
+              if (course.description != null &&
+                  course.description!.trim().isNotEmpty) ...[
+                const SizedBox(height: Space.s6),
+                Text(
+                  'درباره دوره',
+                  style: context.text.h3.copyWith(color: c.textPrimary),
+                ),
+                const SizedBox(height: Space.s2),
+                Text(
+                  course.description!,
+                  style: context.text.bodyMedium.copyWith(
+                    color: c.textSecondary,
+                    height: 1.8,
+                  ),
+                ),
               ],
-            ),
+              if (course.learningGoals.isNotEmpty) ...[
+                const SizedBox(height: Space.s6),
+                Text(
+                  'آنچه یاد می‌گیرید',
+                  style: context.text.h3.copyWith(color: c.textPrimary),
+                ),
+                const SizedBox(height: Space.s2),
+                for (final g in course.learningGoals)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: Space.s2),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Icon(
+                          Icons.check_circle_outline_rounded,
+                          size: 18,
+                          color: c.success,
+                        ),
+                        const SizedBox(width: Space.s2),
+                        Expanded(
+                          child: Text(
+                            g,
+                            style: context.text.bodySmall.copyWith(
+                              color: c.textSecondary,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+              ],
+              if (enrolled != null) ...[
+                const SizedBox(height: Space.s6),
+                PishroCard(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Text(
+                        'شما در این دوره ثبت‌نام کرده‌اید',
+                        style: context.text.bodyMedium.copyWith(
+                          color: c.textPrimary,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      const SizedBox(height: Space.s3),
+                      PishroProgress(value: enrolled.progress),
+                      const SizedBox(height: Space.s4),
+                      PishroButton(
+                        label: 'ادامه یادگیری',
+                        onPressed: () =>
+                            context.push(Routes.learningDashboard(course.id)),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+              if (course.hasVip) ...[
+                const SizedBox(height: Space.s4),
+                PishroButton(
+                  label: 'مقایسه بسته‌ها',
+                  variant: PishroButtonVariant.secondary,
+                  onPressed: () =>
+                      context.push(Routes.packageComparison(course.id)),
+                ),
+              ],
+            ],
           ),
-          const SizedBox(height: Space.s5),
-          PishroButton(
-            label: 'ادامه',
-            onPressed: () {
-              if (context.canPop()) {
-                context.pop();
-              }
-            },
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _DeckRow extends StatelessWidget {
-  const _DeckRow({required this.text});
-  final String text;
-
-  @override
-  Widget build(BuildContext context) {
-    final c = context.colors;
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: Space.s2),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(Icons.circle, size: 6, color: c.actionPrimary),
-          const SizedBox(width: Space.s3),
-          Expanded(
-            child: Text(
-              text,
-              style: context.text.bodyMedium.copyWith(color: c.textSecondary),
-            ),
-          ),
-        ],
-      ),
+          bottomNavigationBar: enrolled != null
+              ? null
+              : StickyPurchaseBar(
+                  toman: course.finalPrice,
+                  prefix: course.hasVip ? 'شروع از' : 'قیمت',
+                  actionLabel: course.isFree ? 'ثبت‌نام رایگان' : 'خرید دوره',
+                  onAction: () {
+                    ref
+                        .read(checkoutProvider.notifier)
+                        .start(course, PackageType.regular);
+                    context.push(Routes.checkout);
+                  },
+                ),
+        );
+      },
     );
   }
 }

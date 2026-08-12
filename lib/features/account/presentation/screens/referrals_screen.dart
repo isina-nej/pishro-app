@@ -1,90 +1,47 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/tokens.dart';
-import '../../../../shared/widgets/common.dart';
-import '../../../../shared/widgets/pishro_button.dart';
+import '../../../../shared/widgets/states.dart';
 
-/// Screen/Account/Referrals — «معرفی به دوستان».
-///
-/// Source: `../desighn/_capture/11-09-account-part-2.dc.html` · Android 390dp · RTL.
+import '../../data/account_repository.dart';
+
 class AccountReferralsScreen extends ConsumerWidget {
   const AccountReferralsScreen({super.key});
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final c = context.colors;
+    final info = ref.watch(referralsProvider);
     return Scaffold(
       appBar: AppBar(
-        titleSpacing: Space.s5,
         title: Text(
-          'معرفی به دوستان',
+          'معرفی دوستان',
           style: context.text.h3.copyWith(color: c.textPrimary),
         ),
       ),
-      body: ListView(
-        padding: const EdgeInsets.fromLTRB(
-          Space.page,
-          Space.s4,
-          Space.page,
-          Space.s8,
+      body: info.when(
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (_, __) =>
+            ErrorStateView(onRetry: () => ref.invalidate(referralsProvider)),
+        data: (r) => ListView(
+          padding: const EdgeInsets.all(Space.page),
+          children: [
+            Text(
+              'کد دعوت',
+              style: context.text.caption.copyWith(color: c.textMuted),
+            ),
+            Text(r.code, style: context.text.h2.copyWith(color: c.textPrimary)),
+            const SizedBox(height: Space.s3),
+            Text(
+              '${r.invites} دعوت موفق',
+              style: context.text.bodySmall.copyWith(color: c.textSecondary),
+            ),
+            const SizedBox(height: Space.s4),
+            NoticeBanner(message: r.note, tone: NoticeTone.info),
+          ],
         ),
-        children: [
-          Text(
-            'معرفی به دوستان',
-            style: context.text.h2.copyWith(color: c.textPrimary),
-          ),
-          const SizedBox(height: Space.s2),
-          Text(
-            'پیاده‌سازی بر اساس دک طراحی · Screen/Account/Referrals',
-            style: context.text.bodySmall.copyWith(color: c.textMuted),
-          ),
-          const SizedBox(height: Space.s5),
-          PishroCard(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [_DeckRow(text: r'معرفی به دوستان')],
-            ),
-          ),
-          const SizedBox(height: Space.s5),
-          PishroButton(
-            label: 'ادامه',
-            onPressed: () {
-              if (context.canPop()) {
-                context.pop();
-              }
-            },
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _DeckRow extends StatelessWidget {
-  const _DeckRow({required this.text});
-  final String text;
-
-  @override
-  Widget build(BuildContext context) {
-    final c = context.colors;
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: Space.s2),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(Icons.circle, size: 6, color: c.actionPrimary),
-          const SizedBox(width: Space.s3),
-          Expanded(
-            child: Text(
-              text,
-              style: context.text.bodyMedium.copyWith(color: c.textSecondary),
-            ),
-          ),
-        ],
       ),
     );
   }

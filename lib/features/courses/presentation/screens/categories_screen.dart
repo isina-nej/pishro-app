@@ -2,98 +2,89 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/network/api_exception.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/tokens.dart';
-import '../../../../shared/widgets/common.dart';
-import '../../../../shared/widgets/pishro_button.dart';
+import '../../../../routing/routes.dart';
+import '../../../../shared/widgets/states.dart';
+import '../../data/courses_repository.dart';
+import '../widgets/course_widgets.dart';
 
-/// Screen/Courses/Categories — «دسته‌بندی‌ها».
-///
-/// Source: `../desighn/_capture/02-04-courses-part-1.dc.html` · Android 390dp · RTL.
+/// Screen/Courses/Categories — «۰۱ · دسته‌بندی‌ها».
 class CoursesCategoriesScreen extends ConsumerWidget {
   const CoursesCategoriesScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final c = context.colors;
+    final cats = ref.watch(courseCategoriesProvider);
+
     return Scaffold(
       appBar: AppBar(
-        titleSpacing: Space.s5,
         title: Text(
           'دسته‌بندی‌ها',
           style: context.text.h3.copyWith(color: c.textPrimary),
         ),
+        actions: [
+          IconButton(
+            tooltip: 'جست‌وجو',
+            onPressed: () => context.push(Routes.courseSearch),
+            icon: const Icon(Icons.search_rounded),
+          ),
+        ],
       ),
-      body: ListView(
-        padding: const EdgeInsets.fromLTRB(
-          Space.page,
-          Space.s4,
-          Space.page,
-          Space.s8,
+      body: cats.when(
+        loading: () => ListView(
+          padding: const EdgeInsets.all(Space.page),
+          children: const [
+            Skeleton.line(width: 180),
+            SizedBox(height: Space.s4),
+            Skeleton.box(height: 72),
+            SizedBox(height: Space.s3),
+            Skeleton.box(height: 72),
+            SizedBox(height: Space.s3),
+            Skeleton.box(height: 72),
+          ],
         ),
-        children: [
-          Text(
-            'دسته‌بندی‌ها',
-            style: context.text.h2.copyWith(color: c.textPrimary),
-          ),
-          const SizedBox(height: Space.s2),
-          Text(
-            'پیاده‌سازی بر اساس دک طراحی · Screen/Courses/Categories',
-            style: context.text.bodySmall.copyWith(color: c.textMuted),
-          ),
-          const SizedBox(height: Space.s5),
-          PishroCard(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                _DeckRow(text: r'تحلیل'),
-                _DeckRow(text: r'انصراف'),
-                _DeckRow(text: r'جست‌وجوهای اخیر'),
-                _DeckRow(text: r'پاک کردن'),
-                _DeckRow(text: r'تحلیل تکنیکال'),
-                _DeckRow(text: r'مدیریت ریسک'),
-                _DeckRow(text: r'ارز دیجیتال'),
-                _DeckRow(text: r'پیشنهاد جست‌وجو'),
-              ],
+        error: (e, _) => ErrorStateView(
+          message: e is ApiException ? e.message : 'دسته‌بندی‌ها بارگذاری نشد.',
+          onRetry: () => ref.invalidate(courseCategoriesProvider),
+        ),
+        data: (items) {
+          if (items.isEmpty) {
+            return const EmptyState(
+              title: 'دسته‌بندی‌ای برای نمایش نیست',
+              icon: Icons.category_outlined,
+            );
+          }
+          return RefreshIndicator(
+            onRefresh: () async => ref.invalidate(courseCategoriesProvider),
+            child: ListView.separated(
+              padding: const EdgeInsets.fromLTRB(
+                Space.page,
+                Space.s3,
+                Space.page,
+                Space.s8,
+              ),
+              itemCount: items.length,
+              separatorBuilder: (_, __) => const SizedBox(height: Space.s3),
+              itemBuilder: (_, i) {
+                final cat = items[i];
+                return CategoryCard(
+                  category: cat,
+                  onTap: () {
+                    ref.read(courseFiltersProvider.notifier).state = ref
+                        .read(courseFiltersProvider)
+                        .copyWith(categoryId: cat.id);
+                    ref.read(courseQueryProvider.notifier).state = '';
+                    context.push(Routes.courseSearchResults);
+                  },
+                );
+              },
             ),
-          ),
-          const SizedBox(height: Space.s5),
-          PishroButton(
-            label: 'ادامه',
-            onPressed: () {
-              if (context.canPop()) {
-                context.pop();
-              }
-            },
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _DeckRow extends StatelessWidget {
-  const _DeckRow({required this.text});
-  final String text;
-
-  @override
-  Widget build(BuildContext context) {
-    final c = context.colors;
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: Space.s2),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(Icons.circle, size: 6, color: c.actionPrimary),
-          const SizedBox(width: Space.s3),
-          Expanded(
-            child: Text(
-              text,
-              style: context.text.bodyMedium.copyWith(color: c.textSecondary),
-            ),
-          ),
-        ],
+          );
+        },
       ),
     );
   }

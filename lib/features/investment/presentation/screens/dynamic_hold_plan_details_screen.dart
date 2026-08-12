@@ -5,12 +5,16 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/tokens.dart';
-import '../../../../shared/widgets/common.dart';
+import '../../../../core/utils/formatters.dart';
+import '../../../../routing/routes.dart';
+import '../../../../shared/widgets/pishro_badge.dart';
 import '../../../../shared/widgets/pishro_button.dart';
+import '../../../../shared/widgets/states.dart';
+import '../../data/investment_flow.dart';
+import '../../data/investment_models.dart';
+import '../../data/investment_repository.dart';
 
-/// Screen/Investment/DynamicHoldPlanDetails — «طرح هولد داینامیک».
-///
-/// Source: `../desighn/_capture/06-06-investment-part-1.dc.html` · Android 390dp · RTL.
+/// Screen/Investment/DynamicHoldPlanDetails — بدون درصد اختراعی.
 class DynamicHoldPlanDetailsScreen extends ConsumerWidget {
   const DynamicHoldPlanDetailsScreen({super.key, this.id = ''});
 
@@ -19,87 +23,82 @@ class DynamicHoldPlanDetailsScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final c = context.colors;
+    final plan = ref.watch(planProvider(id));
+
     return Scaffold(
       appBar: AppBar(
-        titleSpacing: Space.s5,
         title: Text(
           'طرح هولد داینامیک',
           style: context.text.h3.copyWith(color: c.textPrimary),
         ),
       ),
-      body: ListView(
-        padding: const EdgeInsets.fromLTRB(
-          Space.page,
-          Space.s4,
-          Space.page,
-          Space.s8,
-        ),
-        children: [
-          Text(
-            'طرح هولد داینامیک',
-            style: context.text.h2.copyWith(color: c.textPrimary),
-          ),
-          const SizedBox(height: Space.s2),
-          Text(
-            'پیاده‌سازی بر اساس دک طراحی · Screen/Investment/DynamicHoldPlanDetails',
-            style: context.text.bodySmall.copyWith(color: c.textMuted),
-          ),
-          const SizedBox(height: Space.s5),
-          PishroCard(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                _DeckRow(text: r'مقایسه طرح‌ها'),
-                _DeckRow(text: r'ماهیانه ۸٪'),
-                _DeckRow(text: r'هولد داینامیک'),
-                _DeckRow(text: r'نوع بازده'),
-                _DeckRow(text: r'اعلام‌شده'),
-                _DeckRow(text: r'داینامیک'),
-                _DeckRow(text: r'حداقل مبلغ'),
-                _DeckRow(text: r'۱۰م تومان'),
-                _DeckRow(text: r'۵م تومان'),
-                _DeckRow(text: r'نحوه پرداخت'),
-                _DeckRow(text: r'دوره‌ای'),
-                _DeckRow(text: r'در سررسید'),
-              ],
-            ),
-          ),
-          const SizedBox(height: Space.s5),
-          PishroButton(
-            label: 'ادامه',
-            onPressed: () {
-              if (context.canPop()) {
-                context.pop();
-              }
-            },
-          ),
-        ],
+      body: plan.when(
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (_, __) =>
+            ErrorStateView(onRetry: () => ref.invalidate(planProvider(id))),
+        data: (p) {
+          if (p == null) {
+            return const EmptyState(title: 'این طرح یافت نشد');
+          }
+          return ListView(
+            padding: const EdgeInsets.all(Space.page),
+            children: [
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      p.name,
+                      style: context.text.h2.copyWith(color: c.textPrimary),
+                    ),
+                  ),
+                  RiskBadge(p.riskLevel),
+                ],
+              ),
+              const SizedBox(height: Space.s3),
+              Text(
+                'مدل بازده: داینامیک · $kPerContract',
+                style: context.text.bodyMedium.copyWith(color: c.textSecondary),
+              ),
+              const SizedBox(height: Space.s3),
+              Text(
+                p.description ??
+                    'بازده این طرح متغیر است و درصد ثابتی اعلام نمی‌شود.',
+                style: context.text.bodySmall.copyWith(
+                  color: c.textSecondary,
+                  height: 1.8,
+                ),
+              ),
+              const SizedBox(height: Space.s4),
+              Text(
+                'حداقل ${Fmt.toman(p.minAmount)} · مدت ${Fmt.fa('${p.minDurationMonths}')} تا ${Fmt.fa('${p.maxDurationMonths}')} ماه',
+                style: context.text.caption.copyWith(color: c.textMuted),
+              ),
+              const SizedBox(height: Space.s5),
+              const NoticeBanner(
+                message:
+                    'هیچ درصد یا سود تضمینی برای طرح هولد نمایش داده نمی‌شود.',
+                tone: NoticeTone.warning,
+              ),
+            ],
+          );
+        },
       ),
-    );
-  }
-}
-
-class _DeckRow extends StatelessWidget {
-  const _DeckRow({required this.text});
-  final String text;
-
-  @override
-  Widget build(BuildContext context) {
-    final c = context.colors;
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: Space.s2),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(Icons.circle, size: 6, color: c.actionPrimary),
-          const SizedBox(width: Space.s3),
-          Expanded(
-            child: Text(
-              text,
-              style: context.text.bodyMedium.copyWith(color: c.textSecondary),
-            ),
-          ),
-        ],
+      bottomNavigationBar: plan.maybeWhen(
+        data: (p) => p == null
+            ? null
+            : SafeArea(
+                child: Padding(
+                  padding: const EdgeInsets.all(Space.page),
+                  child: PishroButton(
+                    label: 'ادامه با این طرح',
+                    onPressed: () {
+                      ref.read(investmentFlowProvider.notifier).start(p);
+                      context.push(Routes.riskDisclosure);
+                    },
+                  ),
+                ),
+              ),
+        orElse: () => null,
       ),
     );
   }

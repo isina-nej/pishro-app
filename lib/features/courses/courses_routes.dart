@@ -4,19 +4,23 @@ import 'presentation/screens/categories_screen.dart';
 import 'presentation/screens/certificate_screen.dart';
 import 'presentation/screens/chapters_screen.dart';
 import 'presentation/screens/checkout_regular_screen.dart';
+import 'presentation/screens/checkout_vip_screen.dart';
 import 'presentation/screens/completion_screen.dart';
 import 'presentation/screens/courses_home_screen.dart';
 import 'presentation/screens/details_screen.dart';
 import 'presentation/screens/discount_and_coin_screen.dart';
 import 'presentation/screens/downloads_and_resources_screen.dart';
+import 'presentation/screens/filters_screen.dart';
 import 'presentation/screens/learning_dashboard_screen.dart';
 import 'presentation/screens/lesson_details_screen.dart';
 import 'presentation/screens/my_courses_screen.dart';
+import 'presentation/screens/network_error_screen.dart';
 import 'presentation/screens/package_comparison_screen.dart';
 import 'presentation/screens/payment_failure_screen.dart';
 import 'presentation/screens/payment_method_screen.dart';
 import 'presentation/screens/payment_processing_screen.dart';
 import 'presentation/screens/payment_success_screen.dart';
+import 'presentation/screens/processing_screen.dart';
 import 'presentation/screens/search_results_screen.dart';
 import 'presentation/screens/search_screen.dart';
 import 'presentation/screens/vip_instructor_chat_screen.dart';
@@ -38,6 +42,10 @@ final List<RouteBase> coursesTabRoutes = [
           GoRoute(
             path: 'results',
             builder: (_, __) => const CoursesSearchResultsScreen(),
+          ),
+          GoRoute(
+            path: 'filters',
+            builder: (_, __) => const CoursesFiltersScreen(),
           ),
         ],
       ),
@@ -85,8 +93,10 @@ final List<RouteBase> coursesTabRoutes = [
           ),
           GoRoute(
             path: 'lessons/:lessonId',
-            builder: (context, state) =>
-                LessonDetailsScreen(id: state.pathParameters['id'] ?? ''),
+            builder: (context, state) => LessonDetailsScreen(
+              id: state.pathParameters['id'] ?? '',
+              lessonId: state.pathParameters['lessonId'] ?? '',
+            ),
           ),
         ],
       ),
@@ -100,6 +110,7 @@ final List<RouteBase> checkoutRoutes = [
     path: '/checkout',
     builder: (_, __) => const CourseRegularScreen(),
     routes: [
+      GoRoute(path: 'vip', builder: (_, __) => const CourseVIPScreen()),
       GoRoute(
         path: 'payment-method',
         builder: (_, __) => const PaymentMethodScreen(),
@@ -113,12 +124,20 @@ final List<RouteBase> checkoutRoutes = [
         builder: (_, __) => const PaymentProcessingScreen(),
       ),
       GoRoute(
+        path: 'gateway',
+        builder: (_, __) => const CheckoutProcessingScreen(),
+      ),
+      GoRoute(
         path: 'success',
         builder: (_, __) => const PaymentSuccessScreen(),
       ),
       GoRoute(
         path: 'failure',
         builder: (_, __) => const PaymentFailureScreen(),
+      ),
+      GoRoute(
+        path: 'network-error',
+        builder: (_, __) => const CheckoutNetworkErrorScreen(),
       ),
     ],
   ),

@@ -5,85 +5,117 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/tokens.dart';
-import '../../../../shared/widgets/common.dart';
-import '../../../../shared/widgets/pishro_button.dart';
+import '../../../../routing/routes.dart';
+import '../../../../shared/widgets/pishro_text_field.dart';
+import '../../../../shared/widgets/states.dart';
+import '../../data/news_repository.dart';
+import '../widgets/article_card.dart';
+import '../widgets/comment_tile.dart';
 
-/// Screen/News/Comments — «دیدگاه‌ها».
-///
-/// Source: `../desighn/_capture/05-05-news.dc.html` · Android 390dp · RTL.
-class NewsCommentsScreen extends ConsumerWidget {
+/// Screen/News/Comments.
+class NewsCommentsScreen extends ConsumerStatefulWidget {
   const NewsCommentsScreen({super.key, this.id = ''});
 
   final String id;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<NewsCommentsScreen> createState() => _NewsCommentsScreenState();
+}
+
+class _NewsCommentsScreenState extends ConsumerState<NewsCommentsScreen> {
+  final _text = TextEditingController();
+  var _sending = false;
+
+  @override
+  void dispose() {
+    _text.dispose();
+    super.dispose();
+  }
+
+  Future<void> _send() async {
+    final body = _text.text.trim();
+    if (body.isEmpty || _sending) return;
+    setState(() => _sending = true);
+    try {
+      await ref.read(newsCommentsRepositoryProvider).add(widget.id, body);
+      _text.clear();
+      ref.invalidate(newsCommentsProvider(widget.id));
+    } finally {
+      if (mounted) setState(() => _sending = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final c = context.colors;
+    final comments = ref.watch(newsCommentsProvider(widget.id));
+
     return Scaffold(
       appBar: AppBar(
-        titleSpacing: Space.s5,
         title: Text(
           'دیدگاه‌ها',
           style: context.text.h3.copyWith(color: c.textPrimary),
         ),
       ),
-      body: ListView(
-        padding: const EdgeInsets.fromLTRB(
-          Space.page,
-          Space.s4,
-          Space.page,
-          Space.s8,
-        ),
+      body: Column(
         children: [
-          Text(
-            'دیدگاه‌ها',
-            style: context.text.h2.copyWith(color: c.textPrimary),
-          ),
-          const SizedBox(height: Space.s2),
-          Text(
-            'پیاده‌سازی بر اساس دک طراحی · Screen/News/Comments',
-            style: context.text.bodySmall.copyWith(color: c.textMuted),
-          ),
-          const SizedBox(height: Space.s5),
-          PishroCard(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [_DeckRow(text: r'دیدگاه‌ها')],
+          Expanded(
+            child: NewsAsync(
+              value: comments,
+              onRetry: () => ref.invalidate(newsCommentsProvider(widget.id)),
+              builder: (context, items) {
+                if (items.isEmpty) {
+                  return const EmptyState(
+                    title: 'هنوز دیدگاهی ثبت نشده',
+                    icon: Icons.chat_bubble_outline_rounded,
+                  );
+                }
+                return ListView.separated(
+                  padding: const EdgeInsets.all(Space.page),
+                  itemCount: items.length,
+                  separatorBuilder: (_, __) => const SizedBox(height: Space.s3),
+                  itemBuilder: (_, i) {
+                    final comment = items[i];
+                    return CommentTile(
+                      comment: comment,
+                      onReplies: comment.totalReplies == 0
+                          ? null
+                          : () => context.push(
+                              Routes.newsCommentThread(widget.id, comment.id),
+                            ),
+                    );
+                  },
+                );
+              },
             ),
           ),
-          const SizedBox(height: Space.s5),
-          PishroButton(
-            label: 'ادامه',
-            onPressed: () {
-              if (context.canPop()) {
-                context.pop();
-              }
-            },
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _DeckRow extends StatelessWidget {
-  const _DeckRow({required this.text});
-  final String text;
-
-  @override
-  Widget build(BuildContext context) {
-    final c = context.colors;
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: Space.s2),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(Icons.circle, size: 6, color: c.actionPrimary),
-          const SizedBox(width: Space.s3),
-          Expanded(
-            child: Text(
-              text,
-              style: context.text.bodyMedium.copyWith(color: c.textSecondary),
+          SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(
+                Space.page,
+                Space.s2,
+                Space.page,
+                Space.s3,
+              ),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: PishroTextField(
+                      controller: _text,
+                      label: 'دیدگاه شما',
+                      hint: 'متن دیدگاه…',
+                    ),
+                  ),
+                  IconButton(
+                    tooltip: _sending ? 'در حال ارسال' : 'ارسال',
+                    onPressed: _sending ? null : _send,
+                    icon: Icon(
+                      Icons.send_rounded,
+                      color: _sending ? c.textMuted : c.actionPrimary,
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ],

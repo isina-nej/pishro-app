@@ -17,16 +17,16 @@ class Skeleton extends StatelessWidget {
   });
 
   const Skeleton.line({super.key, this.width, this.height = 14})
-      : radius = Radii.xs;
+    : radius = Radii.xs;
 
   const Skeleton.box({super.key, this.width, this.height = 120})
-      : radius = Radii.card;
+    : radius = Radii.card;
 
   /// 16:9 course/news cover placeholder.
   const Skeleton.cover({super.key})
-      : width = double.infinity,
-        height = 180,
-        radius = Radii.card;
+    : width = double.infinity,
+      height = 180,
+      radius = Radii.card;
 
   final double? width;
   final double height;

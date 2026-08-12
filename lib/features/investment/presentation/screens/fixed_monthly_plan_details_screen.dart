@@ -5,12 +5,17 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/tokens.dart';
-import '../../../../shared/widgets/common.dart';
+import '../../../../core/utils/formatters.dart';
+import '../../../../routing/routes.dart';
+import '../../../../shared/widgets/pishro_badge.dart';
 import '../../../../shared/widgets/pishro_button.dart';
+import '../../../../shared/widgets/states.dart';
+import '../../data/investment_flow.dart';
+import '../../data/investment_models.dart';
+import '../../data/investment_repository.dart';
+import 'dynamic_hold_plan_details_screen.dart';
 
-/// Screen/Investment/FixedMonthlyPlanDetails — «طرح ماهیانه ۸٪».
-///
-/// Source: `../desighn/_capture/06-06-investment-part-1.dc.html` · Android 390dp · RTL.
+/// Screen/Investment/FixedMonthlyPlanDetails.
 class FixedMonthlyPlanDetailsScreen extends ConsumerWidget {
   const FixedMonthlyPlanDetailsScreen({super.key, this.id = ''});
 
@@ -18,93 +23,103 @@ class FixedMonthlyPlanDetailsScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final c = context.colors;
-    return Scaffold(
-      appBar: AppBar(
-        titleSpacing: Space.s5,
-        title: Text(
-          'طرح ماهیانه ۸٪',
-          style: context.text.h3.copyWith(color: c.textPrimary),
-        ),
+    final plan = ref.watch(planProvider(id));
+    return plan.when(
+      loading: () =>
+          const Scaffold(body: Center(child: CircularProgressIndicator())),
+      error: (e, _) => Scaffold(
+        appBar: AppBar(),
+        body: ErrorStateView(onRetry: () => ref.invalidate(planProvider(id))),
       ),
-      body: ListView(
-        padding: const EdgeInsets.fromLTRB(
-          Space.page,
-          Space.s4,
-          Space.page,
-          Space.s8,
-        ),
-        children: [
-          Text(
-            'طرح ماهیانه ۸٪',
-            style: context.text.h2.copyWith(color: c.textPrimary),
-          ),
-          const SizedBox(height: Space.s2),
-          Text(
-            'پیاده‌سازی بر اساس دک طراحی · Screen/Investment/FixedMonthlyPlanDetails',
-            style: context.text.bodySmall.copyWith(color: c.textMuted),
-          ),
-          const SizedBox(height: Space.s5),
-          PishroCard(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                _DeckRow(text: r'طرح هولد با بازده داینامیک'),
-                _DeckRow(text: r'مدل بازده'),
-                _DeckRow(text: r'داینامیک'),
-                _DeckRow(
-                  text:
-                      r'بازده این طرح متغیر است و ممکن است افزایش یا کاهش یابد.',
-                ),
-                _DeckRow(
-                  text: r'داده تاریخی تأییدشده برای نمایش در دسترس نیست.',
-                ),
-                _DeckRow(text: r'سناریوهای برآوردی (نمونه)'),
-                _DeckRow(text: r'کاهشی'),
-                _DeckRow(text: r'داده نیاز است'),
-                _DeckRow(text: r'میانه'),
-                _DeckRow(text: r'داده نیاز است'),
-                _DeckRow(text: r'افزایشی'),
-                _DeckRow(text: r'داده نیاز است'),
-              ],
-            ),
-          ),
-          const SizedBox(height: Space.s5),
-          PishroButton(
-            label: 'ادامه',
-            onPressed: () {
-              if (context.canPop()) {
-                context.pop();
-              }
-            },
-          ),
-        ],
-      ),
+      data: (p) {
+        if (p == null) {
+          return Scaffold(
+            appBar: AppBar(),
+            body: const EmptyState(title: 'این طرح یافت نشد'),
+          );
+        }
+        if (p.isDynamic) return DynamicHoldPlanDetailsScreen(id: id);
+        return _FixedBody(plan: p);
+      },
     );
   }
 }
 
-class _DeckRow extends StatelessWidget {
-  const _DeckRow({required this.text});
-  final String text;
+class _FixedBody extends ConsumerWidget {
+  const _FixedBody({required this.plan});
+  final InvestmentPlan plan;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final c = context.colors;
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: Space.s2),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
+    final rate = plan.monthlyRatePercent;
+
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(
+          plan.name,
+          style: context.text.h3.copyWith(color: c.textPrimary),
+        ),
+      ),
+      body: ListView(
+        padding: const EdgeInsets.all(Space.page),
         children: [
-          Icon(Icons.circle, size: 6, color: c.actionPrimary),
-          const SizedBox(width: Space.s3),
-          Expanded(
-            child: Text(
-              text,
-              style: context.text.bodyMedium.copyWith(color: c.textSecondary),
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  plan.name,
+                  style: context.text.h2.copyWith(color: c.textPrimary),
+                ),
+              ),
+              RiskBadge(plan.riskLevel),
+            ],
+          ),
+          const SizedBox(height: Space.s3),
+          Text(
+            rate == null
+                ? kPerContract
+                : 'برآورد ماهانه ${Fmt.fa(rate.toStringAsFixed(0))}٪ — تضمین نیست',
+            style: context.text.bodyMedium.copyWith(color: c.textSecondary),
+          ),
+          if (plan.description != null) ...[
+            const SizedBox(height: Space.s4),
+            Text(
+              plan.description!,
+              style: context.text.bodySmall.copyWith(
+                color: c.textSecondary,
+                height: 1.8,
+              ),
             ),
+          ],
+          const SizedBox(height: Space.s4),
+          Text(
+            'حداقل مبلغ ${Fmt.toman(plan.minAmount)} · حداکثر ${Fmt.toman(plan.maxAmount)}',
+            style: context.text.caption.copyWith(color: c.textMuted),
+          ),
+          const SizedBox(height: Space.s2),
+          Text(
+            'مدت ${Fmt.fa('${plan.minDurationMonths}')} تا ${Fmt.fa('${plan.maxDurationMonths}')} ماه',
+            style: context.text.caption.copyWith(color: c.textMuted),
+          ),
+          const SizedBox(height: Space.s5),
+          const NoticeBanner(
+            message: 'اعداد برآورد است و تعهد سود قطعی ایجاد نمی‌کند.',
+            tone: NoticeTone.warning,
           ),
         ],
+      ),
+      bottomNavigationBar: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(Space.page),
+          child: PishroButton(
+            label: 'شروع سرمایه‌گذاری',
+            onPressed: () {
+              ref.read(investmentFlowProvider.notifier).start(plan);
+              context.push(Routes.amountEntry);
+            },
+          ),
+        ),
       ),
     );
   }

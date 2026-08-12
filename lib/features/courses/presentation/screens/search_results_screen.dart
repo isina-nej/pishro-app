@@ -2,102 +2,96 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/network/api_exception.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/tokens.dart';
-import '../../../../shared/widgets/common.dart';
-import '../../../../shared/widgets/pishro_button.dart';
+import '../../../../core/utils/formatters.dart';
+import '../../../../routing/routes.dart';
+import '../../../../shared/widgets/states.dart';
+import '../../data/courses_repository.dart';
+import '../widgets/course_widgets.dart';
 
-/// Screen/Courses/SearchResults — «نتایج جست‌وجو».
-///
-/// Source: `../desighn/_capture/02-04-courses-part-1.dc.html` · Android 390dp · RTL.
+/// Screen/Courses/SearchResults — فهرست پس از جست‌وجو و فیلتر.
 class CoursesSearchResultsScreen extends ConsumerWidget {
   const CoursesSearchResultsScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final c = context.colors;
+    final query = ref.watch(courseQueryProvider);
+    final filters = ref.watch(courseFiltersProvider);
+    final results = ref.watch(searchResultsProvider);
+
     return Scaffold(
       appBar: AppBar(
-        titleSpacing: Space.s5,
         title: Text(
-          'نتایج جست‌وجو',
+          query.isEmpty ? 'نتایج' : query,
           style: context.text.h3.copyWith(color: c.textPrimary),
         ),
+        actions: [
+          IconButton(
+            tooltip: 'فیلترها',
+            onPressed: () => context.push(Routes.courseFilters),
+            icon: Badge(
+              isLabelVisible: !filters.isEmpty,
+              label: Text(Fmt.fa('${filters.selectedCount}')),
+              child: const Icon(Icons.tune_rounded),
+            ),
+          ),
+        ],
       ),
-      body: ListView(
-        padding: const EdgeInsets.fromLTRB(
-          Space.page,
-          Space.s4,
-          Space.page,
-          Space.s8,
+      body: results.when(
+        loading: () => ListView(
+          padding: const EdgeInsets.all(Space.page),
+          children: const [
+            Skeleton.box(height: 96),
+            SizedBox(height: Space.s3),
+            Skeleton.box(height: 96),
+            SizedBox(height: Space.s3),
+            Skeleton.box(height: 96),
+          ],
         ),
-        children: [
-          Text(
-            'نتایج جست‌وجو',
-            style: context.text.h2.copyWith(color: c.textPrimary),
-          ),
-          const SizedBox(height: Space.s2),
-          Text(
-            'پیاده‌سازی بر اساس دک طراحی · Screen/Courses/SearchResults',
-            style: context.text.bodySmall.copyWith(color: c.textMuted),
-          ),
-          const SizedBox(height: Space.s5),
-          PishroCard(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                _DeckRow(text: r'عادی'),
-                _DeckRow(text: r'★ VIP موجود'),
-                _DeckRow(text: r'تحلیل تکنیکال از صفر تا معامله‌گری'),
-                _DeckRow(text: r'تیم آموزشی پیشرو سرمایه'),
-                _DeckRow(text: r'★ ۴٫۸ (۳۱۰)'),
-                _DeckRow(text: r'۱٬۲۴۰ دانشجو'),
-                _DeckRow(text: r'مدت'),
-                _DeckRow(text: r'۱۲ ساعت'),
-                _DeckRow(text: r'سطح'),
-                _DeckRow(text: r'مقدماتی'),
-                _DeckRow(text: r'به‌روزرسانی'),
-                _DeckRow(text: r'تیر ۱۴۰۵'),
-              ],
+        error: (e, _) => ErrorStateView(
+          message: e is ApiException ? e.message : 'نتایج بارگذاری نشد.',
+          onRetry: () => ref.invalidate(searchResultsProvider),
+        ),
+        data: (courses) {
+          if (courses.isEmpty) {
+            return EmptyState(
+              title: 'دوره‌ای مطابق جست‌وجو پیدا نشد',
+              message: query.isEmpty
+                  ? 'فیلترها را تغییر دهید یا جست‌وجوی تازه‌ای بزنید.'
+                  : 'برای «$query» نتیجه‌ای نبود.',
+              icon: Icons.search_off_rounded,
+              actionLabel: 'تغییر فیلتر',
+              onAction: () => context.push(Routes.courseFilters),
+            );
+          }
+          return ListView.separated(
+            padding: const EdgeInsets.fromLTRB(
+              Space.page,
+              Space.s3,
+              Space.page,
+              Space.s8,
             ),
-          ),
-          const SizedBox(height: Space.s5),
-          PishroButton(
-            label: 'ادامه',
-            onPressed: () {
-              if (context.canPop()) {
-                context.pop();
+            itemCount: courses.length + 1,
+            separatorBuilder: (_, __) => const SizedBox(height: Space.s3),
+            itemBuilder: (context, i) {
+              if (i == 0) {
+                return Text(
+                  '${Fmt.fa('${courses.length}')} دوره',
+                  style: context.text.caption.copyWith(color: c.textMuted),
+                );
               }
+              final course = courses[i - 1];
+              return CourseListRow(
+                course: course,
+                onTap: () => context.push(Routes.courseDetails(course.id)),
+              );
             },
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _DeckRow extends StatelessWidget {
-  const _DeckRow({required this.text});
-  final String text;
-
-  @override
-  Widget build(BuildContext context) {
-    final c = context.colors;
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: Space.s2),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(Icons.circle, size: 6, color: c.actionPrimary),
-          const SizedBox(width: Space.s3),
-          Expanded(
-            child: Text(
-              text,
-              style: context.text.bodyMedium.copyWith(color: c.textSecondary),
-            ),
-          ),
-        ],
+          );
+        },
       ),
     );
   }

@@ -26,15 +26,23 @@ void main() {
 
   test('relative time buckets', () {
     final now = DateTime(2026, 8, 11, 12);
-    expect(Fmt.relative(now.subtract(const Duration(seconds: 20)), now: now),
-        'همین حالا');
-    expect(Fmt.relative(now.subtract(const Duration(hours: 2)), now: now),
-        '۲ ساعت پیش');
-    expect(Fmt.relative(now.subtract(const Duration(days: 1)), now: now),
-        'دیروز');
+    expect(
+      Fmt.relative(now.subtract(const Duration(seconds: 20)), now: now),
+      'همین حالا',
+    );
+    expect(
+      Fmt.relative(now.subtract(const Duration(hours: 2)), now: now),
+      '۲ ساعت پیش',
+    );
+    expect(
+      Fmt.relative(now.subtract(const Duration(days: 1)), now: now),
+      'دیروز',
+    );
     // Past a week it falls back to an absolute Jalali date.
-    expect(Fmt.relative(now.subtract(const Duration(days: 30)), now: now),
-        contains('۱۴۰'));
+    expect(
+      Fmt.relative(now.subtract(const Duration(days: 30)), now: now),
+      contains('۱۴۰'),
+    );
   });
 
   test('phone masking matches the Account/Home deck', () {
@@ -44,7 +52,9 @@ void main() {
   test('duration', () {
     expect(Fmt.duration(const Duration(hours: 12)), '۱۲ ساعت');
     expect(Fmt.duration(const Duration(minutes: 45)), '۴۵ دقیقه');
-    expect(Fmt.duration(const Duration(hours: 1, minutes: 30)),
-        '۱ ساعت و ۳۰ دقیقه');
+    expect(
+      Fmt.duration(const Duration(hours: 1, minutes: 30)),
+      '۱ ساعت و ۳۰ دقیقه',
+    );
   });
 }

@@ -5,99 +5,80 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/tokens.dart';
+import '../../../../routing/routes.dart';
 import '../../../../shared/widgets/common.dart';
 import '../../../../shared/widgets/pishro_button.dart';
+import '../../data/investment_flow.dart';
+import '../../data/investment_models.dart';
 
-/// Screen/Investment/FundingSource — «منبع تأمین وجه».
-///
-/// Source: `../desighn/_capture/07-06-investment-part-2.dc.html` · Android 390dp · RTL.
+/// Screen/Investment/FundingSource.
 class FundingSourceScreen extends ConsumerWidget {
   const FundingSourceScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final c = context.colors;
+    final draft = ref.watch(investmentFlowProvider);
+
     return Scaffold(
       appBar: AppBar(
-        titleSpacing: Space.s5,
         title: Text(
           'منبع تأمین وجه',
           style: context.text.h3.copyWith(color: c.textPrimary),
         ),
       ),
       body: ListView(
-        padding: const EdgeInsets.fromLTRB(
-          Space.page,
-          Space.s4,
-          Space.page,
-          Space.s8,
-        ),
+        padding: const EdgeInsets.all(Space.page),
         children: [
-          Text(
-            'منبع تأمین وجه',
-            style: context.text.h2.copyWith(color: c.textPrimary),
-          ),
-          const SizedBox(height: Space.s2),
-          Text(
-            'پیاده‌سازی بر اساس دک طراحی · Screen/Investment/FundingSource',
-            style: context.text.bodySmall.copyWith(color: c.textMuted),
-          ),
-          const SizedBox(height: Space.s5),
-          PishroCard(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                _DeckRow(text: r'مرور نهایی سرمایه‌گذاری'),
-                _DeckRow(text: r'طرح'),
-                _DeckRow(text: r'دریافت ماهیانه ۸٪'),
-                _DeckRow(text: r'مبلغ سرمایه‌گذاری'),
-                _DeckRow(text: r'۵۰٬۰۰۰٬۰۰۰ تومان'),
-                _DeckRow(text: r'ویرایش'),
-                _DeckRow(text: r'منبع تأمین وجه'),
-                _DeckRow(text: r'کیف پول داخلی'),
-                _DeckRow(text: r'تغییر'),
-                _DeckRow(text: r'نرخ اعلام‌شده'),
-                _DeckRow(text: r'۸٪ ماهیانه'),
-                _DeckRow(text: r'برآورد پرداخت ماهانه'),
-              ],
+          for (final k in FundingSourceKind.values) ...[
+            PishroCard(
+              selected: draft.funding == k,
+              onTap: () =>
+                  ref.read(investmentFlowProvider.notifier).setFunding(k),
+              child: Row(
+                children: [
+                  Icon(
+                    draft.funding == k
+                        ? Icons.radio_button_checked_rounded
+                        : Icons.radio_button_off_rounded,
+                    color: draft.funding == k ? c.actionPrimary : c.textMuted,
+                  ),
+                  const SizedBox(width: Space.s3),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          k.title,
+                          style: context.text.bodyMedium.copyWith(
+                            color: c.textPrimary,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        Text(
+                          k.subtitle,
+                          style: context.text.caption.copyWith(
+                            color: c.textMuted,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
-          const SizedBox(height: Space.s5),
-          PishroButton(
-            label: 'ادامه',
-            onPressed: () {
-              if (context.canPop()) {
-                context.pop();
-              }
-            },
-          ),
+            const SizedBox(height: Space.s3),
+          ],
         ],
       ),
-    );
-  }
-}
-
-class _DeckRow extends StatelessWidget {
-  const _DeckRow({required this.text});
-  final String text;
-
-  @override
-  Widget build(BuildContext context) {
-    final c = context.colors;
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: Space.s2),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(Icons.circle, size: 6, color: c.actionPrimary),
-          const SizedBox(width: Space.s3),
-          Expanded(
-            child: Text(
-              text,
-              style: context.text.bodyMedium.copyWith(color: c.textSecondary),
-            ),
+      bottomNavigationBar: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(Space.page),
+          child: PishroButton(
+            label: 'بازبینی نهایی',
+            onPressed: () => context.push(Routes.finalReview),
           ),
-        ],
+        ),
       ),
     );
   }

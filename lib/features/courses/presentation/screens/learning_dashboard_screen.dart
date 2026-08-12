@@ -2,15 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/network/api_exception.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/tokens.dart';
+import '../../../../routing/routes.dart';
 import '../../../../shared/widgets/common.dart';
+import '../../../../shared/widgets/pishro_badge.dart';
 import '../../../../shared/widgets/pishro_button.dart';
+import '../../../../shared/widgets/states.dart';
+import '../../data/courses_models.dart';
+import '../../data/courses_repository.dart';
 
-/// Screen/Course/LearningDashboard — «داشبورد یادگیری».
-///
-/// Source: `../desighn/_capture/03-04-courses-part-2.dc.html` · Android 390dp · RTL.
+/// Screen/Course/LearningDashboard — پیشرفت + ادامه از آخرین جلسه.
 class LearningDashboardScreen extends ConsumerWidget {
   const LearningDashboardScreen({super.key, this.id = ''});
 
@@ -19,87 +23,139 @@ class LearningDashboardScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final c = context.colors;
+    final enrollment = ref.watch(enrollmentProvider(id));
+    final curriculum = ref.watch(curriculumProvider(id));
+
     return Scaffold(
       appBar: AppBar(
-        titleSpacing: Space.s5,
         title: Text(
           'داشبورد یادگیری',
           style: context.text.h3.copyWith(color: c.textPrimary),
         ),
       ),
-      body: ListView(
-        padding: const EdgeInsets.fromLTRB(
-          Space.page,
-          Space.s4,
-          Space.page,
-          Space.s8,
+      body: enrollment.when(
+        loading: () => const Padding(
+          padding: EdgeInsets.all(Space.page),
+          child: Column(
+            children: [
+              Skeleton.line(width: 200),
+              SizedBox(height: Space.s4),
+              Skeleton.box(height: 80),
+            ],
+          ),
         ),
-        children: [
-          Text(
-            'داشبورد یادگیری',
-            style: context.text.h2.copyWith(color: c.textPrimary),
-          ),
-          const SizedBox(height: Space.s2),
-          Text(
-            'پیاده‌سازی بر اساس دک طراحی · Screen/Course/LearningDashboard',
-            style: context.text.bodySmall.copyWith(color: c.textMuted),
-          ),
-          const SizedBox(height: Space.s5),
-          PishroCard(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                _DeckRow(text: r'سرفصل‌های دوره'),
-                _DeckRow(text: r'فصل ۱ — آشنایی با بازار'),
-                _DeckRow(
-                  text: r'مقدمه‌ای بر ساختار بازارهای مالی و بازیگران اصلی آن',
+        error: (e, _) => ErrorStateView(
+          message: e is ApiException ? e.message : 'داشبورد بارگذاری نشد.',
+          onRetry: () => ref.invalidate(enrollmentProvider(id)),
+        ),
+        data: (enrolled) {
+          if (enrolled == null) {
+            return EmptyState(
+              title: 'در این دوره ثبت‌نام نشده‌اید',
+              actionLabel: 'مشاهده دوره',
+              onAction: () => context.go(Routes.courseDetails(id)),
+            );
+          }
+          final current = curriculum.valueOrNull?.currentLesson;
+          return ListView(
+            padding: const EdgeInsets.all(Space.page),
+            children: [
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      enrolled.course.title,
+                      style: context.text.h3.copyWith(color: c.textPrimary),
+                    ),
+                  ),
+                  enrolled.packageType == PackageType.vip
+                      ? const PishroBadge.vip()
+                      : const PishroBadge.regular(),
+                ],
+              ),
+              const SizedBox(height: Space.s4),
+              PishroProgress(
+                value: enrolled.progress,
+                label: enrolled.lessonProgressLabel,
+              ),
+              const SizedBox(height: Space.s5),
+              if (current != null)
+                PishroCard(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'ادامه از آخرین جلسه',
+                        style: context.text.caption.copyWith(
+                          color: c.textMuted,
+                        ),
+                      ),
+                      const SizedBox(height: Space.s2),
+                      Text(
+                        current.title,
+                        style: context.text.bodyMedium.copyWith(
+                          color: c.textPrimary,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      const SizedBox(height: Space.s4),
+                      PishroButton(
+                        label: 'پخش جلسه',
+                        onPressed: () =>
+                            context.push(Routes.lesson(id, current.id)),
+                      ),
+                    ],
+                  ),
                 ),
-                _DeckRow(text: r'۸ دقیقه'),
-                _DeckRow(text: r'عرضه و تقاضا و تأثیر آن بر قیمت'),
-                _DeckRow(text: r'در حال پخش'),
-                _DeckRow(text: r'آشنایی با کارگزاری‌ها و انواع حساب معاملاتی'),
-                _DeckRow(text: r'۱۱ دقیقه'),
-                _DeckRow(text: r'تمرین شناسایی روند بازار'),
-              ],
-            ),
-          ),
-          const SizedBox(height: Space.s5),
-          PishroButton(
-            label: 'ادامه',
-            onPressed: () {
-              if (context.canPop()) {
-                context.pop();
-              }
-            },
-          ),
-        ],
+              const SizedBox(height: Space.s4),
+              _NavRow(
+                icon: Icons.view_list_rounded,
+                label: 'فصل‌ها و جلسات',
+                onTap: () => context.push(Routes.chapters(id)),
+              ),
+              _NavRow(
+                icon: Icons.download_rounded,
+                label: 'دانلودها و منابع',
+                onTap: () => context.push(Routes.downloads(id)),
+              ),
+              _NavRow(
+                icon: Icons.chat_bubble_outline_rounded,
+                label: 'گفت‌وگو با مدرس',
+                onTap: () => context.push(Routes.instructorChat(id)),
+              ),
+              if (enrolled.isCompleted)
+                _NavRow(
+                  icon: Icons.workspace_premium_rounded,
+                  label: 'گواهی پایان دوره',
+                  onTap: () => context.push(Routes.certificate(id)),
+                ),
+            ],
+          );
+        },
       ),
     );
   }
 }
 
-class _DeckRow extends StatelessWidget {
-  const _DeckRow({required this.text});
-  final String text;
+class _NavRow extends StatelessWidget {
+  const _NavRow({required this.icon, required this.label, required this.onTap});
+
+  final IconData icon;
+  final String label;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
     final c = context.colors;
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: Space.s2),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(Icons.circle, size: 6, color: c.actionPrimary),
-          const SizedBox(width: Space.s3),
-          Expanded(
-            child: Text(
-              text,
-              style: context.text.bodyMedium.copyWith(color: c.textSecondary),
-            ),
-          ),
-        ],
+    return ListTile(
+      contentPadding: EdgeInsets.zero,
+      leading: Icon(icon, color: c.textSecondary),
+      title: Text(
+        label,
+        style: context.text.bodyMedium.copyWith(color: c.textPrimary),
       ),
+      trailing: Icon(Icons.chevron_left_rounded, color: c.textMuted),
+      onTap: onTap,
     );
   }
 }

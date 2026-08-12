@@ -25,6 +25,7 @@ abstract final class Routes {
   // ---- Courses ----
   static const courseCategories = '$courses/categories';
   static const courseSearch = '$courses/search';
+  static const courseFilters = '$courseSearch/filters';
   static const courseSearchResults = '$courses/search/results';
   static const myCourses = '$courses/mine';
   static String courseDetails(String id) => '$courses/$id';
@@ -40,19 +41,25 @@ abstract final class Routes {
 
   // ---- Checkout ----
   static const checkout = '/checkout';
+  static const checkoutVip = '$checkout/vip';
   static const checkoutPaymentMethod = '$checkout/payment-method';
   static const checkoutDiscount = '$checkout/discount';
   static const checkoutProcessing = '$checkout/processing';
+  static const checkoutGateway = '$checkout/gateway';
   static const checkoutSuccess = '$checkout/success';
   static const checkoutFailure = '$checkout/failure';
+  static const checkoutNetworkError = '$checkout/network-error';
 
   // ---- News ----
   static const newsTrending = '$news/trending';
   static const newsCategories = '$news/categories';
   static const newsSearch = '$news/search';
+  static const newsFilters = '$newsSearch/filters';
   static const newsSaved = '$news/saved';
   static String newsDetails(String slug) => '$news/$slug';
   static String newsComments(String slug) => '$news/$slug/comments';
+  static String newsCommentThread(String slug, String commentId) =>
+      '$news/$slug/comments/$commentId';
 
   // ---- Investment ----
   static const planCatalog = '$investment/plans';

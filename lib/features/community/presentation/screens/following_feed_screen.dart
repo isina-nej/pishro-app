@@ -5,91 +5,73 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/tokens.dart';
+import '../../../../routing/routes.dart';
 import '../../../../shared/widgets/common.dart';
-import '../../../../shared/widgets/pishro_button.dart';
+import '../../../../shared/widgets/pishro_badge.dart';
+import '../../../../shared/widgets/states.dart';
 
-/// Screen/Community/FollowingFeed — «دنبال‌شده‌ها».
-///
-/// Source: `../desighn/_capture/09-08-community.dc.html` · Android 390dp · RTL.
+import '../../../../core/utils/formatters.dart';
+import '../../data/community_repository.dart';
+
 class FollowingFeedScreen extends ConsumerWidget {
   const FollowingFeedScreen({super.key});
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final c = context.colors;
+    final feed = ref.watch(followingFeedProvider);
     return Scaffold(
       appBar: AppBar(
-        titleSpacing: Space.s5,
         title: Text(
           'دنبال‌شده‌ها',
           style: context.text.h3.copyWith(color: c.textPrimary),
         ),
       ),
-      body: ListView(
-        padding: const EdgeInsets.fromLTRB(
-          Space.page,
-          Space.s4,
-          Space.page,
-          Space.s8,
+      body: feed.when(
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (_, __) => ErrorStateView(
+          onRetry: () => ref.invalidate(followingFeedProvider),
         ),
-        children: [
-          Text(
-            'دنبال‌شده‌ها',
-            style: context.text.h2.copyWith(color: c.textPrimary),
-          ),
-          const SizedBox(height: Space.s2),
-          Text(
-            'پیاده‌سازی بر اساس دک طراحی · Screen/Community/FollowingFeed',
-            style: context.text.bodySmall.copyWith(color: c.textMuted),
-          ),
-          const SizedBox(height: Space.s5),
-          PishroCard(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                _DeckRow(text: r'رتبه‌بندی تحلیلگران'),
-                _DeckRow(text: r'این ماه'),
-                _DeckRow(text: r'این هفته'),
-                _DeckRow(text: r'همه دوره‌ها'),
-              ],
-            ),
-          ),
-          const SizedBox(height: Space.s5),
-          PishroButton(
-            label: 'ادامه',
-            onPressed: () {
-              if (context.canPop()) {
-                context.pop();
-              }
-            },
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _DeckRow extends StatelessWidget {
-  const _DeckRow({required this.text});
-  final String text;
-
-  @override
-  Widget build(BuildContext context) {
-    final c = context.colors;
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: Space.s2),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(Icons.circle, size: 6, color: c.actionPrimary),
-          const SizedBox(width: Space.s3),
-          Expanded(
-            child: Text(
-              text,
-              style: context.text.bodyMedium.copyWith(color: c.textSecondary),
-            ),
-          ),
-        ],
+        data: (items) => items.isEmpty
+            ? EmptyState(
+                title: 'هنوز کسی را دنبال نکرده‌اید',
+                actionLabel: 'تحلیلگران',
+                onAction: () => context.push(Routes.recommendedAnalysts),
+              )
+            : ListView.separated(
+                padding: const EdgeInsets.all(Space.page),
+                itemCount: items.length,
+                separatorBuilder: (_, __) => const SizedBox(height: Space.s3),
+                itemBuilder: (_, i) {
+                  final a = items[i];
+                  return PishroCard(
+                    onTap: () => context.push(Routes.analysisDetails(a.id)),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        if (a.isNew)
+                          const PishroBadge(
+                            label: 'جدید',
+                            tone: PishroBadgeTone.info,
+                            icon: Icons.fiber_new_rounded,
+                          ),
+                        Text(
+                          a.title,
+                          style: context.text.bodyMedium.copyWith(
+                            color: c.textPrimary,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        Text(
+                          '${a.author.displayName} · ${Fmt.relative(a.publishedAt)}',
+                          style: context.text.caption.copyWith(
+                            color: c.textMuted,
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              ),
       ),
     );
   }

@@ -117,8 +117,7 @@ class AppColors extends ThemeExtension<AppColors> {
   );
 
   /// Divider is a hair lighter than the border in light mode; identical in dark.
-  Color get divider =>
-      isDark ? Neutral.n800 : const Color(0xFFE1E7E3);
+  Color get divider => isDark ? Neutral.n800 : const Color(0xFFE1E7E3);
 
   @override
   AppColors copyWith({Brightness? brightness}) => this;
@@ -131,5 +130,6 @@ class AppColors extends ThemeExtension<AppColors> {
 }
 
 extension AppColorsX on BuildContext {
-  AppColors get colors => Theme.of(this).extension<AppColors>() ?? AppColors.dark;
+  AppColors get colors =>
+      Theme.of(this).extension<AppColors>() ?? AppColors.dark;
 }

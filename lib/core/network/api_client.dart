@@ -60,8 +60,7 @@ class ApiClient {
         DioExceptionType.connectionTimeout ||
         DioExceptionType.receiveTimeout ||
         DioExceptionType.sendTimeout ||
-        DioExceptionType.connectionError =>
-          const NetworkException(),
+        DioExceptionType.connectionError => const NetworkException(),
         _ => ServerException(e.message ?? 'خطای نامشخص در ارتباط با سرور'),
       };
     }
@@ -73,7 +72,9 @@ class ApiClient {
     final body = res.data;
 
     if (status == 401 || status == 403) {
-      throw UnauthorizedException(_messageOf(body) ?? 'دسترسی شما منقضی شده است.');
+      throw UnauthorizedException(
+        _messageOf(body) ?? 'دسترسی شما منقضی شده است.',
+      );
     }
 
     // JSend envelope.
@@ -95,8 +96,12 @@ class ApiClient {
     }
 
     // Un-enveloped handler (19 of them). Trust the HTTP status instead.
-    if (status == 404) throw NotFoundException(_messageOf(body) ?? 'موردی یافت نشد.');
-    if (status >= 400) throw ServerException(_messageOf(body) ?? 'خطایی رخ داد.');
+    if (status == 404) {
+      throw NotFoundException(_messageOf(body) ?? 'موردی یافت نشد.');
+    }
+    if (status >= 400) {
+      throw ServerException(_messageOf(body) ?? 'خطایی رخ داد.');
+    }
 
     return body as T;
   }

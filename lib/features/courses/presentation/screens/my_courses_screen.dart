@@ -2,93 +2,128 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/network/api_exception.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/tokens.dart';
+import '../../../../routing/routes.dart';
 import '../../../../shared/widgets/common.dart';
-import '../../../../shared/widgets/pishro_button.dart';
+import '../../../../shared/widgets/pishro_badge.dart';
+import '../../../../shared/widgets/pishro_chip.dart';
+import '../../../../shared/widgets/states.dart';
+import '../../data/courses_models.dart';
+import '../../data/courses_repository.dart';
 
-/// Screen/Courses/MyCourses — «دوره‌های من».
-///
-/// Source: `../desighn/_capture/03-04-courses-part-2.dc.html` · Android 390dp · RTL.
-class MyCoursesScreen extends ConsumerWidget {
+/// Screen/Courses/MyCourses — در حال یادگیری / تکمیل‌شده / همه.
+class MyCoursesScreen extends ConsumerStatefulWidget {
   const MyCoursesScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<MyCoursesScreen> createState() => _MyCoursesScreenState();
+}
+
+class _MyCoursesScreenState extends ConsumerState<MyCoursesScreen> {
+  var _tab = MyCoursesTab.inProgress;
+
+  @override
+  Widget build(BuildContext context) {
     final c = context.colors;
+    final enrolled = ref.watch(enrolledCoursesProvider);
+
     return Scaffold(
       appBar: AppBar(
-        titleSpacing: Space.s5,
         title: Text(
           'دوره‌های من',
           style: context.text.h3.copyWith(color: c.textPrimary),
         ),
       ),
-      body: ListView(
-        padding: const EdgeInsets.fromLTRB(
-          Space.page,
-          Space.s4,
-          Space.page,
-          Space.s8,
-        ),
+      body: Column(
         children: [
-          Text(
-            'دوره‌های من',
-            style: context.text.h2.copyWith(color: c.textPrimary),
+          PishroChipBar(
+            labels: [for (final t in MyCoursesTab.values) t.label],
+            selectedIndex: _tab.index,
+            onSelected: (i) => setState(() => _tab = MyCoursesTab.values[i]),
           ),
-          const SizedBox(height: Space.s2),
-          Text(
-            'پیاده‌سازی بر اساس دک طراحی · Screen/Courses/MyCourses',
-            style: context.text.bodySmall.copyWith(color: c.textMuted),
-          ),
-          const SizedBox(height: Space.s5),
-          PishroCard(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                _DeckRow(text: r'تحلیل تکنیکال از صفر تا معامله‌گری'),
-                _DeckRow(text: r'۴۲٪'),
-                _DeckRow(text: r'۵ از ۱۲ جلسه تکمیل‌شده'),
-                _DeckRow(text: r'زمان صرف‌شده: ۳ ساعت و ۲۰ دقیقه'),
-                _DeckRow(text: r'ادامه یادگیری — جلسه ۵'),
-                _DeckRow(text: r'۳ جلسه برای مشاهده آفلاین دانلود شده است.'),
-              ],
-            ),
-          ),
-          const SizedBox(height: Space.s5),
-          PishroButton(
-            label: 'ادامه',
-            onPressed: () {
-              if (context.canPop()) {
-                context.pop();
-              }
-            },
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _DeckRow extends StatelessWidget {
-  const _DeckRow({required this.text});
-  final String text;
-
-  @override
-  Widget build(BuildContext context) {
-    final c = context.colors;
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: Space.s2),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(Icons.circle, size: 6, color: c.actionPrimary),
-          const SizedBox(width: Space.s3),
           Expanded(
-            child: Text(
-              text,
-              style: context.text.bodyMedium.copyWith(color: c.textSecondary),
+            child: enrolled.when(
+              loading: () => ListView(
+                padding: const EdgeInsets.all(Space.page),
+                children: const [
+                  Skeleton.box(height: 110),
+                  SizedBox(height: Space.s3),
+                  Skeleton.box(height: 110),
+                ],
+              ),
+              error: (e, _) => ErrorStateView(
+                message: e is ApiException
+                    ? e.message
+                    : 'دوره‌های شما بارگذاری نشد.',
+                onRetry: () => ref.invalidate(enrolledCoursesProvider),
+              ),
+              data: (all) {
+                final items = [
+                  for (final e in all)
+                    if (_tab.accepts(e)) e,
+                ];
+                if (items.isEmpty) {
+                  return EmptyState(
+                    title: _tab == MyCoursesTab.completed
+                        ? 'هنوز دوره‌ای را تمام نکرده‌اید'
+                        : 'هنوز دوره‌ای شروع نکرده‌اید',
+                    actionLabel: 'مشاهده دوره‌ها',
+                    onAction: () => context.go(Routes.courses),
+                  );
+                }
+                return RefreshIndicator(
+                  onRefresh: () async =>
+                      ref.invalidate(enrolledCoursesProvider),
+                  child: ListView.separated(
+                    padding: const EdgeInsets.all(Space.page),
+                    itemCount: items.length,
+                    separatorBuilder: (_, __) =>
+                        const SizedBox(height: Space.s3),
+                    itemBuilder: (_, i) {
+                      final e = items[i];
+                      return PishroCard(
+                        onTap: () =>
+                            context.push(Routes.learningDashboard(e.course.id)),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: Text(
+                                    e.course.title,
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: context.text.bodyMedium.copyWith(
+                                      color: c.textPrimary,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ),
+                                e.packageType == PackageType.vip
+                                    ? const PishroBadge.vip()
+                                    : const PishroBadge.regular(),
+                              ],
+                            ),
+                            const SizedBox(height: Space.s2),
+                            Text(
+                              e.lessonProgressLabel,
+                              style: context.text.caption.copyWith(
+                                color: c.textMuted,
+                              ),
+                            ),
+                            const SizedBox(height: Space.s3),
+                            PishroProgress(value: e.progress),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+                );
+              },
             ),
           ),
         ],

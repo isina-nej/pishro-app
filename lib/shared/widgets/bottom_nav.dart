@@ -23,21 +23,30 @@ class PishroBottomNav extends StatelessWidget {
   /// index -> unread count, e.g. `{1: 3}` for the news badge in the deck.
   final Map<int, int> badges;
 
-  static const destinations = <({String label, IconData outline, IconData filled})>[
-    (label: 'دوره‌ها', outline: Icons.school_outlined, filled: Icons.school),
-    (label: 'اخبار', outline: Icons.article_outlined, filled: Icons.article),
-    (
-      label: 'سرمایه‌گذاری',
-      outline: Icons.trending_up_outlined,
-      filled: Icons.trending_up
-    ),
-    (
-      label: 'بازار',
-      outline: Icons.candlestick_chart_outlined,
-      filled: Icons.candlestick_chart
-    ),
-    (label: 'حساب', outline: Icons.person_outline, filled: Icons.person),
-  ];
+  static const destinations =
+      <({String label, IconData outline, IconData filled})>[
+        (
+          label: 'دوره‌ها',
+          outline: Icons.school_outlined,
+          filled: Icons.school,
+        ),
+        (
+          label: 'اخبار',
+          outline: Icons.article_outlined,
+          filled: Icons.article,
+        ),
+        (
+          label: 'سرمایه‌گذاری',
+          outline: Icons.trending_up_outlined,
+          filled: Icons.trending_up,
+        ),
+        (
+          label: 'بازار',
+          outline: Icons.candlestick_chart_outlined,
+          filled: Icons.candlestick_chart,
+        ),
+        (label: 'حساب', outline: Icons.person_outline, filled: Icons.person),
+      ];
 
   @override
   Widget build(BuildContext context) {
@@ -106,7 +115,11 @@ class _NavItem extends StatelessWidget {
               Stack(
                 clipBehavior: Clip.none,
                 children: [
-                  Icon(active ? data.filled : data.outline, size: 24, color: color),
+                  Icon(
+                    active ? data.filled : data.outline,
+                    size: 24,
+                    color: color,
+                  ),
                   if (badge != null && badge! > 0)
                     Positioned(
                       top: -4,
@@ -151,9 +164,6 @@ class _NavItem extends StatelessWidget {
     );
   }
 
-  static String _fa(int n) => n
-      .toString()
-      .split('')
-      .map((d) => '۰۱۲۳۴۵۶۷۸۹'[int.parse(d)])
-      .join();
+  static String _fa(int n) =>
+      n.toString().split('').map((d) => '۰۱۲۳۴۵۶۷۸۹'[int.parse(d)]).join();
 }

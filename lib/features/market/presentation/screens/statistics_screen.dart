@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/tokens.dart';
+import '../../../../core/utils/formatters.dart';
 import '../../../../shared/widgets/common.dart';
-import '../../../../shared/widgets/pishro_button.dart';
+import '../../data/market_models.dart';
+import '../../data/market_repository.dart';
+import '../widgets/market_async.dart';
 
-/// Screen/Market/Statistics — «آمار بازار».
-///
-/// Source: `../desighn/_capture/08-07-market.dc.html` · Android 390dp · RTL.
+/// Screen/Market/Statistics — مقدار ناموجود هرگز صفر نمی‌شود.
 class StatisticsScreen extends ConsumerWidget {
   const StatisticsScreen({super.key, this.id = ''});
 
@@ -19,77 +19,86 @@ class StatisticsScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final c = context.colors;
+    final detail = ref.watch(assetDetailProvider(id));
+
     return Scaffold(
       appBar: AppBar(
-        titleSpacing: Space.s5,
         title: Text(
-          'آمار بازار',
+          'آمار',
           style: context.text.h3.copyWith(color: c.textPrimary),
         ),
       ),
-      body: ListView(
-        padding: const EdgeInsets.fromLTRB(
-          Space.page,
-          Space.s4,
-          Space.page,
-          Space.s8,
-        ),
-        children: [
-          Text(
-            'آمار بازار',
-            style: context.text.h2.copyWith(color: c.textPrimary),
-          ),
-          const SizedBox(height: Space.s2),
-          Text(
-            'پیاده‌سازی بر اساس دک طراحی · Screen/Market/Statistics',
-            style: context.text.bodySmall.copyWith(color: c.textMuted),
-          ),
-          const SizedBox(height: Space.s5),
-          PishroCard(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                _DeckRow(text: r'هشدارهای قیمت'),
-                _DeckRow(text: r'Bitcoin — بیشتر از ۳٬۵۰۰٬۰۰۰٬۰۰۰ تومان'),
-              ],
-            ),
-          ),
-          const SizedBox(height: Space.s5),
-          PishroButton(
-            label: 'ادامه',
-            onPressed: () {
-              if (context.canPop()) {
-                context.pop();
-              }
-            },
-          ),
-        ],
+      body: MarketAsync(
+        value: detail,
+        onRetry: () => ref.invalidate(assetDetailProvider(id)),
+        builder: (context, data) {
+          final a = data.asset;
+          String orMissing(double? v, [String Function(double)? fmt]) =>
+              v == null ? 'داده در دسترس نیست' : (fmt ?? faToman)(v);
+
+          return ListView(
+            padding: const EdgeInsets.all(Space.page),
+            children: [
+              _Stat(
+                'قیمت تومان',
+                orMissing(a.priceIrt, (v) => '${faToman(v)} تومان'),
+              ),
+              _Stat('قیمت دلار', '${Fmt.fa(a.priceUsd.toStringAsFixed(2))} \$'),
+              _Stat('تغییر ۲۴ساعت', Fmt.percentDelta(a.change24h)),
+              _Stat('تغییر ۷روز', Fmt.percentDelta(a.change7d)),
+              _Stat('تغییر ۳۰روز', Fmt.percentDelta(a.change30d)),
+              _Stat('حجم ۲۴ساعت', orMissing(a.volume24h, faMillions)),
+              _Stat('ارزش بازار', orMissing(a.marketCap, faMillions)),
+              _Stat(
+                'ATH',
+                orMissing(a.athUsd, (v) => Fmt.fa(v.toStringAsFixed(2))),
+              ),
+              _Stat(
+                'تاریخ ATH',
+                a.athDate == null
+                    ? 'داده در دسترس نیست'
+                    : Fmt.jalaliLong(a.athDate!),
+              ),
+              _Stat('عرضه در گردش', orMissing(a.circulatingSupply, faMillions)),
+              _Stat('سقف عرضه', orMissing(a.maxSupply, faMillions)),
+            ],
+          );
+        },
       ),
     );
   }
 }
 
-class _DeckRow extends StatelessWidget {
-  const _DeckRow({required this.text});
-  final String text;
+class _Stat extends StatelessWidget {
+  const _Stat(this.label, this.value);
+  final String label;
+  final String value;
 
   @override
   Widget build(BuildContext context) {
     final c = context.colors;
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: Space.s2),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(Icons.circle, size: 6, color: c.actionPrimary),
-          const SizedBox(width: Space.s3),
-          Expanded(
-            child: Text(
-              text,
-              style: context.text.bodyMedium.copyWith(color: c.textSecondary),
+      padding: const EdgeInsets.only(bottom: Space.s3),
+      child: PishroCard(
+        child: Row(
+          children: [
+            Text(
+              label,
+              style: context.text.bodySmall.copyWith(color: c.textMuted),
             ),
-          ),
-        ],
+            const Spacer(),
+            Flexible(
+              child: Text(
+                value,
+                textAlign: TextAlign.end,
+                style: context.text.bodySmall.copyWith(
+                  color: c.textPrimary,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

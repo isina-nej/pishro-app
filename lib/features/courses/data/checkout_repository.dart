@@ -70,9 +70,7 @@ CheckoutTotals computeTotals({
       ? 0
       : (safeBase * code.percent.clamp(0, 100) / 100).round();
   final discount = rawDiscount.clamp(0, safeBase);
-  final coin = coinDiscount == null
-      ? null
-      : coinDiscount.clamp(0, safeBase - discount);
+  final coin = coinDiscount?.clamp(0, safeBase - discount);
   return CheckoutTotals(
     base: safeBase,
     discount: discount,
@@ -371,8 +369,9 @@ class CheckoutController extends StateNotifier<CheckoutDraft?> {
   Future<String> submit() async {
     final current = state;
     if (current == null) throw const ServerException('سفارشی در جریان نیست.');
-    if (current.submitting)
+    if (current.submitting) {
       throw const ServerException('پرداخت در حال انجام است.');
+    }
 
     final userId = _ref.read(sessionProvider).userId;
     if (userId == null) {

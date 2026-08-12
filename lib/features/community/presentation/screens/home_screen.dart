@@ -5,67 +5,102 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/tokens.dart';
+import '../../../../routing/routes.dart';
 import '../../../../shared/widgets/common.dart';
-import '../../../../shared/widgets/pishro_button.dart';
+import '../../../../shared/widgets/pishro_badge.dart';
+import '../../../../shared/widgets/pishro_chip.dart';
+import '../../../../shared/widgets/states.dart';
 
-/// Screen/Community/Home — «جامعه (خانه)».
-///
-/// Source: `../desighn/_capture/09-08-community.dc.html` · Android 390dp · RTL.
-class CommunityHomeScreen extends ConsumerWidget {
+import '../../../../core/utils/formatters.dart';
+import '../../data/community_models.dart';
+import '../../data/community_repository.dart';
+
+class CommunityHomeScreen extends ConsumerStatefulWidget {
   const CommunityHomeScreen({super.key});
-
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<CommunityHomeScreen> createState() =>
+      _CommunityHomeScreenState();
+}
+
+class _CommunityHomeScreenState extends ConsumerState<CommunityHomeScreen> {
+  var _filter = AnalysisFilter.all;
+  @override
+  Widget build(BuildContext context) {
     final c = context.colors;
+    final feed = ref.watch(communityFeedProvider(_filter));
     return Scaffold(
       appBar: AppBar(
-        titleSpacing: Space.s5,
         title: Text(
-          'جامعه (خانه)',
-          style: context.text.h3.copyWith(color: c.textPrimary),
+          'جامعه',
+          style: context.text.h2.copyWith(color: c.textPrimary),
         ),
+        actions: [
+          IconButton(
+            tooltip: 'جستجو',
+            onPressed: () => context.push(Routes.communitySearch),
+            icon: const Icon(Icons.search_rounded),
+          ),
+          IconButton(
+            tooltip: 'تحلیل جدید',
+            onPressed: () => context.push(Routes.createAnalysis),
+            icon: const Icon(Icons.edit_outlined),
+          ),
+        ],
       ),
-      body: ListView(
-        padding: const EdgeInsets.fromLTRB(
-          Space.page,
-          Space.s4,
-          Space.page,
-          Space.s8,
-        ),
+      body: Column(
         children: [
-          Text(
-            'جامعه (خانه)',
-            style: context.text.h2.copyWith(color: c.textPrimary),
+          PishroChipBar(
+            labels: [for (final f in AnalysisFilter.values) f.label],
+            selectedIndex: _filter.index,
+            onSelected: (i) =>
+                setState(() => _filter = AnalysisFilter.values[i]),
           ),
-          const SizedBox(height: Space.s2),
-          Text(
-            'پیاده‌سازی بر اساس دک طراحی · Screen/Community/Home',
-            style: context.text.bodySmall.copyWith(color: c.textMuted),
-          ),
-          const SizedBox(height: Space.s5),
-          PishroCard(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                _DeckRow(text: r'تحلیلگران پیشنهادی'),
-                _DeckRow(
-                  text:
-                      r'این پیشنهادها بر اساس علایق، فعالیت و تنظیمات شما نمایش داده می‌شوند.',
-                ),
-                _DeckRow(text: r'تحلیلگر نمونه ۴'),
-                _DeckRow(text: r'تحلیل بنیادی · ۲۱ تحلیل منتشرشده'),
-                _DeckRow(text: r'★ ۴٫۶'),
-              ],
+          Expanded(
+            child: feed.when(
+              loading: () => const Padding(
+                padding: EdgeInsets.all(Space.page),
+                child: Skeleton.box(height: 96),
+              ),
+              error: (_, __) => ErrorStateView(
+                onRetry: () => ref.invalidate(communityFeedProvider(_filter)),
+              ),
+              data: (items) => items.isEmpty
+                  ? const EmptyState(title: 'تحلیلی در این فیلتر نیست')
+                  : ListView(
+                      padding: const EdgeInsets.all(Space.page),
+                      children: [
+                        Wrap(
+                          spacing: Space.s2,
+                          children: [
+                            ActionChip(
+                              label: const Text('دنبال‌شده‌ها'),
+                              onPressed: () =>
+                                  context.push(Routes.followingFeed),
+                            ),
+                            ActionChip(
+                              label: const Text('تحلیلگران'),
+                              onPressed: () =>
+                                  context.push(Routes.recommendedAnalysts),
+                            ),
+                            ActionChip(
+                              label: const Text('رتبه‌بندی'),
+                              onPressed: () => context.push(Routes.leaderboard),
+                            ),
+                            ActionChip(
+                              label: const Text('سیگنال‌ها'),
+                              onPressed: () =>
+                                  context.push(Routes.premiumSignals),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: Space.s4),
+                        for (final a in items) ...[
+                          _AnalysisCard(a),
+                          const SizedBox(height: Space.s3),
+                        ],
+                      ],
+                    ),
             ),
-          ),
-          const SizedBox(height: Space.s5),
-          PishroButton(
-            label: 'ادامه',
-            onPressed: () {
-              if (context.canPop()) {
-                context.pop();
-              }
-            },
           ),
         ],
       ),
@@ -73,26 +108,50 @@ class CommunityHomeScreen extends ConsumerWidget {
   }
 }
 
-class _DeckRow extends StatelessWidget {
-  const _DeckRow({required this.text});
-  final String text;
-
+class _AnalysisCard extends StatelessWidget {
+  const _AnalysisCard(this.a);
+  final Analysis a;
   @override
   Widget build(BuildContext context) {
     final c = context.colors;
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: Space.s2),
-      child: Row(
+    return PishroCard(
+      onTap: a.isLocked
+          ? null
+          : () => context.push(Routes.analysisDetails(a.id)),
+      child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(Icons.circle, size: 6, color: c.actionPrimary),
-          const SizedBox(width: Space.s3),
-          Expanded(
-            child: Text(
-              text,
-              style: context.text.bodyMedium.copyWith(color: c.textSecondary),
+          Row(
+            children: [
+              Text(
+                a.assetSymbol,
+                style: context.text.caption.copyWith(color: c.textMuted),
+              ),
+              const Spacer(),
+              if (a.risk != null) RiskBadge(a.risk!),
+            ],
+          ),
+          const SizedBox(height: Space.s2),
+          Text(
+            a.title,
+            style: context.text.bodyMedium.copyWith(
+              color: c.textPrimary,
+              fontWeight: FontWeight.w700,
             ),
           ),
+          const SizedBox(height: Space.s1),
+          Text(
+            '${a.author.displayName} · ${a.kind.label} · ${Fmt.relative(a.publishedAt)}',
+            style: context.text.caption.copyWith(color: c.textMuted),
+          ),
+          if (a.isLocked) ...[
+            const SizedBox(height: Space.s2),
+            const PishroBadge(
+              label: 'مخصوص مشترکان',
+              tone: PishroBadgeTone.premium,
+              icon: Icons.lock_outline_rounded,
+            ),
+          ],
         ],
       ),
     );

@@ -12,7 +12,7 @@ import '../../../auth/presentation/widgets/consent_checkbox.dart';
 import '../../data/checkout_repository.dart';
 import '../widgets/checkout_summary.dart';
 
-/// Screen/Checkout/Course-Regular — خلاصه سفارش بسته عادی.
+/// Screen/Checkout/Course-Regular — «۰۷ · پرداخت بسته عادی».
 class CourseRegularScreen extends ConsumerWidget {
   const CourseRegularScreen({super.key});
 
@@ -35,7 +35,7 @@ class CourseRegularScreen extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'پرداخت بسته عادی',
+          'تکمیل خرید',
           style: context.text.h3.copyWith(color: c.textPrimary),
         ),
       ),
@@ -47,11 +47,11 @@ class CourseRegularScreen extends ConsumerWidget {
           ListTile(
             contentPadding: EdgeInsets.zero,
             title: Text(
-              'روش پرداخت',
+              draft.method.label,
               style: context.text.bodyMedium.copyWith(color: c.textPrimary),
             ),
             subtitle: Text(
-              draft.method.label,
+              draft.method.hint,
               style: context.text.caption.copyWith(color: c.textMuted),
             ),
             trailing: const Icon(Icons.chevron_left_rounded),
@@ -62,7 +62,8 @@ class CourseRegularScreen extends ConsumerWidget {
             value: draft.consentAccepted,
             showRequired: draft.showConsentError,
             onChanged: (v) => ref.read(checkoutProvider.notifier).setConsent(v),
-            label: 'قوانین خرید و استرداد را خوانده و می‌پذیرم.',
+            label:
+                'قوانین خرید و شرایط استفاده از دوره را مطالعه کرده‌ام و می‌پذیرم.',
           ),
           if (draft.showConsentError)
             Padding(

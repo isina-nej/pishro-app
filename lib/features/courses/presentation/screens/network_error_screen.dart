@@ -8,7 +8,7 @@ import '../../../../routing/routes.dart';
 import '../../../../shared/widgets/states.dart';
 import '../../data/checkout_repository.dart';
 
-/// Screen/Checkout/NetworkError — قطع اتصال هنگام پرداخت.
+/// Screen/Checkout/NetworkError.
 class CheckoutNetworkErrorScreen extends ConsumerWidget {
   const CheckoutNetworkErrorScreen({super.key});
 

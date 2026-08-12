@@ -10,7 +10,7 @@ import '../../../../shared/widgets/pishro_button.dart';
 import '../../../../shared/widgets/states.dart';
 import '../../data/checkout_repository.dart';
 
-/// Screen/Checkout/Processing — انتظار بازگشت از درگاه (وضعیت نامشخص).
+/// Screen/Checkout/Processing — وضعیت نامشخص؛ جدا از ناموفق.
 class CheckoutProcessingScreen extends ConsumerWidget {
   const CheckoutProcessingScreen({super.key});
 
@@ -20,7 +20,7 @@ class CheckoutProcessingScreen extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'در انتظار تأیید درگاه',
+          'وضعیت پرداخت نامشخص',
           style: context.text.h3.copyWith(color: c.textPrimary),
         ),
       ),
@@ -29,36 +29,36 @@ class CheckoutProcessingScreen extends ConsumerWidget {
         child: Column(
           children: [
             const Spacer(),
-            CircularProgressIndicator(color: c.actionPrimary),
-            const SizedBox(height: Space.s5),
+            Icon(Icons.hourglass_top_rounded, size: 48, color: c.warning),
+            const SizedBox(height: Space.s4),
             Text(
-              'وضعیت پرداخت هنوز مشخص نیست',
+              'وضعیت پرداخت نامشخص است',
               textAlign: TextAlign.center,
               style: context.text.h3.copyWith(color: c.textPrimary),
             ),
             const SizedBox(height: Space.s2),
             Text(
-              'نامشخص هرگز به‌عنوان ناموفق نمایش داده نمی‌شود. چند لحظه صبر کنید یا سفارش‌ها را بررسی کنید.',
+              'نتیجه پرداخت هنوز از بانک دریافت نشده. در صورت کسر مبلغ، دوره به‌صورت خودکار فعال می‌شود.',
               textAlign: TextAlign.center,
               style: context.text.bodySmall.copyWith(color: c.textSecondary),
             ),
             const SizedBox(height: Space.s4),
             const NoticeBanner(
-              message: 'از بستن برنامه تا بازگشت درگاه خودداری کنید.',
+              message: 'نامشخص هرگز به‌عنوان ناموفق نمایش داده نمی‌شود.',
               tone: NoticeTone.info,
             ),
             const Spacer(),
             PishroButton(
-              label: 'بررسی دوباره',
+              label: 'بررسی وضعیت',
               onPressed: () => context.go(Routes.checkoutProcessing),
             ),
             const SizedBox(height: Space.s3),
             PishroButton(
-              label: 'سفارش‌های من',
+              label: 'بازگشت به دوره‌های من',
               variant: PishroButtonVariant.secondary,
               onPressed: () {
                 ref.read(checkoutProvider.notifier).clear();
-                context.go(Routes.purchaseHistory);
+                context.go(Routes.myCourses);
               },
             ),
           ],

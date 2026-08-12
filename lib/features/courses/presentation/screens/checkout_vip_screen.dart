@@ -6,6 +6,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/tokens.dart';
 import '../../../../routing/routes.dart';
+import '../../../../shared/widgets/common.dart';
 import '../../../../shared/widgets/pishro_badge.dart';
 import '../../../../shared/widgets/pishro_button.dart';
 import '../../../../shared/widgets/states.dart';
@@ -14,7 +15,7 @@ import '../../data/checkout_repository.dart';
 import '../../data/courses_models.dart';
 import '../widgets/checkout_summary.dart';
 
-/// Screen/Checkout/Course-VIP — همان خلاصه با دکمه طلایی VIP.
+/// Screen/Checkout/Course-VIP — «۰۸ · پرداخت بسته VIP».
 class CourseVIPScreen extends ConsumerWidget {
   const CourseVIPScreen({super.key});
 
@@ -37,7 +38,7 @@ class CourseVIPScreen extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'پرداخت بسته VIP',
+          'تکمیل خرید VIP',
           style: context.text.h3.copyWith(color: c.textPrimary),
         ),
         actions: const [
@@ -52,19 +53,49 @@ class CourseVIPScreen extends ConsumerWidget {
         children: [
           CheckoutSummaryCard(draft: draft),
           const SizedBox(height: Space.s4),
-          const NoticeBanner(
-            message: 'گفت‌وگوی مدرس فقط پس از فعال‌شدن بسته VIP در دسترس است.',
-            tone: NoticeTone.info,
+          PishroCard(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'دسترسی گفت‌وگو با مدرس',
+                  style: context.text.bodyMedium.copyWith(
+                    color: c.textPrimary,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                const SizedBox(height: Space.s2),
+                Text(
+                  'دسترسی گفت‌وگو با مدرس پس از فعال‌شدن موفق دوره در حساب شما نمایش داده می‌شود.',
+                  style: context.text.bodySmall.copyWith(
+                    color: c.textSecondary,
+                  ),
+                ),
+                const SizedBox(height: Space.s3),
+                Text(
+                  'مدت دسترسی به گفت‌وگو: اطلاعات تکمیلی طرح',
+                  style: context.text.caption.copyWith(color: c.textMuted),
+                ),
+                Text(
+                  'سیاست پاسخ‌گویی: طبق شرایط دوره',
+                  style: context.text.caption.copyWith(color: c.textMuted),
+                ),
+                Text(
+                  'خدمات تکمیلی VIP: در صورت ارائه توسط مدرس',
+                  style: context.text.caption.copyWith(color: c.textMuted),
+                ),
+              ],
+            ),
           ),
           const SizedBox(height: Space.s5),
           ListTile(
             contentPadding: EdgeInsets.zero,
             title: Text(
-              'روش پرداخت',
+              draft.method.label,
               style: context.text.bodyMedium.copyWith(color: c.textPrimary),
             ),
             subtitle: Text(
-              draft.method.label,
+              draft.method.hint,
               style: context.text.caption.copyWith(color: c.textMuted),
             ),
             trailing: const Icon(Icons.chevron_left_rounded),
@@ -75,8 +106,17 @@ class CourseVIPScreen extends ConsumerWidget {
             value: draft.consentAccepted,
             showRequired: draft.showConsentError,
             onChanged: (v) => ref.read(checkoutProvider.notifier).setConsent(v),
-            label: 'قوانین خرید و استرداد را خوانده و می‌پذیرم.',
+            label:
+                'قوانین خرید و شرایط استفاده از دوره را مطالعه کرده‌ام و می‌پذیرم.',
           ),
+          if (draft.showConsentError)
+            Padding(
+              padding: const EdgeInsets.only(top: Space.s2),
+              child: Text(
+                'برای ادامه، پذیرش قوانین خرید الزامی است.',
+                style: context.text.caption.copyWith(color: c.danger),
+              ),
+            ),
         ],
       ),
       bottomNavigationBar: SafeArea(

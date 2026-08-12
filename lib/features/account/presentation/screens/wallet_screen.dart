@@ -60,6 +60,11 @@ class AccountWalletScreen extends ConsumerWidget {
                   ],
                 ),
                 const SizedBox(height: Space.s3),
+                Text(
+                  'به‌روزرسانی: ${Fmt.relative(DateTime.now())}',
+                  style: context.text.caption.copyWith(color: c.textMuted),
+                ),
+                const SizedBox(height: Space.s3),
                 const NoticeBanner(
                   message: 'موجودی کیف پول endpoint مستقل ندارد.',
                   tone: NoticeTone.info,

@@ -24,7 +24,7 @@ class AccountProfileScreen extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'پروفایل',
+          'اطلاعات حساب',
           style: context.text.h3.copyWith(color: c.textPrimary),
         ),
       ),

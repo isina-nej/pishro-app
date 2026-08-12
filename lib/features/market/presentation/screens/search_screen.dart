@@ -89,7 +89,7 @@ class _MarketSearchScreenState extends ConsumerState<MarketSearchScreen> {
                       ];
                 if (_query.isEmpty) {
                   return const EmptyState(
-                    title: 'نام یا نماد را بنویسید',
+                    title: 'نام ارز یا نماد آن را جستجو کنید',
                     icon: Icons.search_rounded,
                   );
                 }

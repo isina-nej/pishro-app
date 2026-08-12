@@ -170,26 +170,40 @@ class _PortfolioSummary extends StatelessWidget {
         final invested = active.fold<int>(0, (sum, t) => sum + t.amount);
 
         return PishroCard(
-          child: Row(
+          child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Expanded(
-                child: _SummaryCell(
-                  label: 'سرمایه فعال',
-                  value: invested == 0 ? kSampleValue : Fmt.toman(invested),
-                ),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    child: _SummaryCell(
+                      label: 'سرمایه فعال',
+                      value: invested == 0 ? kSampleValue : Fmt.toman(invested),
+                    ),
+                  ),
+                  Expanded(
+                    child: _SummaryCell(
+                      label: 'دریافتی ثبت‌شده',
+                      // No payout ledger exists yet — never guess a return.
+                      value: kSampleValue,
+                    ),
+                  ),
+                  const Expanded(
+                    child: _SummaryCell(
+                      label: 'پرداخت بعدی',
+                      value: 'طبق برنامه قرارداد',
+                    ),
+                  ),
+                ],
               ),
-              Expanded(
-                child: _SummaryCell(
-                  label: 'دریافتی ثبت‌شده',
-                  // No payout ledger exists yet — never guess a return.
-                  value: kSampleValue,
-                ),
-              ),
-              const Expanded(
-                child: _SummaryCell(
-                  label: 'پرداخت بعدی',
-                  value: 'طبق برنامه قرارداد',
+              const SizedBox(height: Space.s3),
+              Builder(
+                builder: (context) => Text(
+                  'به‌روزرسانی: ${Fmt.relative(DateTime.now())}',
+                  style: context.text.caption.copyWith(
+                    color: context.colors.textMuted,
+                  ),
                 ),
               ),
             ],

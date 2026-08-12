@@ -35,7 +35,7 @@ class _KYCVerificationScreenState extends ConsumerState<KYCVerificationScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'ارسال مدارک احراز هویت',
+          'تکمیل احراز هویت',
           style: context.text.h3.copyWith(color: c.textPrimary),
         ),
       ),

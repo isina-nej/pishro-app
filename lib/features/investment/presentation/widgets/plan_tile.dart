@@ -40,7 +40,7 @@ class PlanTile extends StatelessWidget {
           const SizedBox(height: Space.s2),
           Text(
             plan.isDynamic
-                ? 'بازده: $kPerContract'
+                ? 'بازده متغیر'
                 : (rate == null
                       ? kSampleValue
                       : 'برآورد ماهانه ${Fmt.fa(rate.toStringAsFixed(0))}٪'),

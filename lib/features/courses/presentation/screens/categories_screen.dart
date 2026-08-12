@@ -23,7 +23,7 @@ class CoursesCategoriesScreen extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'دسته‌بندی‌ها',
+          'دسته‌بندی دوره‌ها',
           style: context.text.h3.copyWith(color: c.textPrimary),
         ),
         actions: [

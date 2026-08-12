@@ -81,7 +81,7 @@ class _NewsSearchScreenState extends ConsumerState<NewsSearchScreen> {
           PishroTextField(
             controller: _controller,
             label: 'عبارت جستجو',
-            hint: 'بیت‌کوین، نرخ بهره…',
+            hint: 'عنوان خبر، موضوع یا کلیدواژه…',
             autofocus: true,
             textInputAction: TextInputAction.search,
             onChanged: (_) {},

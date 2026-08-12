@@ -19,7 +19,7 @@ class PurchaseHistoryScreen extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'تاریخچه خرید',
+          'سوابق خرید',
           style: context.text.h3.copyWith(color: c.textPrimary),
         ),
       ),

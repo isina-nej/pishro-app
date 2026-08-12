@@ -108,7 +108,7 @@ class _NewsCommentsScreenState extends ConsumerState<NewsCommentsScreen> {
                     ),
                   ),
                   IconButton(
-                    tooltip: _sending ? 'در حال ارسال' : 'ارسال',
+                    tooltip: _sending ? 'در حال ارسال' : 'ثبت دیدگاه',
                     onPressed: _sending ? null : _send,
                     icon: Icon(
                       Icons.send_rounded,

@@ -99,6 +99,10 @@ class _FixedBody extends ConsumerWidget {
                 ? kPerContract
                 : '${Fmt.fa(rate.toStringAsFixed(0))}٪ ماهیانه',
           ),
+          const _Spec(
+            label: 'نحوه محاسبه',
+            value: 'طبق شرایط و نحوه محاسبه قرارداد',
+          ),
           _Spec(
             label: 'مدت طرح',
             value:

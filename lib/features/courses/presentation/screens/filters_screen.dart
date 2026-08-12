@@ -24,14 +24,14 @@ class CoursesFiltersScreen extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'فیلترها',
+          'فیلتر دوره‌ها',
           style: context.text.h3.copyWith(color: c.textPrimary),
         ),
         actions: [
           if (!filters.isEmpty)
             TextButton(
               onPressed: () => notifier.state = const CourseFilters(),
-              child: const Text('حذف همه'),
+              child: const Text('پاک کردن همه'),
             ),
         ],
       ),

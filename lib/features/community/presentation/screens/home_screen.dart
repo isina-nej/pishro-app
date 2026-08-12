@@ -28,7 +28,7 @@ class _CommunityHomeScreenState extends ConsumerState<CommunityHomeScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'جامعه',
+          'جامعه تحلیلگران',
           style: context.text.h2.copyWith(color: c.textPrimary),
         ),
         actions: [

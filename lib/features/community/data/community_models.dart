@@ -176,21 +176,21 @@ class Analyst {
   final bool isSuspended;
 
   Analyst copyWith({bool? isFollowing}) => Analyst(
-        id: id,
-        displayName: displayName,
-        specialty: specialty,
-        publishedCount: publishedCount,
-        rating: rating,
-        reviewCount: reviewCount,
-        followerCount: followerCount,
-        activeSinceJalaliYear: activeSinceJalaliYear,
-        bio: bio,
-        badges: badges,
-        disclosure: disclosure,
-        isFollowing: isFollowing ?? this.isFollowing,
-        isIdentityVerified: isIdentityVerified,
-        isSuspended: isSuspended,
-      );
+    id: id,
+    displayName: displayName,
+    specialty: specialty,
+    publishedCount: publishedCount,
+    rating: rating,
+    reviewCount: reviewCount,
+    followerCount: followerCount,
+    activeSinceJalaliYear: activeSinceJalaliYear,
+    bio: bio,
+    badges: badges,
+    disclosure: disclosure,
+    isFollowing: isFollowing ?? this.isFollowing,
+    isIdentityVerified: isIdentityVerified,
+    isSuspended: isSuspended,
+  );
 }
 
 /// Author stub carried by every analysis/comment, so a list never has to fetch
@@ -305,7 +305,10 @@ class LeaderboardPage {
 
 @immutable
 class CommunitySearchResults {
-  const CommunitySearchResults({required this.analysts, required this.analyses});
+  const CommunitySearchResults({
+    required this.analysts,
+    required this.analyses,
+  });
   final List<Analyst> analysts;
   final List<Analysis> analyses;
 
@@ -512,22 +515,21 @@ class AnalysisDraft {
     String? invalidation,
     String? sources,
     AnalysisVisibility? visibility,
-  }) =>
-      AnalysisDraft(
-        kind: kind ?? this.kind,
-        asset: asset ?? this.asset,
-        title: title ?? this.title,
-        timeframe: timeframe ?? this.timeframe,
-        risk: risk ?? this.risk,
-        holdsAsset: holdsAsset ?? this.holdsAsset,
-        isSponsored: isSponsored ?? this.isSponsored,
-        summary: summary ?? this.summary,
-        body: body ?? this.body,
-        scenarios: scenarios ?? this.scenarios,
-        invalidation: invalidation ?? this.invalidation,
-        sources: sources ?? this.sources,
-        visibility: visibility ?? this.visibility,
-      );
+  }) => AnalysisDraft(
+    kind: kind ?? this.kind,
+    asset: asset ?? this.asset,
+    title: title ?? this.title,
+    timeframe: timeframe ?? this.timeframe,
+    risk: risk ?? this.risk,
+    holdsAsset: holdsAsset ?? this.holdsAsset,
+    isSponsored: isSponsored ?? this.isSponsored,
+    summary: summary ?? this.summary,
+    body: body ?? this.body,
+    scenarios: scenarios ?? this.scenarios,
+    invalidation: invalidation ?? this.invalidation,
+    sources: sources ?? this.sources,
+    visibility: visibility ?? this.visibility,
+  );
 }
 
 @immutable

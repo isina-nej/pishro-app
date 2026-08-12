@@ -202,15 +202,17 @@ class _Pill extends StatelessWidget {
               horizontal: square ? Space.s2 : Space.s3,
               vertical: Space.s2 - 1,
             ),
-            constraints: const BoxConstraints(minHeight: 34),
-            child: Center(
-              widthFactor: square ? null : 1,
-              child: Text(
-                label,
-                textAlign: TextAlign.center,
-                style: context.text.micro.copyWith(
-                  color: selected ? c.onAction : c.textSecondary,
-                  fontWeight: selected ? FontWeight.w600 : FontWeight.w400,
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(minHeight: 34),
+              child: Center(
+                widthFactor: square ? null : 1,
+                child: Text(
+                  label,
+                  textAlign: TextAlign.center,
+                  style: context.text.micro.copyWith(
+                    color: selected ? c.onAction : c.textSecondary,
+                    fontWeight: selected ? FontWeight.w600 : FontWeight.w400,
+                  ),
                 ),
               ),
             ),

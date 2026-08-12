@@ -104,7 +104,11 @@ List<NewsCategoryGroup> groupCategories(List<NewsArticle> items) {
     final seen = byTitle[a.category];
     byTitle[a.category] = seen == null
         ? (id: a.categoryId, count: 1, latest: a.title)
-        : (id: seen.id ?? a.categoryId, count: seen.count + 1, latest: seen.latest);
+        : (
+            id: seen.id ?? a.categoryId,
+            count: seen.count + 1,
+            latest: seen.latest,
+          );
   }
   final groups = [
     for (final e in byTitle.entries)
@@ -126,7 +130,9 @@ List<NewsArticle> applyNewsQuery(
   DateTime? now,
 }) {
   final window = query.range.window;
-  final cutoff = window == null ? null : (now ?? DateTime.now()).subtract(window);
+  final cutoff = window == null
+      ? null
+      : (now ?? DateTime.now()).subtract(window);
 
   final out = [
     for (final a in items)
@@ -134,10 +140,13 @@ List<NewsArticle> applyNewsQuery(
   ];
 
   out.sort(switch (query.sort) {
-    NewsSort.newest => (a, b) => (b.date ?? DateTime(0)).compareTo(a.date ?? DateTime(0)),
+    NewsSort.newest => (a, b) => (b.date ?? DateTime(0)).compareTo(
+      a.date ?? DateTime(0),
+    ),
     NewsSort.mostViewed => (a, b) => b.views.compareTo(a.views),
-    NewsSort.mostCommented => (a, b) =>
-        (b.commentCount ?? 0).compareTo(a.commentCount ?? 0),
+    NewsSort.mostCommented => (a, b) => (b.commentCount ?? 0).compareTo(
+      a.commentCount ?? 0,
+    ),
   });
   return out;
 }
@@ -214,9 +223,10 @@ class RecentSearches {
     final t = term.trim();
     if (t.isEmpty) return load();
     final prefs = await SharedPreferences.getInstance();
-    final next = [t, ...(prefs.getStringList(_key) ?? const []).where((e) => e != t)]
-        .take(_max)
-        .toList();
+    final next = [
+      t,
+      ...(prefs.getStringList(_key) ?? const []).where((e) => e != t),
+    ].take(_max).toList();
     await prefs.setStringList(_key, next);
     return next;
   }
@@ -245,14 +255,15 @@ final recentSearchesProvider = Provider<RecentSearches>(
 );
 
 /// The feed for one [NewsQuery]. Sort and range are applied to the loaded page.
-final newsFeedProvider = FutureProvider.family<List<NewsArticle>, NewsQuery>(
-  (ref, query) async {
-    final page = await ref
-        .watch(newsRepositoryProvider)
-        .feed(search: query.search, category: query.category);
-    return applyNewsQuery(page.items, query);
-  },
-);
+final newsFeedProvider = FutureProvider.family<List<NewsArticle>, NewsQuery>((
+  ref,
+  query,
+) async {
+  final page = await ref
+      .watch(newsRepositoryProvider)
+      .feed(search: query.search, category: query.category);
+  return applyNewsQuery(page.items, query);
+});
 
 final newsArticleProvider = FutureProvider.family<NewsArticle, String>(
   (ref, slug) => ref.watch(newsRepositoryProvider).article(slug),

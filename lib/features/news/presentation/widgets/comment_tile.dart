@@ -82,8 +82,7 @@ class CommentTile extends StatelessWidget {
                 ),
               if (onReplies != null && onReport != null)
                 const SizedBox(width: Space.s3 + 2),
-              if (onReport != null)
-                _Action(label: 'گزارش', onTap: onReport),
+              if (onReport != null) _Action(label: 'گزارش', onTap: onReport),
             ],
           ),
         ],

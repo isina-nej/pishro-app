@@ -52,7 +52,9 @@ class NewsArticle {
       coverImage: _nullableString(json['coverImage']),
       author: _nullableString(json['author']),
       categoryId: _nullableString(
-        related is Map ? related['id'] ?? json['categoryId'] : json['categoryId'],
+        related is Map
+            ? related['id'] ?? json['categoryId']
+            : json['categoryId'],
       ),
       tags: _stringList(json['tags']),
       publishedAt: _date(json['publishedAt']),
@@ -163,17 +165,20 @@ class NewsComment {
     ];
     return NewsComment(
       id: '${json['id'] ?? ''}',
-      author: _nullableString(json['userName']) ??
+      author:
+          _nullableString(json['userName']) ??
           (user is Map ? _nullableString(user['name']) : null) ??
           'کاربر پیشرو',
       text: '${json['content'] ?? json['text'] ?? ''}',
-      avatar: _nullableString(json['userAvatar']) ??
+      avatar:
+          _nullableString(json['userAvatar']) ??
           (user is Map ? _nullableString(user['image']) : null),
       createdAt: _date(json['createdAt']),
       // `published: false` is the moderation queue — «در انتظار بررسی».
       pending: json.containsKey('published') && json['published'] != true,
       replies: replies,
-      replyCount: _int(json['replyCount']) ?? (replies.isEmpty ? null : replies.length),
+      replyCount:
+          _int(json['replyCount']) ?? (replies.isEmpty ? null : replies.length),
     );
   }
 
@@ -258,34 +263,34 @@ enum NewsRange { all, today, week, month }
 
 extension NewsRangeX on NewsRange {
   String get label => switch (this) {
-        NewsRange.all => 'همه',
-        NewsRange.today => 'امروز',
-        NewsRange.week => 'این هفته',
-        NewsRange.month => 'این ماه',
-      };
+    NewsRange.all => 'همه',
+    NewsRange.today => 'امروز',
+    NewsRange.week => 'این هفته',
+    NewsRange.month => 'این ماه',
+  };
 
   /// Label used inside the filter sheet, which words the same ranges as spans.
   String get spanLabel => switch (this) {
-        NewsRange.all => 'همه زمان‌ها',
-        NewsRange.today => 'امروز',
-        NewsRange.week => '۷ روز گذشته',
-        NewsRange.month => '۳۰ روز گذشته',
-      };
+    NewsRange.all => 'همه زمان‌ها',
+    NewsRange.today => 'امروز',
+    NewsRange.week => '۷ روز گذشته',
+    NewsRange.month => '۳۰ روز گذشته',
+  };
 
   Duration? get window => switch (this) {
-        NewsRange.all => null,
-        NewsRange.today => const Duration(days: 1),
-        NewsRange.week => const Duration(days: 7),
-        NewsRange.month => const Duration(days: 30),
-      };
+    NewsRange.all => null,
+    NewsRange.today => const Duration(days: 1),
+    NewsRange.week => const Duration(days: 7),
+    NewsRange.month => const Duration(days: 30),
+  };
 }
 
 extension NewsSortX on NewsSort {
   String get label => switch (this) {
-        NewsSort.newest => 'جدیدترین',
-        NewsSort.mostViewed => 'پربازدیدترین',
-        NewsSort.mostCommented => 'بیشترین دیدگاه',
-      };
+    NewsSort.newest => 'جدیدترین',
+    NewsSort.mostViewed => 'پربازدیدترین',
+    NewsSort.mostCommented => 'بیشترین دیدگاه',
+  };
 }
 
 /// Identity of a feed request. A record so `FutureProvider.family` gets value
@@ -311,11 +316,11 @@ String? _nullableString(dynamic value) {
 }
 
 int? _int(dynamic value) => switch (value) {
-      int v => v,
-      num v => v.round(),
-      String v => int.tryParse(v),
-      _ => null,
-    };
+  int v => v,
+  num v => v.round(),
+  String v => int.tryParse(v),
+  _ => null,
+};
 
 DateTime? _date(dynamic value) =>
     value is String ? DateTime.tryParse(value)?.toLocal() : null;

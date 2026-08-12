@@ -29,12 +29,8 @@ class _TrendingScreenState extends ConsumerState<TrendingScreen> {
 
   static const _ranges = [NewsRange.today, NewsRange.week, NewsRange.month];
 
-  NewsQuery get _query => (
-    search: null,
-    category: null,
-    sort: NewsSort.mostViewed,
-    range: _range,
-  );
+  NewsQuery get _query =>
+      (search: null, category: null, sort: NewsSort.mostViewed, range: _range);
 
   @override
   Widget build(BuildContext context) {

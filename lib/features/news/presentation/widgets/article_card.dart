@@ -17,11 +17,7 @@ import '../../data/news_repository.dart';
 /// Every meta line is dot-separated exactly as the deck words it:
 /// «ارز دیجیتال · ۴۵ دقیقه پیش · ۱۲ دیدگاه».
 class FeaturedArticleCard extends StatelessWidget {
-  const FeaturedArticleCard({
-    super.key,
-    required this.article,
-    this.onTap,
-  });
+  const FeaturedArticleCard({super.key, required this.article, this.onTap});
 
   final NewsArticle article;
   final VoidCallback? onTap;
@@ -57,7 +53,9 @@ class FeaturedArticleCard extends StatelessWidget {
                     ),
                     child: Text(
                       article.category,
-                      style: context.text.micro.copyWith(color: c.textSecondary),
+                      style: context.text.micro.copyWith(
+                        color: c.textSecondary,
+                      ),
                     ),
                   ),
                 ),
@@ -367,8 +365,9 @@ class SaveButton extends ConsumerWidget {
     final c = context.colors;
     final saved = ref.watch(
       bookmarksProvider.select(
-        (v) => (v.value ?? const <SavedArticle>[])
-            .any((s) => s.articleId == article.id),
+        (v) => (v.value ?? const <SavedArticle>[]).any(
+          (s) => s.articleId == article.id,
+        ),
       ),
     );
 
@@ -385,9 +384,9 @@ class SaveButton extends ConsumerWidget {
           await ref.read(bookmarksProvider.notifier).toggle(article);
         } catch (_) {
           if (!context.mounted) return;
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('ذخیره خبر انجام نشد.')),
-          );
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(const SnackBar(content: Text('ذخیره خبر انجام نشد.')));
         }
       },
       icon: Icon(
@@ -463,7 +462,10 @@ class _StripePattern extends StatelessWidget {
     final c = context.colors;
     return CustomPaint(
       size: Size(width ?? double.infinity, height),
-      painter: _StripePainter(base: c.surfaceSecondary, stripe: c.borderDefault),
+      painter: _StripePainter(
+        base: c.surfaceSecondary,
+        stripe: c.borderDefault,
+      ),
     );
   }
 }
@@ -482,7 +484,11 @@ class _StripePainter extends CustomPainter {
       ..strokeWidth = 8;
     // 135° stripes, 16px pitch — matches the deck's repeating-linear-gradient.
     for (var x = -size.height; x < size.width + size.height; x += 16) {
-      canvas.drawLine(Offset(x, 0), Offset(x + size.height, size.height), paint);
+      canvas.drawLine(
+        Offset(x, 0),
+        Offset(x + size.height, size.height),
+        paint,
+      );
     }
   }
 
@@ -500,7 +506,12 @@ class ArticleListSkeleton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => ListView(
-    padding: const EdgeInsets.fromLTRB(Space.page, Space.s3, Space.page, Space.s6),
+    padding: const EdgeInsets.fromLTRB(
+      Space.page,
+      Space.s3,
+      Space.page,
+      Space.s6,
+    ),
     children: [
       if (featured) ...[
         const Skeleton(height: 150, radius: Radii.lg),

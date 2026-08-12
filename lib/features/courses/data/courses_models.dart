@@ -1,12 +1,10 @@
 import '../../../core/utils/formatters.dart';
 
-int? _int(Object? v) => v is num
-    ? v.toInt()
-    : (v is String ? int.tryParse(v.trim()) : null);
+int? _int(Object? v) =>
+    v is num ? v.toInt() : (v is String ? int.tryParse(v.trim()) : null);
 
-double? _double(Object? v) => v is num
-    ? v.toDouble()
-    : (v is String ? double.tryParse(v.trim()) : null);
+double? _double(Object? v) =>
+    v is num ? v.toDouble() : (v is String ? double.tryParse(v.trim()) : null);
 
 bool _bool(Object? v, {bool fallback = false}) => switch (v) {
   bool b => b,
@@ -340,12 +338,13 @@ class CourseFilters {
     matched.sort(switch (sort) {
       // No sales figures are exposed, so «پرفروش‌ترین» ranks by enrolled
       // students — the closest real signal rather than an invented one.
-      CourseSort.newest =>
-        (a, b) => (b.createdAt ?? DateTime(0)).compareTo(a.createdAt ?? DateTime(0)),
-      CourseSort.popular =>
-        (a, b) => (b.rating ?? 0).compareTo(a.rating ?? 0),
-      CourseSort.bestSelling =>
-        (a, b) => (b.students ?? 0).compareTo(a.students ?? 0),
+      CourseSort.newest => (a, b) => (b.createdAt ?? DateTime(0)).compareTo(
+        a.createdAt ?? DateTime(0),
+      ),
+      CourseSort.popular => (a, b) => (b.rating ?? 0).compareTo(a.rating ?? 0),
+      CourseSort.bestSelling => (a, b) => (b.students ?? 0).compareTo(
+        a.students ?? 0,
+      ),
     });
     return matched;
   }
@@ -398,11 +397,7 @@ class Lesson {
 }
 
 class Chapter {
-  const Chapter({
-    required this.id,
-    required this.title,
-    required this.lessons,
-  });
+  const Chapter({required this.id, required this.title, required this.lessons});
 
   final String id;
   final String title;
@@ -475,7 +470,8 @@ class EnrolledCourse {
   });
 
   factory EnrolledCourse.fromJson(Map<String, dynamic> json) {
-    final course = (json['course'] as Map?)?.cast<String, dynamic>() ?? const {};
+    final course =
+        (json['course'] as Map?)?.cast<String, dynamic>() ?? const {};
     final progress = (_int(json['progress']) ?? 0).clamp(0, 100);
     final total = _int(course['videosCount']) ?? 0;
     return EnrolledCourse(

@@ -154,7 +154,9 @@ class CheckoutDraft {
     course: course,
     package: package ?? this.package,
     discount: clearDiscount ? null : (discount ?? this.discount),
-    discountError: clearDiscountError ? null : (discountError ?? this.discountError),
+    discountError: clearDiscountError
+        ? null
+        : (discountError ?? this.discountError),
     applyingDiscount: applyingDiscount ?? this.applyingDiscount,
     useCoin: useCoin ?? this.useCoin,
     coinDiscount: coinDiscount ?? this.coinDiscount,
@@ -344,8 +346,9 @@ class CheckoutController extends StateNotifier<CheckoutDraft?> {
     if (current == null) return;
     state = current.copyWith(applyingDiscount: true, clearDiscountError: true);
     try {
-      final applied =
-          await _ref.read(checkoutRepositoryProvider).applyDiscountCode(code);
+      final applied = await _ref
+          .read(checkoutRepositoryProvider)
+          .applyDiscountCode(code);
       state = state?.copyWith(
         discount: applied,
         applyingDiscount: false,
@@ -360,17 +363,16 @@ class CheckoutController extends StateNotifier<CheckoutDraft?> {
     }
   }
 
-  void removeDiscount() => state = state?.copyWith(
-    clearDiscount: true,
-    clearDiscountError: true,
-  );
+  void removeDiscount() =>
+      state = state?.copyWith(clearDiscount: true, clearDiscountError: true);
 
   /// Creates the order. Returns the order id, or throws an [ApiException] that
   /// the Processing screen renders as its network-error frame.
   Future<String> submit() async {
     final current = state;
     if (current == null) throw const ServerException('سفارشی در جریان نیست.');
-    if (current.submitting) throw const ServerException('پرداخت در حال انجام است.');
+    if (current.submitting)
+      throw const ServerException('پرداخت در حال انجام است.');
 
     final userId = _ref.read(sessionProvider).userId;
     if (userId == null) {

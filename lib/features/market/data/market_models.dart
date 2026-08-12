@@ -24,9 +24,8 @@ enum ProviderStatus {
   };
 }
 
-double? _num(Object? v) => v is num
-    ? v.toDouble()
-    : (v is String ? double.tryParse(v) : null);
+double? _num(Object? v) =>
+    v is num ? v.toDouble() : (v is String ? double.tryParse(v) : null);
 
 double _numOr0(Object? v) => _num(v) ?? 0;
 

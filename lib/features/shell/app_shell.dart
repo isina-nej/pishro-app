@@ -41,7 +41,7 @@ class PlaceholderScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-        appBar: AppBar(title: Text(title)),
-        body: Center(child: Text(title)),
-      );
+    appBar: AppBar(title: Text(title)),
+    body: Center(child: Text(title)),
+  );
 }

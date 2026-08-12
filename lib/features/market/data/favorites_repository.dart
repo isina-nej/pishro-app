@@ -43,11 +43,9 @@ class FavoritesNotifier extends AsyncNotifier<Set<String>> {
     await ref.read(favoritesRepositoryProvider).save(next);
   }
 
-  bool contains(String assetId) =>
-      state.value?.contains(assetId) ?? false;
+  bool contains(String assetId) => state.value?.contains(assetId) ?? false;
 }
 
-final favoritesProvider =
-    AsyncNotifierProvider<FavoritesNotifier, Set<String>>(
-      FavoritesNotifier.new,
-    );
+final favoritesProvider = AsyncNotifierProvider<FavoritesNotifier, Set<String>>(
+  FavoritesNotifier.new,
+);

@@ -101,13 +101,13 @@ class InvestmentPlan {
       key: key,
       name: (json['name'] as String?) ?? '',
       description: json['description'] as String?,
-      returnModel:
-          dynamicPlan ? ReturnModel.dynamicReturn : ReturnModel.stated,
+      returnModel: dynamicPlan ? ReturnModel.dynamicReturn : ReturnModel.stated,
       // The deck labels the stated-rate fund «ریسک متوسط» and the hold fund
       // «ریسک بالا». Always rendered through RiskBadge (icon + label).
       riskLevel: dynamicPlan ? RiskLevel.high : RiskLevel.medium,
-      monthlyRate:
-          dynamicPlan ? null : (json['monthlyRate'] as num?)?.toDouble(),
+      monthlyRate: dynamicPlan
+          ? null
+          : (json['monthlyRate'] as num?)?.toDouble(),
       minDurationMonths: (json['minDuration'] as num?)?.toInt() ?? 1,
       maxDurationMonths: (json['maxDuration'] as num?)?.toInt() ?? 12,
       durationStep: (json['durationStep'] as num?)?.toInt() ?? 1,
@@ -165,17 +165,17 @@ class InvestmentTransaction {
   /// A pending record is never presented as a failure — deck rule
   /// «نامشخص هرگز به‌عنوان ناموفق نمایش داده نمی‌شود».
   String get investmentStatusLabel => switch (status) {
-        TxStatus.success => 'فعال',
-        TxStatus.pending => 'در انتظار فعال‌سازی',
-        TxStatus.failed => 'ناموفق',
-      };
+    TxStatus.success => 'فعال',
+    TxStatus.pending => 'در انتظار فعال‌سازی',
+    TxStatus.failed => 'ناموفق',
+  };
 
   /// «پرداخت‌شده» / «در حال بررسی» / «ناموفق» — PaymentSchedule wording.
   String get scheduleStatusLabel => switch (status) {
-        TxStatus.success => 'پرداخت‌شده',
-        TxStatus.pending => 'در حال بررسی',
-        TxStatus.failed => 'ناموفق',
-      };
+    TxStatus.success => 'پرداخت‌شده',
+    TxStatus.pending => 'در حال بررسی',
+    TxStatus.failed => 'ناموفق',
+  };
 
   /// The API has no plan reference on a transaction; `description` is the
   /// closest human label it offers.
@@ -194,8 +194,10 @@ class InvestmentTransaction {
         },
         type: (json['type'] as String?) ?? 'PAYMENT',
         createdAt:
-            DateTime.tryParse((json['createdAt'] as String?) ?? '')?.toLocal() ??
-                DateTime.now(),
+            DateTime.tryParse(
+              (json['createdAt'] as String?) ?? '',
+            )?.toLocal() ??
+            DateTime.now(),
         gateway: json['gateway'] as String?,
         refNumber: json['refNumber'] as String?,
         description: json['description'] as String?,
@@ -207,18 +209,18 @@ enum FundingSourceKind { wallet, gateway, bankTransfer }
 
 extension FundingSourceLabels on FundingSourceKind {
   String get title => switch (this) {
-        FundingSourceKind.wallet => 'کیف پول داخلی',
-        FundingSourceKind.gateway => 'درگاه پرداخت بانکی',
-        FundingSourceKind.bankTransfer => 'انتقال بانکی با شناسه واریز',
-      };
+    FundingSourceKind.wallet => 'کیف پول داخلی',
+    FundingSourceKind.gateway => 'درگاه پرداخت بانکی',
+    FundingSourceKind.bankTransfer => 'انتقال بانکی با شناسه واریز',
+  };
 
   /// The wallet balance and the bank-transfer settlement time have no endpoint,
   /// so both fall back to the deck's own placeholder.
   String get subtitle => switch (this) {
-        FundingSourceKind.wallet => 'موجودی: $kSampleValue',
-        FundingSourceKind.gateway => 'پرداخت امن از طریق درگاه بانکی',
-        FundingSourceKind.bankTransfer => 'زمان تأیید: $kSampleValue',
-      };
+    FundingSourceKind.wallet => 'موجودی: $kSampleValue',
+    FundingSourceKind.gateway => 'پرداخت امن از طریق درگاه بانکی',
+    FundingSourceKind.bankTransfer => 'زمان تأیید: $kSampleValue',
+  };
 }
 
 // ---------------------------------------------------------------------------
@@ -229,10 +231,10 @@ enum CheckStatus { verified, pending, missing }
 
 extension CheckStatusLabel on CheckStatus {
   String get label => switch (this) {
-        CheckStatus.verified => 'تأییدشده',
-        CheckStatus.pending => 'در حال بررسی',
-        CheckStatus.missing => 'تکمیل نشده',
-      };
+    CheckStatus.verified => 'تأییدشده',
+    CheckStatus.pending => 'در حال بررسی',
+    CheckStatus.missing => 'تکمیل نشده',
+  };
 }
 
 class EligibilityCheck {
@@ -245,8 +247,7 @@ class Eligibility {
   const Eligibility(this.checks);
   final List<EligibilityCheck> checks;
 
-  bool get isEligible =>
-      checks.every((c) => c.status == CheckStatus.verified);
+  bool get isEligible => checks.every((c) => c.status == CheckStatus.verified);
 
   bool get isPending =>
       !isEligible && checks.any((c) => c.status == CheckStatus.pending);

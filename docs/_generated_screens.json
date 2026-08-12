@@ -1,0 +1,778 @@
+[
+  {
+    "module": "courses",
+    "file": "lib/features/courses/presentation/screens/courses_home_screen.dart",
+    "class": "CoursesHomeScreen",
+    "path": "Screen/Courses/Home",
+    "fa": "دوره‌ها (خانه)",
+    "needs_id": false
+  },
+  {
+    "module": "courses",
+    "file": "lib/features/courses/presentation/screens/categories_screen.dart",
+    "class": "CoursesCategoriesScreen",
+    "path": "Screen/Courses/Categories",
+    "fa": "دسته‌بندی‌ها",
+    "needs_id": false
+  },
+  {
+    "module": "courses",
+    "file": "lib/features/courses/presentation/screens/search_screen.dart",
+    "class": "CoursesSearchScreen",
+    "path": "Screen/Courses/Search",
+    "fa": "جست‌وجو",
+    "needs_id": false
+  },
+  {
+    "module": "courses",
+    "file": "lib/features/courses/presentation/screens/filters_screen.dart",
+    "class": "CoursesFiltersScreen",
+    "path": "Screen/Courses/Filters",
+    "fa": "فیلترها",
+    "needs_id": false
+  },
+  {
+    "module": "courses",
+    "file": "lib/features/courses/presentation/screens/search_results_screen.dart",
+    "class": "CoursesSearchResultsScreen",
+    "path": "Screen/Courses/SearchResults",
+    "fa": "نتایج جست‌وجو",
+    "needs_id": false
+  },
+  {
+    "module": "courses",
+    "file": "lib/features/courses/presentation/screens/details_screen.dart",
+    "class": "CourseDetailsScreen",
+    "path": "Screen/Course/Details",
+    "fa": "جزئیات دوره",
+    "needs_id": true
+  },
+  {
+    "module": "courses",
+    "file": "lib/features/courses/presentation/screens/package_comparison_screen.dart",
+    "class": "PackageComparisonScreen",
+    "path": "Screen/Course/PackageComparison",
+    "fa": "مقایسه بسته",
+    "needs_id": true
+  },
+  {
+    "module": "courses",
+    "file": "lib/features/courses/presentation/screens/checkout_regular_screen.dart",
+    "class": "CourseRegularScreen",
+    "path": "Screen/Checkout/Course-Regular",
+    "fa": "پرداخت بسته عادی",
+    "needs_id": false
+  },
+  {
+    "module": "courses",
+    "file": "lib/features/courses/presentation/screens/checkout_vip_screen.dart",
+    "class": "CourseVIPScreen",
+    "path": "Screen/Checkout/Course-VIP",
+    "fa": "پرداخت بسته VIP",
+    "needs_id": false
+  },
+  {
+    "module": "courses",
+    "file": "lib/features/courses/presentation/screens/payment_method_screen.dart",
+    "class": "PaymentMethodScreen",
+    "path": "Screen/Checkout/PaymentMethod",
+    "fa": "روش پرداخت",
+    "needs_id": false
+  },
+  {
+    "module": "courses",
+    "file": "lib/features/courses/presentation/screens/discount_and_coin_screen.dart",
+    "class": "DiscountAndCoinScreen",
+    "path": "Screen/Checkout/DiscountAndCoin",
+    "fa": "تخفیف و کوین",
+    "needs_id": true
+  },
+  {
+    "module": "courses",
+    "file": "lib/features/courses/presentation/screens/payment_processing_screen.dart",
+    "class": "PaymentProcessingScreen",
+    "path": "Screen/Checkout/PaymentProcessing",
+    "fa": "در حال پردازش",
+    "needs_id": false
+  },
+  {
+    "module": "courses",
+    "file": "lib/features/courses/presentation/screens/payment_success_screen.dart",
+    "class": "PaymentSuccessScreen",
+    "path": "Screen/Checkout/PaymentSuccess",
+    "fa": "پرداخت موفق",
+    "needs_id": false
+  },
+  {
+    "module": "courses",
+    "file": "lib/features/courses/presentation/screens/payment_failure_screen.dart",
+    "class": "PaymentFailureScreen",
+    "path": "Screen/Checkout/PaymentFailure",
+    "fa": "پرداخت ناموفق",
+    "needs_id": false
+  },
+  {
+    "module": "courses",
+    "file": "lib/features/courses/presentation/screens/my_courses_screen.dart",
+    "class": "MyCoursesScreen",
+    "path": "Screen/Courses/MyCourses",
+    "fa": "دوره‌های من",
+    "needs_id": false
+  },
+  {
+    "module": "courses",
+    "file": "lib/features/courses/presentation/screens/learning_dashboard_screen.dart",
+    "class": "LearningDashboardScreen",
+    "path": "Screen/Course/LearningDashboard",
+    "fa": "داشبورد یادگیری",
+    "needs_id": true
+  },
+  {
+    "module": "courses",
+    "file": "lib/features/courses/presentation/screens/chapters_screen.dart",
+    "class": "ChaptersScreen",
+    "path": "Screen/Course/Chapters",
+    "fa": "سرفصل‌های دوره",
+    "needs_id": true
+  },
+  {
+    "module": "courses",
+    "file": "lib/features/courses/presentation/screens/lesson_details_screen.dart",
+    "class": "LessonDetailsScreen",
+    "path": "Screen/Course/LessonDetails",
+    "fa": "جزئیات جلسه",
+    "needs_id": true
+  },
+  {
+    "module": "courses",
+    "file": "lib/features/courses/presentation/screens/downloads_and_resources_screen.dart",
+    "class": "DownloadsAndResourcesScreen",
+    "path": "Screen/Course/DownloadsAndResources",
+    "fa": "دانلودها و منابع",
+    "needs_id": true
+  },
+  {
+    "module": "courses",
+    "file": "lib/features/courses/presentation/screens/vip_instructor_chat_screen.dart",
+    "class": "VIPInstructorChatScreen",
+    "path": "Screen/Course/VIPInstructorChat",
+    "fa": "گفت‌وگوی VIP",
+    "needs_id": true
+  },
+  {
+    "module": "courses",
+    "file": "lib/features/courses/presentation/screens/completion_screen.dart",
+    "class": "CompletionScreen",
+    "path": "Screen/Course/Completion",
+    "fa": "تکمیل دوره",
+    "needs_id": true
+  },
+  {
+    "module": "courses",
+    "file": "lib/features/courses/presentation/screens/certificate_screen.dart",
+    "class": "CertificateScreen",
+    "path": "Screen/Course/Certificate",
+    "fa": "گواهی",
+    "needs_id": true
+  },
+  {
+    "module": "news",
+    "file": "lib/features/news/presentation/screens/filters_screen.dart",
+    "class": "NewsFiltersScreen",
+    "path": "Screen/News/Filters",
+    "fa": "فیلتر",
+    "needs_id": false
+  },
+  {
+    "module": "news",
+    "file": "lib/features/news/presentation/screens/search_screen.dart",
+    "class": "NewsSearchScreen",
+    "path": "Screen/News/Search",
+    "fa": "جستجو",
+    "needs_id": false
+  },
+  {
+    "module": "news",
+    "file": "lib/features/news/presentation/screens/search_results_screen.dart",
+    "class": "NewsSearchResultsScreen",
+    "path": "Screen/News/SearchResults",
+    "fa": "نتایج جستجو",
+    "needs_id": false
+  },
+  {
+    "module": "news",
+    "file": "lib/features/news/presentation/screens/details_screen.dart",
+    "class": "NewsDetailsScreen",
+    "path": "Screen/News/Details",
+    "fa": "جزئیات خبر",
+    "needs_id": true
+  },
+  {
+    "module": "news",
+    "file": "lib/features/news/presentation/screens/comments_screen.dart",
+    "class": "NewsCommentsScreen",
+    "path": "Screen/News/Comments",
+    "fa": "دیدگاه‌ها",
+    "needs_id": true
+  },
+  {
+    "module": "news",
+    "file": "lib/features/news/presentation/screens/comment_thread_screen.dart",
+    "class": "NewsCommentThreadScreen",
+    "path": "Screen/News/CommentThread",
+    "fa": "رشته پاسخ",
+    "needs_id": true
+  },
+  {
+    "module": "news",
+    "file": "lib/features/news/presentation/screens/saved_screen.dart",
+    "class": "NewsSavedScreen",
+    "path": "Screen/News/Saved",
+    "fa": "ذخیره‌شده‌ها",
+    "needs_id": false
+  },
+  {
+    "module": "investment",
+    "file": "lib/features/investment/presentation/screens/home_screen.dart",
+    "class": "InvestmentHomeScreen",
+    "path": "Screen/Investment/Home",
+    "fa": "سرمایه‌گذاری (خانه)",
+    "needs_id": false
+  },
+  {
+    "module": "investment",
+    "file": "lib/features/investment/presentation/screens/plan_catalog_screen.dart",
+    "class": "PlanCatalogScreen",
+    "path": "Screen/Investment/PlanCatalog",
+    "fa": "فهرست طرح‌ها",
+    "needs_id": false
+  },
+  {
+    "module": "investment",
+    "file": "lib/features/investment/presentation/screens/fixed_monthly_plan_details_screen.dart",
+    "class": "FixedMonthlyPlanDetailsScreen",
+    "path": "Screen/Investment/FixedMonthlyPlanDetails",
+    "fa": "طرح ماهیانه ۸٪",
+    "needs_id": true
+  },
+  {
+    "module": "investment",
+    "file": "lib/features/investment/presentation/screens/dynamic_hold_plan_details_screen.dart",
+    "class": "DynamicHoldPlanDetailsScreen",
+    "path": "Screen/Investment/DynamicHoldPlanDetails",
+    "fa": "طرح هولد داینامیک",
+    "needs_id": true
+  },
+  {
+    "module": "investment",
+    "file": "lib/features/investment/presentation/screens/plan_comparison_screen.dart",
+    "class": "PlanComparisonScreen",
+    "path": "Screen/Investment/PlanComparison",
+    "fa": "مقایسه طرح‌ها",
+    "needs_id": false
+  },
+  {
+    "module": "investment",
+    "file": "lib/features/investment/presentation/screens/calculator_screen.dart",
+    "class": "InvestmentCalculatorScreen",
+    "path": "Screen/Investment/Calculator",
+    "fa": "محاسبه‌گر",
+    "needs_id": false
+  },
+  {
+    "module": "investment",
+    "file": "lib/features/investment/presentation/screens/risk_disclosure_screen.dart",
+    "class": "RiskDisclosureScreen",
+    "path": "Screen/Investment/RiskDisclosure",
+    "fa": "اطلاع‌رسانی ریسک",
+    "needs_id": false
+  },
+  {
+    "module": "investment",
+    "file": "lib/features/investment/presentation/screens/terms_and_contract_screen.dart",
+    "class": "TermsAndContractScreen",
+    "path": "Screen/Investment/TermsAndContract",
+    "fa": "شرایط و قرارداد",
+    "needs_id": false
+  },
+  {
+    "module": "investment",
+    "file": "lib/features/investment/presentation/screens/eligibility_kyc_screen.dart",
+    "class": "EligibilityAndKYCScreen",
+    "path": "Screen/Investment/EligibilityAndKYC",
+    "fa": "احراز شرایط",
+    "needs_id": false
+  },
+  {
+    "module": "investment",
+    "file": "lib/features/investment/presentation/screens/amount_entry_screen.dart",
+    "class": "AmountEntryScreen",
+    "path": "Screen/Investment/AmountEntry",
+    "fa": "مبلغ سرمایه‌گذاری",
+    "needs_id": false
+  },
+  {
+    "module": "investment",
+    "file": "lib/features/investment/presentation/screens/funding_source_screen.dart",
+    "class": "FundingSourceScreen",
+    "path": "Screen/Investment/FundingSource",
+    "fa": "منبع تأمین وجه",
+    "needs_id": false
+  },
+  {
+    "module": "investment",
+    "file": "lib/features/investment/presentation/screens/final_review_screen.dart",
+    "class": "FinalReviewScreen",
+    "path": "Screen/Investment/FinalReview",
+    "fa": "مرور نهایی",
+    "needs_id": false
+  },
+  {
+    "module": "investment",
+    "file": "lib/features/investment/presentation/screens/contract_confirmation_screen.dart",
+    "class": "ContractConfirmationScreen",
+    "path": "Screen/Investment/ContractConfirmation",
+    "fa": "تأیید قرارداد",
+    "needs_id": false
+  },
+  {
+    "module": "investment",
+    "file": "lib/features/investment/presentation/screens/processing_screen.dart",
+    "class": "InvestmentProcessingScreen",
+    "path": "Screen/Investment/Processing",
+    "fa": "پردازش",
+    "needs_id": false
+  },
+  {
+    "module": "investment",
+    "file": "lib/features/investment/presentation/screens/success_screen.dart",
+    "class": "InvestmentSuccessScreen",
+    "path": "Screen/Investment/Success",
+    "fa": "موفقیت (فعال‌شده)",
+    "needs_id": false
+  },
+  {
+    "module": "investment",
+    "file": "lib/features/investment/presentation/screens/active_investments_screen.dart",
+    "class": "ActiveInvestmentsScreen",
+    "path": "Screen/Investment/ActiveInvestments",
+    "fa": "سرمایه‌گذاری‌های من",
+    "needs_id": false
+  },
+  {
+    "module": "investment",
+    "file": "lib/features/investment/presentation/screens/active_investment_details_screen.dart",
+    "class": "ActiveInvestmentDetailsScreen",
+    "path": "Screen/Investment/ActiveInvestmentDetails",
+    "fa": "جزئیات سرمایه‌گذاری",
+    "needs_id": true
+  },
+  {
+    "module": "investment",
+    "file": "lib/features/investment/presentation/screens/payment_schedule_screen.dart",
+    "class": "PaymentScheduleScreen",
+    "path": "Screen/Investment/PaymentSchedule",
+    "fa": "برنامه پرداخت",
+    "needs_id": true
+  },
+  {
+    "module": "market",
+    "file": "lib/features/market/presentation/screens/home_screen.dart",
+    "class": "MarketHomeScreen",
+    "path": "Screen/Market/Home",
+    "fa": "بازار (خانه)",
+    "needs_id": false
+  },
+  {
+    "module": "market",
+    "file": "lib/features/market/presentation/screens/all_assets_screen.dart",
+    "class": "AllAssetsScreen",
+    "path": "Screen/Market/AllAssets",
+    "fa": "همه ارزها",
+    "needs_id": false
+  },
+  {
+    "module": "market",
+    "file": "lib/features/market/presentation/screens/favorites_screen.dart",
+    "class": "MarketFavoritesScreen",
+    "path": "Screen/Market/Favorites",
+    "fa": "علاقه‌مندی‌ها",
+    "needs_id": false
+  },
+  {
+    "module": "market",
+    "file": "lib/features/market/presentation/screens/trending_screen.dart",
+    "class": "MarketTrendingScreen",
+    "path": "Screen/Market/Trending",
+    "fa": "پرطرفدار",
+    "needs_id": false
+  },
+  {
+    "module": "market",
+    "file": "lib/features/market/presentation/screens/top_gainers_screen.dart",
+    "class": "TopGainersScreen",
+    "path": "Screen/Market/TopGainers",
+    "fa": "بیشترین رشد",
+    "needs_id": false
+  },
+  {
+    "module": "market",
+    "file": "lib/features/market/presentation/screens/top_losers_screen.dart",
+    "class": "TopLosersScreen",
+    "path": "Screen/Market/TopLosers",
+    "fa": "بیشترین کاهش",
+    "needs_id": false
+  },
+  {
+    "module": "market",
+    "file": "lib/features/market/presentation/screens/search_screen.dart",
+    "class": "MarketSearchScreen",
+    "path": "Screen/Market/Search",
+    "fa": "جستجوی ارز",
+    "needs_id": false
+  },
+  {
+    "module": "market",
+    "file": "lib/features/market/presentation/screens/coin_details_screen.dart",
+    "class": "CoinDetailsScreen",
+    "path": "Screen/Market/CoinDetails",
+    "fa": "جزئیات ارز",
+    "needs_id": true
+  },
+  {
+    "module": "market",
+    "file": "lib/features/market/presentation/screens/price_chart_screen.dart",
+    "class": "PriceChartScreen",
+    "path": "Screen/Market/PriceChart",
+    "fa": "نمودار قیمت",
+    "needs_id": true
+  },
+  {
+    "module": "market",
+    "file": "lib/features/market/presentation/screens/statistics_screen.dart",
+    "class": "StatisticsScreen",
+    "path": "Screen/Market/Statistics",
+    "fa": "آمار بازار",
+    "needs_id": false
+  },
+  {
+    "module": "market",
+    "file": "lib/features/market/presentation/screens/historical_data_screen.dart",
+    "class": "HistoricalDataScreen",
+    "path": "Screen/Market/HistoricalData",
+    "fa": "داده‌های تاریخی",
+    "needs_id": false
+  },
+  {
+    "module": "market",
+    "file": "lib/features/market/presentation/screens/price_alerts_screen.dart",
+    "class": "PriceAlertsScreen",
+    "path": "Screen/Market/PriceAlerts",
+    "fa": "هشدارهای قیمت",
+    "needs_id": false
+  },
+  {
+    "module": "community",
+    "file": "lib/features/community/presentation/screens/home_screen.dart",
+    "class": "CommunityHomeScreen",
+    "path": "Screen/Community/Home",
+    "fa": "جامعه (خانه)",
+    "needs_id": false
+  },
+  {
+    "module": "community",
+    "file": "lib/features/community/presentation/screens/following_feed_screen.dart",
+    "class": "FollowingFeedScreen",
+    "path": "Screen/Community/FollowingFeed",
+    "fa": "دنبال‌شده‌ها",
+    "needs_id": false
+  },
+  {
+    "module": "community",
+    "file": "lib/features/community/presentation/screens/recommended_analysts_screen.dart",
+    "class": "RecommendedAnalystsScreen",
+    "path": "Screen/Community/RecommendedAnalysts",
+    "fa": "تحلیلگران پیشنهادی",
+    "needs_id": true
+  },
+  {
+    "module": "community",
+    "file": "lib/features/community/presentation/screens/leaderboard_screen.dart",
+    "class": "LeaderboardScreen",
+    "path": "Screen/Community/Leaderboard",
+    "fa": "رتبه‌بندی",
+    "needs_id": false
+  },
+  {
+    "module": "community",
+    "file": "lib/features/community/presentation/screens/search_screen.dart",
+    "class": "CommunitySearchScreen",
+    "path": "Screen/Community/Search",
+    "fa": "جستجو در جامعه",
+    "needs_id": false
+  },
+  {
+    "module": "community",
+    "file": "lib/features/community/presentation/screens/analyst_profile_screen.dart",
+    "class": "AnalystProfileScreen",
+    "path": "Screen/Community/AnalystProfile",
+    "fa": "پروفایل تحلیلگر",
+    "needs_id": true
+  },
+  {
+    "module": "community",
+    "file": "lib/features/community/presentation/screens/analyst_ratings_screen.dart",
+    "class": "AnalystRatingsScreen",
+    "path": "Screen/Community/AnalystRatings",
+    "fa": "امتیازها و نظرات",
+    "needs_id": true
+  },
+  {
+    "module": "community",
+    "file": "lib/features/community/presentation/screens/analysis_details_screen.dart",
+    "class": "AnalysisDetailsScreen",
+    "path": "Screen/Community/AnalysisDetails",
+    "fa": "جزئیات تحلیل",
+    "needs_id": true
+  },
+  {
+    "module": "community",
+    "file": "lib/features/community/presentation/screens/premium_signals_screen.dart",
+    "class": "PremiumSignalsScreen",
+    "path": "Screen/Community/PremiumSignals",
+    "fa": "سیگنال‌های اشتراکی",
+    "needs_id": false
+  },
+  {
+    "module": "community",
+    "file": "lib/features/community/presentation/screens/subscriptions_screen.dart",
+    "class": "CommunitySubscriptionsScreen",
+    "path": "Screen/Community/Subscriptions",
+    "fa": "اشتراک‌های من",
+    "needs_id": false
+  },
+  {
+    "module": "community",
+    "file": "lib/features/community/presentation/screens/create_analysis_screen.dart",
+    "class": "CreateAnalysisScreen",
+    "path": "Screen/Community/CreateAnalysis",
+    "fa": "ایجاد تحلیل",
+    "needs_id": true
+  },
+  {
+    "module": "community",
+    "file": "lib/features/community/presentation/screens/analysis_editor_screen.dart",
+    "class": "AnalysisEditorScreen",
+    "path": "Screen/Community/AnalysisEditor",
+    "fa": "ویرایشگر تحلیل",
+    "needs_id": true
+  },
+  {
+    "module": "community",
+    "file": "lib/features/community/presentation/screens/analysis_preview_screen.dart",
+    "class": "AnalysisPreviewScreen",
+    "path": "Screen/Community/AnalysisPreview",
+    "fa": "پیش‌نمایش تحلیل",
+    "needs_id": true
+  },
+  {
+    "module": "community",
+    "file": "lib/features/community/presentation/screens/publish_result_screen.dart",
+    "class": "PublishResultScreen",
+    "path": "Screen/Community/PublishResult",
+    "fa": "نتیجه انتشار",
+    "needs_id": false
+  },
+  {
+    "module": "account",
+    "file": "lib/features/account/presentation/screens/home_screen.dart",
+    "class": "AccountHomeScreen",
+    "path": "Screen/Account/Home",
+    "fa": "حساب کاربری (خانه)",
+    "needs_id": false
+  },
+  {
+    "module": "account",
+    "file": "lib/features/account/presentation/screens/profile_screen.dart",
+    "class": "AccountProfileScreen",
+    "path": "Screen/Account/Profile",
+    "fa": "اطلاعات حساب",
+    "needs_id": false
+  },
+  {
+    "module": "account",
+    "file": "lib/features/account/presentation/screens/edit_profile_screen.dart",
+    "class": "EditProfileScreen",
+    "path": "Screen/Account/EditProfile",
+    "fa": "ویرایش اطلاعات",
+    "needs_id": false
+  },
+  {
+    "module": "account",
+    "file": "lib/features/account/presentation/screens/kyc_overview_screen.dart",
+    "class": "KYCOverviewScreen",
+    "path": "Screen/Account/KYCOverview",
+    "fa": "احراز هویت — نمای کلی",
+    "needs_id": false
+  },
+  {
+    "module": "account",
+    "file": "lib/features/account/presentation/screens/kyc_verification_screen.dart",
+    "class": "KYCVerificationScreen",
+    "path": "Screen/Account/KYCVerification",
+    "fa": "احراز هویت — تکمیل",
+    "needs_id": false
+  },
+  {
+    "module": "account",
+    "file": "lib/features/account/presentation/screens/wallet_screen.dart",
+    "class": "AccountWalletScreen",
+    "path": "Screen/Account/Wallet",
+    "fa": "کیف پول",
+    "needs_id": false
+  },
+  {
+    "module": "account",
+    "file": "lib/features/account/presentation/screens/wallet_transactions_screen.dart",
+    "class": "WalletTransactionsScreen",
+    "path": "Screen/Account/WalletTransactions",
+    "fa": "تراکنش‌های کیف پول",
+    "needs_id": false
+  },
+  {
+    "module": "account",
+    "file": "lib/features/account/presentation/screens/pishro_coin_screen.dart",
+    "class": "PishroCoinScreen",
+    "path": "Screen/Account/PishroCoin",
+    "fa": "کوین پیشرو",
+    "needs_id": true
+  },
+  {
+    "module": "account",
+    "file": "lib/features/account/presentation/screens/purchase_history_screen.dart",
+    "class": "PurchaseHistoryScreen",
+    "path": "Screen/Account/PurchaseHistory",
+    "fa": "سوابق خرید",
+    "needs_id": true
+  },
+  {
+    "module": "account",
+    "file": "lib/features/account/presentation/screens/investment_history_screen.dart",
+    "class": "InvestmentHistoryScreen",
+    "path": "Screen/Account/InvestmentHistory",
+    "fa": "سوابق سرمایه‌گذاری",
+    "needs_id": true
+  },
+  {
+    "module": "account",
+    "file": "lib/features/account/presentation/screens/subscriptions_screen.dart",
+    "class": "AccountSubscriptionsScreen",
+    "path": "Screen/Account/Subscriptions",
+    "fa": "اشتراک‌ها",
+    "needs_id": false
+  },
+  {
+    "module": "account",
+    "file": "lib/features/account/presentation/screens/saved_items_screen.dart",
+    "class": "SavedItemsScreen",
+    "path": "Screen/Account/SavedItems",
+    "fa": "ذخیره‌شده‌ها",
+    "needs_id": false
+  },
+  {
+    "module": "account",
+    "file": "lib/features/account/presentation/screens/notifications_screen.dart",
+    "class": "AccountNotificationsScreen",
+    "path": "Screen/Account/Notifications",
+    "fa": "اعلان‌ها",
+    "needs_id": false
+  },
+  {
+    "module": "account",
+    "file": "lib/features/account/presentation/screens/security_screen.dart",
+    "class": "AccountSecurityScreen",
+    "path": "Screen/Account/Security",
+    "fa": "امنیت حساب",
+    "needs_id": false
+  },
+  {
+    "module": "account",
+    "file": "lib/features/account/presentation/screens/devices_screen.dart",
+    "class": "AccountDevicesScreen",
+    "path": "Screen/Account/Devices",
+    "fa": "دستگاه‌ها و نشست‌ها",
+    "needs_id": false
+  },
+  {
+    "module": "account",
+    "file": "lib/features/account/presentation/screens/privacy_screen.dart",
+    "class": "AccountPrivacyScreen",
+    "path": "Screen/Account/Privacy",
+    "fa": "حریم خصوصی",
+    "needs_id": false
+  },
+  {
+    "module": "account",
+    "file": "lib/features/account/presentation/screens/support_screen.dart",
+    "class": "AccountSupportScreen",
+    "path": "Screen/Account/Support",
+    "fa": "پشتیبانی",
+    "needs_id": false
+  },
+  {
+    "module": "account",
+    "file": "lib/features/account/presentation/screens/referrals_screen.dart",
+    "class": "AccountReferralsScreen",
+    "path": "Screen/Account/Referrals",
+    "fa": "معرفی به دوستان",
+    "needs_id": false
+  },
+  {
+    "module": "account",
+    "file": "lib/features/account/presentation/screens/preferences_screen.dart",
+    "class": "AccountPreferencesScreen",
+    "path": "Screen/Account/Preferences",
+    "fa": "تنظیمات",
+    "needs_id": false
+  },
+  {
+    "module": "account",
+    "file": "lib/features/account/presentation/screens/legal_documents_screen.dart",
+    "class": "LegalDocumentsScreen",
+    "path": "Screen/Account/LegalDocuments",
+    "fa": "اسناد و قوانین",
+    "needs_id": false
+  },
+  {
+    "module": "community",
+    "file": "lib/features/community/presentation/screens/asset_feed_screen.dart",
+    "class": "AssetFeedScreen",
+    "path": "Screen/Community/AssetFeed",
+    "fa": "فید دارایی در جامعه",
+    "needs_id": true
+  },
+  {
+    "module": "courses",
+    "file": "lib/features/courses/presentation/screens/processing_screen.dart",
+    "class": "CheckoutProcessingScreen",
+    "path": "Screen/Checkout/Processing",
+    "fa": "پرداخت — پردازش (شبکه)",
+    "needs_id": false
+  },
+  {
+    "module": "courses",
+    "file": "lib/features/courses/presentation/screens/network_error_screen.dart",
+    "class": "CheckoutNetworkErrorScreen",
+    "path": "Screen/Checkout/NetworkError",
+    "fa": "پرداخت — خطای شبکه",
+    "needs_id": false
+  },
+  {
+    "module": "community",
+    "file": "lib/features/community/presentation/screens/analysis_comments_screen.dart",
+    "class": "AnalysisCommentsScreen",
+    "path": "Screen/AnalysisComments",
+    "fa": "دیدگاه‌های تحلیل",
+    "needs_id": true
+  }
+]

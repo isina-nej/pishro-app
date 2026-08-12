@@ -38,7 +38,10 @@ class CoursesRepository {
   }
 
   /// `GET /user/enrolled-courses` — paginated envelope `{items, pagination}`.
-  Future<List<EnrolledCourse>> fetchEnrolled({int page = 1, int limit = 20}) async {
+  Future<List<EnrolledCourse>> fetchEnrolled({
+    int page = 1,
+    int limit = 20,
+  }) async {
     final data = await _api.get<Map<String, dynamic>>(
       '/user/enrolled-courses',
       query: {'page': page, 'limit': limit},
@@ -50,11 +53,10 @@ class CoursesRepository {
   }
 
   /// `POST /courses/free-enroll` — server re-checks that the final price is 0.
-  Future<void> freeEnroll(String courseId) =>
-      _api.post<Map<String, dynamic>>(
-        '/courses/free-enroll',
-        body: {'courseId': courseId},
-      );
+  Future<void> freeEnroll(String courseId) => _api.post<Map<String, dynamic>>(
+    '/courses/free-enroll',
+    body: {'courseId': courseId},
+  );
 
   /// `POST /courses/like` — `type` is LIKE or DISLIKE, toggling on repeat.
   Future<void> like(String courseId, {bool dislike = false}) =>
@@ -159,7 +161,9 @@ final courseCatalogProvider = FutureProvider<List<Course>>(
 /// Categories are folded out of the catalogue because no public categories
 /// endpoint exists. Buckets whose rows carry no title are dropped rather than
 /// shown as an opaque cuid.
-final courseCategoriesProvider = FutureProvider<List<CourseCategory>>((ref) async {
+final courseCategoriesProvider = FutureProvider<List<CourseCategory>>((
+  ref,
+) async {
   final courses = await ref.watch(courseCatalogProvider.future);
   final counts = <String, int>{};
   final titles = <String, String>{};
@@ -197,8 +201,10 @@ final enrolledCoursesProvider = FutureProvider<List<EnrolledCourse>>(
   (ref) => ref.watch(coursesRepositoryProvider).fetchEnrolled(),
 );
 
-final enrollmentProvider =
-    FutureProvider.family<EnrolledCourse?, String>((ref, courseId) async {
+final enrollmentProvider = FutureProvider.family<EnrolledCourse?, String>((
+  ref,
+  courseId,
+) async {
   final enrolled = await ref.watch(enrolledCoursesProvider.future);
   for (final e in enrolled) {
     if (e.course.id == courseId) return e;
@@ -206,8 +212,10 @@ final enrollmentProvider =
   return null;
 });
 
-final curriculumProvider =
-    FutureProvider.family<Curriculum, String>((ref, courseId) async {
+final curriculumProvider = FutureProvider.family<Curriculum, String>((
+  ref,
+  courseId,
+) async {
   final course = await ref.watch(courseProvider(courseId).future);
   return ref.watch(coursesRepositoryProvider).fetchCurriculum(course);
 });
@@ -216,12 +224,14 @@ final curriculumProvider =
 /// SearchResults.
 final courseQueryProvider = StateProvider<String>((ref) => '');
 
-final courseFiltersProvider =
-    StateProvider<CourseFilters>((ref) => const CourseFilters());
+final courseFiltersProvider = StateProvider<CourseFilters>(
+  (ref) => const CourseFilters(),
+);
 
 /// «جست‌وجوهای اخیر» — session-scoped; persisting them is an Account concern.
-final recentSearchesProvider =
-    NotifierProvider<RecentSearches, List<String>>(RecentSearches.new);
+final recentSearchesProvider = NotifierProvider<RecentSearches, List<String>>(
+  RecentSearches.new,
+);
 
 class RecentSearches extends Notifier<List<String>> {
   @override

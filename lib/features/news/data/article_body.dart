@@ -93,16 +93,16 @@ List<String> parseArticleBody(String? html) {
 String articlePlainText(String? html) => parseArticleBody(html).join(' ');
 
 String _decodeEntities(String input) => input.replaceAllMapped(_entity, (m) {
-      final body = m.group(1)!;
-      if (body.startsWith('#')) {
-        final isHex = body.length > 1 && (body[1] == 'x' || body[1] == 'X');
-        final code = int.tryParse(
-          isHex ? body.substring(2) : body.substring(1),
-          radix: isHex ? 16 : 10,
-        );
-        // Reject control characters and anything outside the BMP+ range.
-        if (code == null || code < 0x20 || code > 0x10ffff) return '';
-        return String.fromCharCode(code);
-      }
-      return _namedEntities[body.toLowerCase()] ?? m.group(0)!;
-    });
+  final body = m.group(1)!;
+  if (body.startsWith('#')) {
+    final isHex = body.length > 1 && (body[1] == 'x' || body[1] == 'X');
+    final code = int.tryParse(
+      isHex ? body.substring(2) : body.substring(1),
+      radix: isHex ? 16 : 10,
+    );
+    // Reject control characters and anything outside the BMP+ range.
+    if (code == null || code < 0x20 || code > 0x10ffff) return '';
+    return String.fromCharCode(code);
+  }
+  return _namedEntities[body.toLowerCase()] ?? m.group(0)!;
+});

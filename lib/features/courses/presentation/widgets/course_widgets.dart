@@ -85,10 +85,7 @@ class PriceTag extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         if (prefix != null)
-          Text(
-            prefix!,
-            style: context.text.micro.copyWith(color: c.textMuted),
-          ),
+          Text(prefix!, style: context.text.micro.copyWith(color: c.textMuted)),
         Row(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.baseline,
@@ -96,10 +93,8 @@ class PriceTag extends StatelessWidget {
           children: [
             Text(
               Fmt.grouped(toman),
-              style: (large ? context.text.h2 : context.text.bodyLarge).copyWith(
-                color: c.textPrimary,
-                fontWeight: FontWeight.w700,
-              ),
+              style: (large ? context.text.h2 : context.text.bodyLarge)
+                  .copyWith(color: c.textPrimary, fontWeight: FontWeight.w700),
             ),
             const SizedBox(width: Space.s1),
             Text(
@@ -278,12 +273,16 @@ class CourseListRow extends StatelessWidget {
                     if (course.students != null)
                       Text(
                         '${Fmt.fa('${course.students}')} دانشجو',
-                        style: context.text.caption.copyWith(color: c.textMuted),
+                        style: context.text.caption.copyWith(
+                          color: c.textMuted,
+                        ),
                       ),
                     if (course.durationLabel != null)
                       Text(
                         course.durationLabel!,
-                        style: context.text.caption.copyWith(color: c.textMuted),
+                        style: context.text.caption.copyWith(
+                          color: c.textMuted,
+                        ),
                       ),
                   ],
                 ),
@@ -319,7 +318,11 @@ class CategoryCard extends StatelessWidget {
               color: c.surfaceSecondary,
               borderRadius: BorderRadius.circular(Radii.md),
             ),
-            child: Icon(Icons.category_outlined, size: 20, color: c.textSecondary),
+            child: Icon(
+              Icons.category_outlined,
+              size: 20,
+              color: c.textSecondary,
+            ),
           ),
           const SizedBox(width: Space.s3),
           Expanded(

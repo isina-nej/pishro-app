@@ -26,8 +26,9 @@ class InvestmentRepository {
 
   /// Header copy for the catalog. Optional: the screen renders without it.
   Future<PlanCatalogIntro> catalogIntro() async {
-    final data =
-        await _api.get<Map<String, dynamic>>('/landing/investment-plans');
+    final data = await _api.get<Map<String, dynamic>>(
+      '/landing/investment-plans',
+    );
     return PlanCatalogIntro.fromJson(data);
   }
 
@@ -81,15 +82,16 @@ final plansProvider = FutureProvider<List<InvestmentPlan>>(
 );
 
 /// Single plan by id, resolved from the same list the catalog uses.
-final planProvider = FutureProvider.family<InvestmentPlan?, String>(
-  (ref, id) async {
-    final plans = await ref.watch(plansProvider.future);
-    for (final p in plans) {
-      if (p.id == id || p.key == id) return p;
-    }
-    return null;
-  },
-);
+final planProvider = FutureProvider.family<InvestmentPlan?, String>((
+  ref,
+  id,
+) async {
+  final plans = await ref.watch(plansProvider.future);
+  for (final p in plans) {
+    if (p.id == id || p.key == id) return p;
+  }
+  return null;
+});
 
 final catalogIntroProvider = FutureProvider<PlanCatalogIntro>(
   (ref) => ref.watch(investmentRepositoryProvider).catalogIntro(),
@@ -99,12 +101,11 @@ final transactionsProvider = FutureProvider<List<InvestmentTransaction>>(
   (ref) => ref.watch(investmentRepositoryProvider).transactions(),
 );
 
-final transactionProvider = FutureProvider.family<InvestmentTransaction?, String>(
-  (ref, id) async {
-    final all = await ref.watch(transactionsProvider.future);
-    for (final t in all) {
-      if (t.id == id) return t;
-    }
-    return null;
-  },
-);
+final transactionProvider =
+    FutureProvider.family<InvestmentTransaction?, String>((ref, id) async {
+      final all = await ref.watch(transactionsProvider.future);
+      for (final t in all) {
+        if (t.id == id) return t;
+      }
+      return null;
+    });

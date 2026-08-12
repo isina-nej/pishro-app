@@ -55,9 +55,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
     ref.listen(sessionProvider, (_, next) {
       if (!next.isResolved) return;
       _timeout?.cancel();
-      context.go(
-        next.isAuthenticated ? Routes.homeAfterLogin : Routes.welcome,
-      );
+      context.go(next.isAuthenticated ? Routes.homeAfterLogin : Routes.welcome);
     });
 
     final c = context.colors;

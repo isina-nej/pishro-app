@@ -75,11 +75,19 @@ class BrandMark extends StatelessWidget {
     return vertical
         ? Column(
             mainAxisSize: MainAxisSize.min,
-            children: [slot, const SizedBox(height: Space.s5 + 2), wordmark],
+            children: [
+              slot,
+              const SizedBox(height: Space.s5 + 2),
+              wordmark,
+            ],
           )
         : Row(
             mainAxisSize: MainAxisSize.min,
-            children: [slot, const SizedBox(width: Space.s3 + 1), wordmark],
+            children: [
+              slot,
+              const SizedBox(width: Space.s3 + 1),
+              wordmark,
+            ],
           );
   }
 }

@@ -33,10 +33,7 @@ class AuthRepository {
   /// `POST /auth/signup` — stores a TempUser and texts an OTP. It does NOT
   /// create the account; `/otp/verify` does. Only `phone` and `password` are
   /// read by the handler.
-  Future<void> signup({
-    required String phone,
-    required String password,
-  }) async {
+  Future<void> signup({required String phone, required String password}) async {
     await _api.post<Map<String, dynamic>>(
       '/auth/signup',
       body: {'phone': Fmt.toAscii(phone), 'password': password},

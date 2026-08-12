@@ -113,8 +113,10 @@ class _OtpBoxInputState extends State<OtpBoxInput> {
               maxLength: widget.length,
               showCursor: false,
               enableInteractiveSelection: false,
-              onTap: () => widget.controller.selection =
-                  TextSelection.collapsed(offset: widget.controller.text.length),
+              onTap: () =>
+                  widget.controller.selection = TextSelection.collapsed(
+                    offset: widget.controller.text.length,
+                  ),
               inputFormatters: [_DigitsOnly()],
               decoration: const InputDecoration(
                 counterText: '',
@@ -210,9 +212,7 @@ class _DigitsOnly extends TextInputFormatter {
     TextEditingValue oldValue,
     TextEditingValue newValue,
   ) {
-    final digits = Fmt.toAscii(
-      newValue.text,
-    ).replaceAll(RegExp(r'\D'), '');
+    final digits = Fmt.toAscii(newValue.text).replaceAll(RegExp(r'\D'), '');
     if (digits == newValue.text) return newValue;
     return TextEditingValue(
       text: digits,

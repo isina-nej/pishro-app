@@ -5,6 +5,8 @@ abstract final class Routes {
   static const splash = '/';
   static const welcome = '/welcome';
   static const onboarding = '/onboarding';
+  static const onboarding2 = '/onboarding/2';
+  static const onboarding3 = '/onboarding/3';
   static const login = '/login';
   static const signup = '/signup';
   static const otp = '/otp';
@@ -98,7 +100,8 @@ abstract final class Routes {
   static String analystProfile(String id) => '$community/analysts/$id';
   static String analystRatings(String id) => '$community/analysts/$id/ratings';
   static String analysisDetails(String id) => '$community/analysis/$id';
-  static String analysisComments(String id) => '$community/analysis/$id/comments';
+  static String analysisComments(String id) =>
+      '$community/analysis/$id/comments';
 
   // ---- Account ----
   static const profile = '$account/profile';

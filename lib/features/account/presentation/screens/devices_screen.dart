@@ -4,15 +4,17 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/tokens.dart';
+import '../../../../core/utils/formatters.dart';
 import '../../../../shared/widgets/common.dart';
 import '../../../../shared/widgets/pishro_badge.dart';
+import '../../../../shared/widgets/pishro_button.dart';
 import '../../../../shared/widgets/states.dart';
-
-import '../../../../core/utils/formatters.dart';
 import '../../data/account_repository.dart';
 
+/// Screen/Account/Devices — mock · IP ماسک.
 class AccountDevicesScreen extends ConsumerWidget {
   const AccountDevicesScreen({super.key});
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final c = context.colors;
@@ -20,7 +22,7 @@ class AccountDevicesScreen extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'دستگاه‌ها',
+          'دستگاه‌ها و نشست‌ها',
           style: context.text.h3.copyWith(color: c.textPrimary),
         ),
       ),
@@ -28,45 +30,71 @@ class AccountDevicesScreen extends ConsumerWidget {
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (_, __) =>
             ErrorStateView(onRetry: () => ref.invalidate(devicesProvider)),
-        data: (items) => ListView.separated(
+        data: (items) => ListView(
           padding: const EdgeInsets.all(Space.page),
-          itemCount: items.length,
-          separatorBuilder: (_, __) => const SizedBox(height: Space.s3),
-          itemBuilder: (_, i) {
-            final d = items[i];
-            return PishroCard(
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            for (final d in items) ...[
+              PishroCard(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
                       children: [
-                        Text(
-                          d.name,
-                          style: context.text.bodyMedium.copyWith(
-                            color: c.textPrimary,
-                            fontWeight: FontWeight.w600,
+                        Expanded(
+                          child: Text(
+                            d.name,
+                            style: context.text.bodyMedium.copyWith(
+                              color: c.textPrimary,
+                              fontWeight: FontWeight.w700,
+                            ),
                           ),
                         ),
-                        Text(
-                          Fmt.relative(d.lastSeen),
-                          style: context.text.caption.copyWith(
-                            color: c.textMuted,
+                        if (d.current)
+                          const PishroBadge(
+                            label: 'این دستگاه',
+                            tone: PishroBadgeTone.info,
+                            icon: Icons.phone_android_rounded,
+                          )
+                        else
+                          const PishroBadge(
+                            label: 'فعال',
+                            tone: PishroBadgeTone.success,
+                            icon: Icons.check_rounded,
                           ),
-                        ),
                       ],
                     ),
-                  ),
-                  if (d.current)
-                    const PishroBadge(
-                      label: 'این دستگاه',
-                      tone: PishroBadgeTone.info,
-                      icon: Icons.phone_android_rounded,
+                    const SizedBox(height: Space.s2),
+                    if (d.maskedIp.isNotEmpty)
+                      Text(
+                        'IP: ${d.maskedIp}',
+                        style: context.text.caption.copyWith(
+                          color: c.textMuted,
+                        ),
+                      ),
+                    Text(
+                      'آخرین فعالیت: ${Fmt.relative(d.lastSeen)}',
+                      style: context.text.caption.copyWith(color: c.textMuted),
                     ),
-                ],
+                    Text(
+                      'موقعیت تقریبی بر اساس اطلاعات شبکه',
+                      style: context.text.caption.copyWith(color: c.textMuted),
+                    ),
+                  ],
+                ),
               ),
-            );
-          },
+              const SizedBox(height: Space.s3),
+            ],
+            const NoticeBanner(
+              message: 'آدرس IP همیشه به‌صورت ماسک‌شده نمایش داده می‌شود.',
+              tone: NoticeTone.info,
+            ),
+            const SizedBox(height: Space.s4),
+            PishroButton(
+              label: 'خروج از همه نشست‌های دیگر',
+              variant: PishroButtonVariant.danger,
+              onPressed: () {},
+            ),
+          ],
         ),
       ),
     );

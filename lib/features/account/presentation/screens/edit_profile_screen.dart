@@ -11,7 +11,7 @@ import '../../../../shared/widgets/pishro_text_field.dart';
 import '../../../../shared/widgets/states.dart';
 import '../../data/account_repository.dart';
 
-/// Screen/Account/EditProfile.
+/// Screen/Account/EditProfile — کد ملی غیرقابل ویرایش.
 class EditProfileScreen extends ConsumerStatefulWidget {
   const EditProfileScreen({super.key});
 
@@ -72,6 +72,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
   @override
   Widget build(BuildContext context) {
     final c = context.colors;
+    final profile = ref.watch(accountProfileProvider).valueOrNull;
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -89,6 +90,19 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
           PishroTextField(controller: _last, label: 'نام خانوادگی'),
           const SizedBox(height: Space.s4),
           PishroTextField(controller: _email, label: 'ایمیل', hint: 'اختیاری'),
+          const SizedBox(height: Space.s4),
+          PishroTextField(
+            label: 'شماره موبایل',
+            hint: profile?.phone ?? '',
+            enabled: false,
+          ),
+          const SizedBox(height: Space.s4),
+          const PishroTextField(
+            label: 'کد ملی',
+            hint: 'غیرقابل ویرایش',
+            helper: 'کد ملی پس از ثبت قابل ویرایش نیست.',
+            enabled: false,
+          ),
         ],
       ),
       bottomNavigationBar: SafeArea(

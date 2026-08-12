@@ -2,19 +2,22 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/network/api_exception.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/tokens.dart';
 import '../../../../routing/routes.dart';
+import '../../../../shared/widgets/common.dart';
+import '../../../../shared/widgets/pishro_badge.dart';
 import '../../../../shared/widgets/pishro_button.dart';
 import '../../../../shared/widgets/pishro_text_field.dart';
 import '../../../../shared/widgets/states.dart';
-
-import '../../../../core/network/api_exception.dart';
 import '../../data/account_repository.dart';
 
+/// Screen/Account/Security — تغییر رمز موجود.
 class AccountSecurityScreen extends ConsumerStatefulWidget {
   const AccountSecurityScreen({super.key});
+
   @override
   ConsumerState<AccountSecurityScreen> createState() =>
       _AccountSecurityScreenState();
@@ -23,6 +26,7 @@ class AccountSecurityScreen extends ConsumerStatefulWidget {
 class _AccountSecurityScreenState extends ConsumerState<AccountSecurityScreen> {
   final _current = TextEditingController();
   final _next = TextEditingController();
+  final _confirm = TextEditingController();
   var _loading = false;
   String? _error;
   String? _ok;
@@ -31,10 +35,15 @@ class _AccountSecurityScreenState extends ConsumerState<AccountSecurityScreen> {
   void dispose() {
     _current.dispose();
     _next.dispose();
+    _confirm.dispose();
     super.dispose();
   }
 
   Future<void> _save() async {
+    if (_next.text != _confirm.text) {
+      setState(() => _error = 'رمز جدید و تکرار آن یکسان نیست.');
+      return;
+    }
     setState(() {
       _loading = true;
       _error = null;
@@ -50,6 +59,7 @@ class _AccountSecurityScreenState extends ConsumerState<AccountSecurityScreen> {
       setState(() => _ok = 'رمز عبور به‌روز شد.');
       _current.clear();
       _next.clear();
+      _confirm.clear();
     } on ApiException catch (e) {
       setState(() => _error = e.message);
     } finally {
@@ -60,10 +70,11 @@ class _AccountSecurityScreenState extends ConsumerState<AccountSecurityScreen> {
   @override
   Widget build(BuildContext context) {
     final c = context.colors;
+    final devices = ref.watch(devicesProvider).valueOrNull ?? const [];
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'امنیت',
+          'امنیت حساب',
           style: context.text.h3.copyWith(color: c.textPrimary),
         ),
       ),
@@ -74,20 +85,75 @@ class _AccountSecurityScreenState extends ConsumerState<AccountSecurityScreen> {
             NoticeBanner(message: _error!, tone: NoticeTone.danger),
           if (_ok != null)
             NoticeBanner(message: _ok!, tone: NoticeTone.success),
+          Text(
+            'رمز عبور',
+            style: context.text.bodySmall.copyWith(
+              color: c.textSecondary,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          const SizedBox(height: Space.s3),
           PishroTextField(
             controller: _current,
-            label: 'رمز فعلی',
+            label: 'رمز عبور فعلی',
+            obscure: true,
+          ),
+          const SizedBox(height: Space.s3),
+          PishroTextField(
+            controller: _next,
+            label: 'رمز عبور جدید',
+            obscure: true,
+          ),
+          const SizedBox(height: Space.s3),
+          PishroTextField(
+            controller: _confirm,
+            label: 'تکرار رمز عبور جدید',
             obscure: true,
           ),
           const SizedBox(height: Space.s4),
-          PishroTextField(controller: _next, label: 'رمز جدید', obscure: true),
-          const SizedBox(height: Space.s5),
-          PishroButton(label: 'تغییر رمز', loading: _loading, onPressed: _save),
-          ListTile(
-            contentPadding: EdgeInsets.zero,
-            title: const Text('دستگاه‌های فعال'),
-            trailing: const Icon(Icons.chevron_left_rounded),
+          PishroButton(
+            label: 'ذخیره رمز جدید',
+            loading: _loading,
+            onPressed: _save,
+          ),
+          const SizedBox(height: Space.s6),
+          PishroCard(
             onTap: () => context.push(Routes.devices),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'نشست‌های فعال',
+                        style: context.text.bodyMedium.copyWith(
+                          color: c.textPrimary,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      Text(
+                        '${devices.length} دستگاه',
+                        style: context.text.caption.copyWith(
+                          color: c.textMuted,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const PishroBadge(
+                  label: 'مشاهده',
+                  tone: PishroBadgeTone.info,
+                  icon: Icons.devices_rounded,
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: Space.s4),
+          const NoticeBanner(
+            message:
+                'فعال‌سازی تأیید دومرحله‌ای امنیت حساب را افزایش می‌دهد. امتیاز امنیتی جعلی نمایش داده نمی‌شود.',
+            tone: NoticeTone.info,
           ),
         ],
       ),

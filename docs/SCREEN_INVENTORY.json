@@ -1,0 +1,1082 @@
+[
+  {
+    "id": 1,
+    "path": "Screen/Auth/Splash",
+    "fa": "شروع",
+    "deck": "01-03-auth.dc.html",
+    "note": "",
+    "module": "auth",
+    "file": "lib/features/auth/presentation/screens/splash_screen.dart",
+    "agent_id": "S001"
+  },
+  {
+    "id": 2,
+    "path": "Screen/Auth/Welcome",
+    "fa": "خوش‌آمد",
+    "deck": "01-03-auth.dc.html",
+    "note": "",
+    "module": "auth",
+    "file": "lib/features/auth/presentation/screens/welcome_screen.dart",
+    "agent_id": "S002"
+  },
+  {
+    "id": 3,
+    "path": "Screen/Auth/Onboarding-01",
+    "fa": "آشنایی ۱",
+    "deck": "01-03-auth.dc.html",
+    "note": "",
+    "module": "auth",
+    "file": "lib/features/auth/presentation/screens/onboarding_01_screen.dart",
+    "agent_id": "S003"
+  },
+  {
+    "id": 4,
+    "path": "Screen/Auth/Onboarding-02",
+    "fa": "آشنایی ۲",
+    "deck": "01-03-auth.dc.html",
+    "note": "",
+    "module": "auth",
+    "file": "lib/features/auth/presentation/screens/onboarding_02_screen.dart",
+    "agent_id": "S004"
+  },
+  {
+    "id": 5,
+    "path": "Screen/Auth/Onboarding-03",
+    "fa": "آشنایی ۳",
+    "deck": "01-03-auth.dc.html",
+    "note": "",
+    "module": "auth",
+    "file": "lib/features/auth/presentation/screens/onboarding_03_screen.dart",
+    "agent_id": "S005"
+  },
+  {
+    "id": 6,
+    "path": "Screen/Auth/Login",
+    "fa": "ورود",
+    "deck": "01-03-auth.dc.html",
+    "note": "اثر انگشت = واریانت پیکربندی‌شده",
+    "module": "auth",
+    "file": "lib/features/auth/presentation/screens/login_screen.dart",
+    "agent_id": "S006"
+  },
+  {
+    "id": 7,
+    "path": "Screen/Auth/Signup",
+    "fa": "ثبت‌نام",
+    "deck": "01-03-auth.dc.html",
+    "note": "دو تیک را بزنید تا دکمه فعال شود",
+    "module": "auth",
+    "file": "lib/features/auth/presentation/screens/signup_screen.dart",
+    "agent_id": "S007"
+  },
+  {
+    "id": 8,
+    "path": "Screen/Auth/OTP",
+    "fa": "کد تأیید",
+    "deck": "01-03-auth.dc.html",
+    "note": "شمارش معکوس زنده",
+    "module": "auth",
+    "file": "lib/features/auth/presentation/screens/o_t_p_screen.dart",
+    "agent_id": "S008"
+  },
+  {
+    "id": 9,
+    "path": "Screen/Courses/Home",
+    "fa": "دوره‌ها (خانه)",
+    "deck": "01-foundations.html",
+    "note": "Default/Skeleton/Empty",
+    "module": "courses",
+    "file": "lib/features/courses/presentation/screens/home_screen.dart",
+    "agent_id": "S009"
+  },
+  {
+    "id": 10,
+    "path": "Screen/Courses/Categories",
+    "fa": "دسته‌بندی‌ها",
+    "deck": "02-04-courses-part-1.dc.html",
+    "note": "",
+    "module": "courses",
+    "file": "lib/features/courses/presentation/screens/categories_screen.dart",
+    "agent_id": "S010"
+  },
+  {
+    "id": 11,
+    "path": "Screen/Courses/Search",
+    "fa": "جست‌وجو",
+    "deck": "02-04-courses-part-1.dc.html",
+    "note": "کیبورد باز",
+    "module": "courses",
+    "file": "lib/features/courses/presentation/screens/search_screen.dart",
+    "agent_id": "S011"
+  },
+  {
+    "id": 12,
+    "path": "Screen/Courses/Filters",
+    "fa": "فیلترها",
+    "deck": "02-04-courses-part-1.dc.html",
+    "note": "Bottom Sheet",
+    "module": "courses",
+    "file": "lib/features/courses/presentation/screens/filters_screen.dart",
+    "agent_id": "S012"
+  },
+  {
+    "id": 13,
+    "path": "Screen/Courses/SearchResults",
+    "fa": "نتایج جست‌وجو",
+    "deck": "02-04-courses-part-1.dc.html",
+    "note": "",
+    "module": "courses",
+    "file": "lib/features/courses/presentation/screens/search_results_screen.dart",
+    "agent_id": "S013"
+  },
+  {
+    "id": 14,
+    "path": "Screen/Course/Details",
+    "fa": "جزئیات دوره",
+    "deck": "02-04-courses-part-1.dc.html",
+    "note": "قیمت‌گذاری همیشه نمایان",
+    "module": "courses",
+    "file": "lib/features/courses/presentation/screens/details_screen.dart",
+    "agent_id": "S014"
+  },
+  {
+    "id": 15,
+    "path": "Screen/Course/PackageComparison",
+    "fa": "مقایسه بسته",
+    "deck": "02-04-courses-part-1.dc.html",
+    "note": "روی هر کارت بزنید",
+    "module": "courses",
+    "file": "lib/features/courses/presentation/screens/package_comparison_screen.dart",
+    "agent_id": "S015"
+  },
+  {
+    "id": 16,
+    "path": "Screen/Checkout/Course-Regular",
+    "fa": "پرداخت بسته عادی",
+    "deck": "02-04-courses-part-1.dc.html",
+    "note": "",
+    "module": "courses",
+    "file": "lib/features/courses/presentation/screens/course__regular_screen.dart",
+    "agent_id": "S016"
+  },
+  {
+    "id": 17,
+    "path": "Screen/Checkout/Course-VIP",
+    "fa": "پرداخت بسته VIP",
+    "deck": "02-04-courses-part-1.dc.html",
+    "note": "",
+    "module": "courses",
+    "file": "lib/features/courses/presentation/screens/course__v_i_p_screen.dart",
+    "agent_id": "S017"
+  },
+  {
+    "id": 18,
+    "path": "Screen/Checkout/PaymentMethod",
+    "fa": "روش پرداخت",
+    "deck": "03-04-courses-part-2.dc.html",
+    "note": "روی هر ردیف بزنید",
+    "module": "courses",
+    "file": "lib/features/courses/presentation/screens/payment_method_screen.dart",
+    "agent_id": "S018"
+  },
+  {
+    "id": 19,
+    "path": "Screen/Checkout/DiscountAndCoin",
+    "fa": "تخفیف و کوین",
+    "deck": "03-04-courses-part-2.dc.html",
+    "note": "کلید کوین را بزنید",
+    "module": "courses",
+    "file": "lib/features/courses/presentation/screens/discount_and_coin_screen.dart",
+    "agent_id": "S019"
+  },
+  {
+    "id": 20,
+    "path": "Screen/Checkout/PaymentProcessing",
+    "fa": "در حال پردازش",
+    "deck": "03-04-courses-part-2.dc.html",
+    "note": "ارسال مجدد مسدود است",
+    "module": "courses",
+    "file": "lib/features/courses/presentation/screens/payment_processing_screen.dart",
+    "agent_id": "S020"
+  },
+  {
+    "id": 21,
+    "path": "Screen/Checkout/PaymentSuccess",
+    "fa": "پرداخت موفق",
+    "deck": "03-04-courses-part-2.dc.html",
+    "note": "بدون کانفتی",
+    "module": "courses",
+    "file": "lib/features/courses/presentation/screens/payment_success_screen.dart",
+    "agent_id": "S021"
+  },
+  {
+    "id": 22,
+    "path": "Screen/Checkout/PaymentFailure",
+    "fa": "پرداخت ناموفق",
+    "deck": "03-04-courses-part-2.dc.html",
+    "note": "متمایز از حالت نامشخص",
+    "module": "courses",
+    "file": "lib/features/courses/presentation/screens/payment_failure_screen.dart",
+    "agent_id": "S022"
+  },
+  {
+    "id": 23,
+    "path": "Screen/Courses/MyCourses",
+    "fa": "دوره‌های من",
+    "deck": "03-04-courses-part-2.dc.html",
+    "note": "تب‌ها را بزنید — گفت‌وگوی مدرس فقط روی دوره VIP",
+    "module": "courses",
+    "file": "lib/features/courses/presentation/screens/my_courses_screen.dart",
+    "agent_id": "S023"
+  },
+  {
+    "id": 24,
+    "path": "Screen/Course/LearningDashboard",
+    "fa": "داشبورد یادگیری",
+    "deck": "03-04-courses-part-2.dc.html",
+    "note": "گفت‌وگو با مدرس فقط برای این کاربر VIP قابل مشاهده است",
+    "module": "courses",
+    "file": "lib/features/courses/presentation/screens/learning_dashboard_screen.dart",
+    "agent_id": "S024"
+  },
+  {
+    "id": 25,
+    "path": "Screen/Course/Chapters",
+    "fa": "سرفصل‌های دوره",
+    "deck": "03-04-courses-part-2.dc.html",
+    "note": "۷ حالت درس با آیکون و برچسب",
+    "module": "courses",
+    "file": "lib/features/courses/presentation/screens/chapters_screen.dart",
+    "agent_id": "S025"
+  },
+  {
+    "id": 26,
+    "path": "Screen/Course/LessonDetails",
+    "fa": "جزئیات جلسه",
+    "deck": "04-04-courses-part-3.dc.html",
+    "note": "دانلود و تکمیل تعاملی",
+    "module": "courses",
+    "file": "lib/features/courses/presentation/screens/lesson_details_screen.dart",
+    "agent_id": "S026"
+  },
+  {
+    "id": 27,
+    "path": "Screen/Course/DownloadsAndResources",
+    "fa": "دانلودها و منابع",
+    "deck": "04-04-courses-part-3.dc.html",
+    "note": "",
+    "module": "courses",
+    "file": "lib/features/courses/presentation/screens/downloads_and_resources_screen.dart",
+    "agent_id": "S027"
+  },
+  {
+    "id": 28,
+    "path": "Screen/Course/VIPInstructorChat",
+    "fa": "گفت‌وگوی VIP",
+    "deck": "04-04-courses-part-3.dc.html",
+    "note": "نشان VIP طلایی، بقیه سبز",
+    "module": "courses",
+    "file": "lib/features/courses/presentation/screens/v_i_p_instructor_chat_screen.dart",
+    "agent_id": "S028"
+  },
+  {
+    "id": 29,
+    "path": "Screen/Course/Completion",
+    "fa": "تکمیل دوره",
+    "deck": "04-04-courses-part-3.dc.html",
+    "note": "بدون کانفتی",
+    "module": "courses",
+    "file": "lib/features/courses/presentation/screens/completion_screen.dart",
+    "agent_id": "S029"
+  },
+  {
+    "id": 30,
+    "path": "Screen/Course/Certificate",
+    "fa": "گواهی",
+    "deck": "04-04-courses-part-3.dc.html",
+    "note": "قاب سبز، تزئین طلایی کم‌مصرف",
+    "module": "courses",
+    "file": "lib/features/courses/presentation/screens/certificate_screen.dart",
+    "agent_id": "S030"
+  },
+  {
+    "id": 31,
+    "path": "Screen/News/Home",
+    "fa": "اخبار (خانه)",
+    "deck": "05-05-news.dc.html",
+    "note": "",
+    "module": "news",
+    "file": "lib/features/news/presentation/screens/home_screen.dart",
+    "agent_id": "S031"
+  },
+  {
+    "id": 32,
+    "path": "Screen/News/Trending",
+    "fa": "پربازدید",
+    "deck": "05-05-news.dc.html",
+    "note": "",
+    "module": "news",
+    "file": "lib/features/news/presentation/screens/trending_screen.dart",
+    "agent_id": "S032"
+  },
+  {
+    "id": 33,
+    "path": "Screen/News/Categories",
+    "fa": "دسته‌بندی",
+    "deck": "05-05-news.dc.html",
+    "note": "",
+    "module": "news",
+    "file": "lib/features/news/presentation/screens/categories_screen.dart",
+    "agent_id": "S033"
+  },
+  {
+    "id": 34,
+    "path": "Screen/News/Filters",
+    "fa": "فیلتر",
+    "deck": "05-05-news.dc.html",
+    "note": "بدون ناوبری پایین",
+    "module": "news",
+    "file": "lib/features/news/presentation/screens/filters_screen.dart",
+    "agent_id": "S034"
+  },
+  {
+    "id": 35,
+    "path": "Screen/News/Search",
+    "fa": "جستجو",
+    "deck": "05-05-news.dc.html",
+    "note": "فوکوس خودکار",
+    "module": "news",
+    "file": "lib/features/news/presentation/screens/search_screen.dart",
+    "agent_id": "S035"
+  },
+  {
+    "id": 36,
+    "path": "Screen/News/SearchResults",
+    "fa": "نتایج جستجو",
+    "deck": "05-05-news.dc.html",
+    "note": "",
+    "module": "news",
+    "file": "lib/features/news/presentation/screens/search_results_screen.dart",
+    "agent_id": "S036"
+  },
+  {
+    "id": 37,
+    "path": "Screen/News/Details",
+    "fa": "جزئیات خبر",
+    "deck": "05-05-news.dc.html",
+    "note": "متن ۱۵px+",
+    "module": "news",
+    "file": "lib/features/news/presentation/screens/details_screen.dart",
+    "agent_id": "S037"
+  },
+  {
+    "id": 38,
+    "path": "Screen/News/Comments",
+    "fa": "دیدگاه‌ها",
+    "deck": "05-05-news.dc.html",
+    "note": "",
+    "module": "news",
+    "file": "lib/features/news/presentation/screens/comments_screen.dart",
+    "agent_id": "S038"
+  },
+  {
+    "id": 39,
+    "path": "Screen/News/CommentThread",
+    "fa": "رشته پاسخ",
+    "deck": "05-05-news.dc.html",
+    "note": "کیبوردایمن",
+    "module": "news",
+    "file": "lib/features/news/presentation/screens/comment_thread_screen.dart",
+    "agent_id": "S039"
+  },
+  {
+    "id": 40,
+    "path": "Screen/News/Saved",
+    "fa": "ذخیره‌شده‌ها",
+    "deck": "05-05-news.dc.html",
+    "note": "",
+    "module": "news",
+    "file": "lib/features/news/presentation/screens/saved_screen.dart",
+    "agent_id": "S040"
+  },
+  {
+    "id": 41,
+    "path": "Screen/Investment/Home",
+    "fa": "سرمایه‌گذاری (خانه)",
+    "deck": "06-06-investment-part-1.dc.html",
+    "note": "",
+    "module": "investment",
+    "file": "lib/features/investment/presentation/screens/home_screen.dart",
+    "agent_id": "S041"
+  },
+  {
+    "id": 42,
+    "path": "Screen/Investment/PlanCatalog",
+    "fa": "فهرست طرح‌ها",
+    "deck": "06-06-investment-part-1.dc.html",
+    "note": "ریسک با آیکون+متن",
+    "module": "investment",
+    "file": "lib/features/investment/presentation/screens/plan_catalog_screen.dart",
+    "agent_id": "S042"
+  },
+  {
+    "id": 43,
+    "path": "Screen/Investment/FixedMonthlyPlanDetails",
+    "fa": "طرح ماهیانه ۸٪",
+    "deck": "06-06-investment-part-1.dc.html",
+    "note": "",
+    "module": "investment",
+    "file": "lib/features/investment/presentation/screens/fixed_monthly_plan_details_screen.dart",
+    "agent_id": "S043"
+  },
+  {
+    "id": 44,
+    "path": "Screen/Investment/DynamicHoldPlanDetails",
+    "fa": "طرح هولد داینامیک",
+    "deck": "06-06-investment-part-1.dc.html",
+    "note": "بدون درصد اختراعی",
+    "module": "investment",
+    "file": "lib/features/investment/presentation/screens/dynamic_hold_plan_details_screen.dart",
+    "agent_id": "S044"
+  },
+  {
+    "id": 45,
+    "path": "Screen/Investment/PlanComparison",
+    "fa": "مقایسه طرح‌ها",
+    "deck": "06-06-investment-part-1.dc.html",
+    "note": "بدون برنده اعلام‌شده",
+    "module": "investment",
+    "file": "lib/features/investment/presentation/screens/plan_comparison_screen.dart",
+    "agent_id": "S045"
+  },
+  {
+    "id": 46,
+    "path": "Screen/Investment/Calculator",
+    "fa": "محاسبه‌گر",
+    "deck": "06-06-investment-part-1.dc.html",
+    "note": "فقط «برآورد»",
+    "module": "investment",
+    "file": "lib/features/investment/presentation/screens/calculator_screen.dart",
+    "agent_id": "S046"
+  },
+  {
+    "id": 47,
+    "path": "Screen/Investment/RiskDisclosure",
+    "fa": "اطلاع‌رسانی ریسک",
+    "deck": "06-06-investment-part-1.dc.html",
+    "note": "بدون پیش‌انتخاب",
+    "module": "investment",
+    "file": "lib/features/investment/presentation/screens/risk_disclosure_screen.dart",
+    "agent_id": "S047"
+  },
+  {
+    "id": 48,
+    "path": "Screen/Investment/TermsAndContract",
+    "fa": "شرایط و قرارداد",
+    "deck": "06-06-investment-part-1.dc.html",
+    "note": "فقط مرور، بدون امضا",
+    "module": "investment",
+    "file": "lib/features/investment/presentation/screens/terms_and_contract_screen.dart",
+    "agent_id": "S048"
+  },
+  {
+    "id": 49,
+    "path": "Screen/Investment/EligibilityAndKYC",
+    "fa": "احراز شرایط",
+    "deck": "07-06-investment-part-2.dc.html",
+    "note": "",
+    "module": "investment",
+    "file": "lib/features/investment/presentation/screens/eligibility_and_k_y_c_screen.dart",
+    "agent_id": "S049"
+  },
+  {
+    "id": 50,
+    "path": "Screen/Investment/AmountEntry",
+    "fa": "مبلغ سرمایه‌گذاری",
+    "deck": "07-06-investment-part-2.dc.html",
+    "note": "",
+    "module": "investment",
+    "file": "lib/features/investment/presentation/screens/amount_entry_screen.dart",
+    "agent_id": "S050"
+  },
+  {
+    "id": 51,
+    "path": "Screen/Investment/FundingSource",
+    "fa": "منبع تأمین وجه",
+    "deck": "07-06-investment-part-2.dc.html",
+    "note": "",
+    "module": "investment",
+    "file": "lib/features/investment/presentation/screens/funding_source_screen.dart",
+    "agent_id": "S051"
+  },
+  {
+    "id": 52,
+    "path": "Screen/Investment/FinalReview",
+    "fa": "مرور نهایی",
+    "deck": "07-06-investment-part-2.dc.html",
+    "note": "",
+    "module": "investment",
+    "file": "lib/features/investment/presentation/screens/final_review_screen.dart",
+    "agent_id": "S052"
+  },
+  {
+    "id": 53,
+    "path": "Screen/Investment/ContractConfirmation",
+    "fa": "تأیید قرارداد",
+    "deck": "07-06-investment-part-2.dc.html",
+    "note": "بدون پیش‌انتخاب",
+    "module": "investment",
+    "file": "lib/features/investment/presentation/screens/contract_confirmation_screen.dart",
+    "agent_id": "S053"
+  },
+  {
+    "id": 54,
+    "path": "Screen/Investment/Processing",
+    "fa": "پردازش",
+    "deck": "07-06-investment-part-2.dc.html",
+    "note": "بدون ثبت تکراری",
+    "module": "investment",
+    "file": "lib/features/investment/presentation/screens/processing_screen.dart",
+    "agent_id": "S054"
+  },
+  {
+    "id": 55,
+    "path": "Screen/Investment/Success",
+    "fa": "موفقیت (فعال‌شده)",
+    "deck": "07-06-investment-part-2.dc.html",
+    "note": "بدون کانفتی",
+    "module": "investment",
+    "file": "lib/features/investment/presentation/screens/success_screen.dart",
+    "agent_id": "S055"
+  },
+  {
+    "id": 56,
+    "path": "Screen/Investment/ActiveInvestments",
+    "fa": "سرمایه‌گذاری‌های من",
+    "deck": "07-06-investment-part-2.dc.html",
+    "note": "",
+    "module": "investment",
+    "file": "lib/features/investment/presentation/screens/active_investments_screen.dart",
+    "agent_id": "S056"
+  },
+  {
+    "id": 57,
+    "path": "Screen/Investment/ActiveInvestmentDetails",
+    "fa": "جزئیات سرمایه‌گذاری",
+    "deck": "07-06-investment-part-2.dc.html",
+    "note": "",
+    "module": "investment",
+    "file": "lib/features/investment/presentation/screens/active_investment_details_screen.dart",
+    "agent_id": "S057"
+  },
+  {
+    "id": 58,
+    "path": "Screen/Investment/PaymentSchedule",
+    "fa": "برنامه پرداخت",
+    "deck": "07-06-investment-part-2.dc.html",
+    "note": "",
+    "module": "investment",
+    "file": "lib/features/investment/presentation/screens/payment_schedule_screen.dart",
+    "agent_id": "S058"
+  },
+  {
+    "id": 59,
+    "path": "Screen/Market/Home",
+    "fa": "بازار (خانه)",
+    "deck": "08-07-market.dc.html",
+    "note": "",
+    "module": "market",
+    "file": "lib/features/market/presentation/screens/home_screen.dart",
+    "agent_id": "S059"
+  },
+  {
+    "id": 60,
+    "path": "Screen/Market/AllAssets",
+    "fa": "همه ارزها",
+    "deck": "08-07-market.dc.html",
+    "note": "",
+    "module": "market",
+    "file": "lib/features/market/presentation/screens/all_assets_screen.dart",
+    "agent_id": "S060"
+  },
+  {
+    "id": 61,
+    "path": "Screen/Market/Favorites",
+    "fa": "علاقه‌مندی‌ها",
+    "deck": "08-07-market.dc.html",
+    "note": "",
+    "module": "market",
+    "file": "lib/features/market/presentation/screens/favorites_screen.dart",
+    "agent_id": "S061"
+  },
+  {
+    "id": 62,
+    "path": "Screen/Market/Trending",
+    "fa": "پرطرفدار",
+    "deck": "08-07-market.dc.html",
+    "note": "",
+    "module": "market",
+    "file": "lib/features/market/presentation/screens/trending_screen.dart",
+    "agent_id": "S062"
+  },
+  {
+    "id": 63,
+    "path": "Screen/Market/TopGainers",
+    "fa": "بیشترین رشد",
+    "deck": "08-07-market.dc.html",
+    "note": "#24C486",
+    "module": "market",
+    "file": "lib/features/market/presentation/screens/top_gainers_screen.dart",
+    "agent_id": "S063"
+  },
+  {
+    "id": 64,
+    "path": "Screen/Market/TopLosers",
+    "fa": "بیشترین کاهش",
+    "deck": "08-07-market.dc.html",
+    "note": "#F05B67",
+    "module": "market",
+    "file": "lib/features/market/presentation/screens/top_losers_screen.dart",
+    "agent_id": "S064"
+  },
+  {
+    "id": 65,
+    "path": "Screen/Market/Search",
+    "fa": "جستجوی ارز",
+    "deck": "08-07-market.dc.html",
+    "note": "فارسی + لاتین",
+    "module": "market",
+    "file": "lib/features/market/presentation/screens/search_screen.dart",
+    "agent_id": "S065"
+  },
+  {
+    "id": 66,
+    "path": "Screen/Market/CoinDetails",
+    "fa": "جزئیات ارز",
+    "deck": "08-07-market.dc.html",
+    "note": "بدون دکمه خرید/فروش",
+    "module": "market",
+    "file": "lib/features/market/presentation/screens/coin_details_screen.dart",
+    "agent_id": "S066"
+  },
+  {
+    "id": 67,
+    "path": "Screen/Market/PriceChart",
+    "fa": "نمودار قیمت",
+    "deck": "08-07-market.dc.html",
+    "note": "",
+    "module": "market",
+    "file": "lib/features/market/presentation/screens/price_chart_screen.dart",
+    "agent_id": "S067"
+  },
+  {
+    "id": 68,
+    "path": "Screen/Market/Statistics",
+    "fa": "آمار بازار",
+    "deck": "08-07-market.dc.html",
+    "note": "",
+    "module": "market",
+    "file": "lib/features/market/presentation/screens/statistics_screen.dart",
+    "agent_id": "S068"
+  },
+  {
+    "id": 69,
+    "path": "Screen/Market/HistoricalData",
+    "fa": "داده‌های تاریخی",
+    "deck": "08-07-market.dc.html",
+    "note": "",
+    "module": "market",
+    "file": "lib/features/market/presentation/screens/historical_data_screen.dart",
+    "agent_id": "S069"
+  },
+  {
+    "id": 70,
+    "path": "Screen/Market/PriceAlerts",
+    "fa": "هشدارهای قیمت",
+    "deck": "08-07-market.dc.html",
+    "note": "",
+    "module": "market",
+    "file": "lib/features/market/presentation/screens/price_alerts_screen.dart",
+    "agent_id": "S070"
+  },
+  {
+    "id": 71,
+    "path": "Screen/Community/Home",
+    "fa": "جامعه (خانه)",
+    "deck": "09-08-community.dc.html",
+    "note": "بازار همچنان فعال",
+    "module": "community",
+    "file": "lib/features/community/presentation/screens/home_screen.dart",
+    "agent_id": "S071"
+  },
+  {
+    "id": 72,
+    "path": "Screen/Community/FollowingFeed",
+    "fa": "دنبال‌شده‌ها",
+    "deck": "09-08-community.dc.html",
+    "note": "",
+    "module": "community",
+    "file": "lib/features/community/presentation/screens/following_feed_screen.dart",
+    "agent_id": "S072"
+  },
+  {
+    "id": 73,
+    "path": "Screen/Community/RecommendedAnalysts",
+    "fa": "تحلیلگران پیشنهادی",
+    "deck": "09-08-community.dc.html",
+    "note": "",
+    "module": "community",
+    "file": "lib/features/community/presentation/screens/recommended_analysts_screen.dart",
+    "agent_id": "S073"
+  },
+  {
+    "id": 74,
+    "path": "Screen/Community/Leaderboard",
+    "fa": "رتبه‌بندی",
+    "deck": "09-08-community.dc.html",
+    "note": "بدون ROI جعلی",
+    "module": "community",
+    "file": "lib/features/community/presentation/screens/leaderboard_screen.dart",
+    "agent_id": "S074"
+  },
+  {
+    "id": 75,
+    "path": "Screen/Community/Search",
+    "fa": "جستجو در جامعه",
+    "deck": "09-08-community.dc.html",
+    "note": "",
+    "module": "community",
+    "file": "lib/features/community/presentation/screens/search_screen.dart",
+    "agent_id": "S075"
+  },
+  {
+    "id": 76,
+    "path": "Screen/Community/AnalystProfile",
+    "fa": "پروفایل تحلیلگر",
+    "deck": "09-08-community.dc.html",
+    "note": "نشان‌های جدا",
+    "module": "community",
+    "file": "lib/features/community/presentation/screens/analyst_profile_screen.dart",
+    "agent_id": "S076"
+  },
+  {
+    "id": 77,
+    "path": "Screen/Community/AnalystRatings",
+    "fa": "امتیازها و نظرات",
+    "deck": "09-08-community.dc.html",
+    "note": "",
+    "module": "community",
+    "file": "lib/features/community/presentation/screens/analyst_ratings_screen.dart",
+    "agent_id": "S077"
+  },
+  {
+    "id": 78,
+    "path": "Screen/Community/AnalysisDetails",
+    "fa": "جزئیات تحلیل",
+    "deck": "09-08-community.dc.html",
+    "note": "سناریوهای هم‌وزن",
+    "module": "community",
+    "file": "lib/features/community/presentation/screens/analysis_details_screen.dart",
+    "agent_id": "S078"
+  },
+  {
+    "id": 79,
+    "path": "Screen/Community/PremiumSignals",
+    "fa": "سیگنال‌های اشتراکی",
+    "deck": "09-08-community.dc.html",
+    "note": "طلا محدود به نشان",
+    "module": "community",
+    "file": "lib/features/community/presentation/screens/premium_signals_screen.dart",
+    "agent_id": "S079"
+  },
+  {
+    "id": 80,
+    "path": "Screen/Community/Subscriptions",
+    "fa": "اشتراک‌های من",
+    "deck": "09-08-community.dc.html",
+    "note": "",
+    "module": "community",
+    "file": "lib/features/community/presentation/screens/subscriptions_screen.dart",
+    "agent_id": "S080"
+  },
+  {
+    "id": 81,
+    "path": "Screen/Community/CreateAnalysis",
+    "fa": "ایجاد تحلیل",
+    "deck": "09-08-community.dc.html",
+    "note": "بدون پیش‌انتخاب افشا",
+    "module": "community",
+    "file": "lib/features/community/presentation/screens/create_analysis_screen.dart",
+    "agent_id": "S081"
+  },
+  {
+    "id": 82,
+    "path": "Screen/Community/AnalysisEditor",
+    "fa": "ویرایشگر تحلیل",
+    "deck": "09-08-community.dc.html",
+    "note": "نوار ابزار پایین قابل‌اسکرول",
+    "module": "community",
+    "file": "lib/features/community/presentation/screens/analysis_editor_screen.dart",
+    "agent_id": "S082"
+  },
+  {
+    "id": 83,
+    "path": "Screen/Community/AnalysisPreview",
+    "fa": "پیش‌نمایش تحلیل",
+    "deck": "09-08-community.dc.html",
+    "note": "",
+    "module": "community",
+    "file": "lib/features/community/presentation/screens/analysis_preview_screen.dart",
+    "agent_id": "S083"
+  },
+  {
+    "id": 84,
+    "path": "Screen/Community/PublishResult",
+    "fa": "نتیجه انتشار",
+    "deck": "09-08-community.dc.html",
+    "note": "بدون کانفتی",
+    "module": "community",
+    "file": "lib/features/community/presentation/screens/publish_result_screen.dart",
+    "agent_id": "S084"
+  },
+  {
+    "id": 85,
+    "path": "Screen/Account/Home",
+    "fa": "حساب کاربری (خانه)",
+    "deck": "10-09-account-part-1.dc.html",
+    "note": "",
+    "module": "account",
+    "file": "lib/features/account/presentation/screens/home_screen.dart",
+    "agent_id": "S085"
+  },
+  {
+    "id": 86,
+    "path": "Screen/Account/Profile",
+    "fa": "اطلاعات حساب",
+    "deck": "10-09-account-part-1.dc.html",
+    "note": "فیلد قفل‌شده",
+    "module": "account",
+    "file": "lib/features/account/presentation/screens/profile_screen.dart",
+    "agent_id": "S086"
+  },
+  {
+    "id": 87,
+    "path": "Screen/Account/EditProfile",
+    "fa": "ویرایش اطلاعات",
+    "deck": "10-09-account-part-1.dc.html",
+    "note": "بدون امکان ویرایش کد ملی",
+    "module": "account",
+    "file": "lib/features/account/presentation/screens/edit_profile_screen.dart",
+    "agent_id": "S087"
+  },
+  {
+    "id": 88,
+    "path": "Screen/Account/KYCOverview",
+    "fa": "احراز هویت — نمای کلی",
+    "deck": "10-09-account-part-1.dc.html",
+    "note": "",
+    "module": "account",
+    "file": "lib/features/account/presentation/screens/k_y_c_overview_screen.dart",
+    "agent_id": "S088"
+  },
+  {
+    "id": 89,
+    "path": "Screen/Account/KYCVerification",
+    "fa": "احراز هویت — تکمیل",
+    "deck": "10-09-account-part-1.dc.html",
+    "note": "بدون رضایت پیش‌فرض",
+    "module": "account",
+    "file": "lib/features/account/presentation/screens/k_y_c_verification_screen.dart",
+    "agent_id": "S089"
+  },
+  {
+    "id": 90,
+    "path": "Screen/Account/Wallet",
+    "fa": "کیف پول",
+    "deck": "10-09-account-part-1.dc.html",
+    "note": "بدون برداشت/واریز اختراعی",
+    "module": "account",
+    "file": "lib/features/account/presentation/screens/wallet_screen.dart",
+    "agent_id": "S090"
+  },
+  {
+    "id": 91,
+    "path": "Screen/Account/WalletTransactions",
+    "fa": "تراکنش‌های کیف پول",
+    "deck": "10-09-account-part-1.dc.html",
+    "note": "نامشخص جدا از ناموفق",
+    "module": "account",
+    "file": "lib/features/account/presentation/screens/wallet_transactions_screen.dart",
+    "agent_id": "S091"
+  },
+  {
+    "id": 92,
+    "path": "Screen/Account/PishroCoin",
+    "fa": "کوین پیشرو",
+    "deck": "10-09-account-part-1.dc.html",
+    "note": "بدون نرخ تبدیل",
+    "module": "account",
+    "file": "lib/features/account/presentation/screens/pishro_coin_screen.dart",
+    "agent_id": "S092"
+  },
+  {
+    "id": 93,
+    "path": "Screen/Account/PurchaseHistory",
+    "fa": "سوابق خرید",
+    "deck": "10-09-account-part-1.dc.html",
+    "note": "دسترسی جدا از پرداخت",
+    "module": "account",
+    "file": "lib/features/account/presentation/screens/purchase_history_screen.dart",
+    "agent_id": "S093"
+  },
+  {
+    "id": 94,
+    "path": "Screen/Account/InvestmentHistory",
+    "fa": "سوابق سرمایه‌گذاری",
+    "deck": "10-09-account-part-1.dc.html",
+    "note": "",
+    "module": "account",
+    "file": "lib/features/account/presentation/screens/investment_history_screen.dart",
+    "agent_id": "S094"
+  },
+  {
+    "id": 95,
+    "path": "Screen/Account/Subscriptions",
+    "fa": "اشتراک‌ها",
+    "deck": "11-09-account-part-2.dc.html",
+    "note": "پرداخت≠دسترسی",
+    "module": "account",
+    "file": "lib/features/account/presentation/screens/subscriptions_screen.dart",
+    "agent_id": "S095"
+  },
+  {
+    "id": 96,
+    "path": "Screen/Account/SavedItems",
+    "fa": "ذخیره‌شده‌ها",
+    "deck": "11-09-account-part-2.dc.html",
+    "note": "محتوای حذف‌شده مخفی نمی‌شود",
+    "module": "account",
+    "file": "lib/features/account/presentation/screens/saved_items_screen.dart",
+    "agent_id": "S096"
+  },
+  {
+    "id": 97,
+    "path": "Screen/Account/Notifications",
+    "fa": "اعلان‌ها",
+    "deck": "11-09-account-part-2.dc.html",
+    "note": "بدون مقادیر حساس کامل",
+    "module": "account",
+    "file": "lib/features/account/presentation/screens/notifications_screen.dart",
+    "agent_id": "S097"
+  },
+  {
+    "id": 98,
+    "path": "Screen/Account/Security",
+    "fa": "امنیت حساب",
+    "deck": "11-09-account-part-2.dc.html",
+    "note": "بدون امتیاز امنیتی جعلی",
+    "module": "account",
+    "file": "lib/features/account/presentation/screens/security_screen.dart",
+    "agent_id": "S098"
+  },
+  {
+    "id": 99,
+    "path": "Screen/Account/Devices",
+    "fa": "دستگاه‌ها و نشست‌ها",
+    "deck": "11-09-account-part-2.dc.html",
+    "note": "IP ماسک، موقعیت تقریبی",
+    "module": "account",
+    "file": "lib/features/account/presentation/screens/devices_screen.dart",
+    "agent_id": "S099"
+  },
+  {
+    "id": 100,
+    "path": "Screen/Account/Privacy",
+    "fa": "حریم خصوصی",
+    "deck": "11-09-account-part-2.dc.html",
+    "note": "رضایت‌ها مجزا و بدون پیش‌انتخاب",
+    "module": "account",
+    "file": "lib/features/account/presentation/screens/privacy_screen.dart",
+    "agent_id": "S100"
+  },
+  {
+    "id": 101,
+    "path": "Screen/Account/Support",
+    "fa": "پشتیبانی",
+    "deck": "11-09-account-part-2.dc.html",
+    "note": "بدون ساعت/شماره اختراعی",
+    "module": "account",
+    "file": "lib/features/account/presentation/screens/support_screen.dart",
+    "agent_id": "S101"
+  },
+  {
+    "id": 102,
+    "path": "Screen/Account/Referrals",
+    "fa": "معرفی به دوستان",
+    "deck": "11-09-account-part-2.dc.html",
+    "note": "بدون درآمد تضمینی",
+    "module": "account",
+    "file": "lib/features/account/presentation/screens/referrals_screen.dart",
+    "agent_id": "S102"
+  },
+  {
+    "id": 103,
+    "path": "Screen/Account/Preferences",
+    "fa": "تنظیمات",
+    "deck": "11-09-account-part-2.dc.html",
+    "note": "بدون تغییر پالت RoyalGreen",
+    "module": "account",
+    "file": "lib/features/account/presentation/screens/preferences_screen.dart",
+    "agent_id": "S103"
+  },
+  {
+    "id": 104,
+    "path": "Screen/Account/LegalDocuments",
+    "fa": "اسناد و قوانین",
+    "deck": "11-09-account-part-2.dc.html",
+    "note": "بدون تأیید خودکار",
+    "module": "account",
+    "file": "lib/features/account/presentation/screens/legal_documents_screen.dart",
+    "agent_id": "S104"
+  },
+  {
+    "id": 105,
+    "path": "Screen/Community/AssetFeed",
+    "fa": "فید دارایی در جامعه",
+    "deck": "08-07-market.dc.html",
+    "note": "nested under market",
+    "module": "community",
+    "file": "lib/features/community/presentation/screens/asset_feed_screen.dart",
+    "agent_id": "S105"
+  },
+  {
+    "id": 106,
+    "path": "Screen/Checkout/Processing",
+    "fa": "پرداخت — پردازش (شبکه)",
+    "deck": "02-04-courses-part-1.dc.html",
+    "note": "",
+    "module": "courses",
+    "file": "lib/features/courses/presentation/screens/processing_screen.dart",
+    "agent_id": "S106"
+  },
+  {
+    "id": 107,
+    "path": "Screen/Checkout/NetworkError",
+    "fa": "پرداخت — خطای شبکه",
+    "deck": "02-04-courses-part-1.dc.html",
+    "note": "",
+    "module": "courses",
+    "file": "lib/features/courses/presentation/screens/network_error_screen.dart",
+    "agent_id": "S107"
+  },
+  {
+    "id": 108,
+    "path": "Screen/AnalysisComments",
+    "fa": "دیدگاه‌های تحلیل",
+    "deck": "09-08-community.dc.html",
+    "note": "CommentThread",
+    "module": "community",
+    "file": "lib/features/community/presentation/screens/analysis_comments_screen.dart",
+    "agent_id": "S108"
+  }
+]

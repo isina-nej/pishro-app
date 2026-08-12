@@ -7,13 +7,14 @@ import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/tokens.dart';
 import '../../../../core/utils/formatters.dart';
 import '../../../../routing/routes.dart';
+import '../../../../shared/widgets/common.dart';
 import '../../../../shared/widgets/pishro_badge.dart';
 import '../../../../shared/widgets/pishro_button.dart';
 import '../../../../shared/widgets/states.dart';
 import '../../data/investment_models.dart';
 import '../../data/investment_repository.dart';
 
-/// Screen/Investment/ActiveInvestmentDetails.
+/// Screen/Investment/ActiveInvestmentDetails — بدون طرح جعلی.
 class ActiveInvestmentDetailsScreen extends ConsumerWidget {
   const ActiveInvestmentDetailsScreen({super.key, this.id = ''});
 
@@ -66,38 +67,77 @@ class ActiveInvestmentDetailsScreen extends ConsumerWidget {
                   ),
                 ],
               ),
-              const SizedBox(height: Space.s4),
-              Text(
-                Fmt.toman(t.amount),
-                style: context.text.h2.copyWith(color: c.textPrimary),
-              ),
-              const SizedBox(height: Space.s2),
-              Text(
-                Fmt.jalaliLong(t.createdAt),
-                style: context.text.caption.copyWith(color: c.textMuted),
-              ),
-              if (t.refNumber != null) ...[
-                const SizedBox(height: Space.s2),
-                Text(
-                  'پیگیری: ${t.refNumber}',
-                  style: context.text.caption.copyWith(color: c.textMuted),
+              const SizedBox(height: Space.s5),
+              PishroCard(
+                child: Column(
+                  children: [
+                    _Row('مبلغ سرمایه‌گذاری', Fmt.toman(t.amount)),
+                    _Row('تاریخ فعال‌سازی', Fmt.jalaliLong(t.createdAt)),
+                    const _Row('نرخ اعلام‌شده', kPerContract),
+                    const _Row('دریافتی تاکنون', kSampleValue),
+                    const _Row('پرداخت بعدی', kPerContractSchedule),
+                    if (t.refNumber != null) _Row('شناسه پیگیری', t.refNumber!),
+                  ],
                 ),
-              ],
+              ),
               const SizedBox(height: Space.s4),
               const NoticeBanner(
                 message:
-                    'API طرح، مدت یا جدول اقساط را روی تراکنش نمی‌فرستد؛ جزئیات فقط طبق داده موجود است.',
+                    'API طرح، مدت یا جدول اقساط را روی تراکنش نمی‌فرستد؛ جزئیات فقط طبق داده موجود است و درصد اختراعی نمایش داده نمی‌شود.',
                 tone: NoticeTone.info,
               ),
               const SizedBox(height: Space.s5),
               PishroButton(
-                label: 'برنامه پرداخت',
-                variant: PishroButtonVariant.secondary,
+                label: 'مشاهده برنامه پرداخت کامل',
                 onPressed: () => context.push(Routes.paymentSchedule(id)),
+              ),
+              const SizedBox(height: Space.s3),
+              PishroButton(
+                label: 'قرارداد — نسخه ۱٫۲',
+                variant: PishroButtonVariant.secondary,
+                onPressed: () => context.push(Routes.terms),
+              ),
+              const SizedBox(height: Space.s3),
+              PishroButton(
+                label: 'سند ریسک طرح',
+                variant: PishroButtonVariant.ghost,
+                onPressed: () => context.push(Routes.riskDisclosure),
+              ),
+              const SizedBox(height: Space.s4),
+              Text(
+                'آخرین به‌روزرسانی داده: ${Fmt.relative(DateTime.now())}',
+                style: context.text.caption.copyWith(color: c.textMuted),
               ),
             ],
           );
         },
+      ),
+    );
+  }
+}
+
+class _Row extends StatelessWidget {
+  const _Row(this.label, this.value);
+  final String label;
+  final String value;
+
+  @override
+  Widget build(BuildContext context) {
+    final c = context.colors;
+    return Padding(
+      padding: const EdgeInsets.only(bottom: Space.s3),
+      child: Row(
+        children: [
+          Text(label, style: context.text.caption.copyWith(color: c.textMuted)),
+          const Spacer(),
+          Text(
+            value,
+            style: context.text.bodySmall.copyWith(
+              color: c.textPrimary,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ],
       ),
     );
   }

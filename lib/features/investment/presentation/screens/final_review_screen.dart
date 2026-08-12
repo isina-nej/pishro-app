@@ -14,7 +14,7 @@ import '../../../../shared/widgets/states.dart';
 import '../../data/investment_flow.dart';
 import '../../data/investment_models.dart';
 
-/// Screen/Investment/FinalReview.
+/// Screen/Investment/FinalReview — فقط برآورد.
 class FinalReviewScreen extends ConsumerWidget {
   const FinalReviewScreen({super.key});
 
@@ -30,10 +30,14 @@ class FinalReviewScreen extends ConsumerWidget {
       );
     }
 
+    final rateLabel = plan.monthlyRatePercent == null
+        ? kPerContract
+        : '${Fmt.fa(plan.monthlyRatePercent!.toStringAsFixed(0))}٪ ماهیانه';
+
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'بازبینی نهایی',
+          'مرور نهایی سرمایه‌گذاری',
           style: context.text.h3.copyWith(color: c.textPrimary),
         ),
       ),
@@ -44,43 +48,52 @@ class FinalReviewScreen extends ConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        plan.name,
-                        style: context.text.bodyMedium.copyWith(
-                          color: c.textPrimary,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                    ),
-                    RiskBadge(plan.riskLevel),
-                  ],
+                _EditableRow(label: 'طرح', value: plan.name, action: null),
+                _EditableRow(
+                  label: 'مبلغ سرمایه‌گذاری',
+                  value: Fmt.toman(draft.amount),
+                  action: 'ویرایش',
+                  onAction: () => context.push(Routes.amountEntry),
                 ),
-                const SizedBox(height: Space.s3),
-                _Row('مبلغ', Fmt.toman(draft.amount)),
-                _Row('مدت', '${Fmt.fa('${draft.durationMonths}')} ماه'),
-                _Row('منبع وجه', draft.funding.title),
-                _Row(
-                  'برآورد ماهانه',
-                  draft.monthlyEstimate == null
+                _EditableRow(
+                  label: 'منبع تأمین وجه',
+                  value: draft.funding.title,
+                  action: 'تغییر',
+                  onAction: () => context.push(Routes.fundingSource),
+                ),
+                _EditableRow(label: 'نرخ اعلام‌شده', value: rateLabel),
+                _EditableRow(
+                  label: 'برآورد پرداخت ماهانه',
+                  value: draft.monthlyEstimate == null
                       ? kPerContract
                       : Fmt.toman(draft.monthlyEstimate!),
                 ),
-                _Row(
-                  'برآورد کل',
-                  draft.totalEstimate == null
-                      ? kPerContract
-                      : Fmt.toman(draft.totalEstimate!),
-                ),
+                _EditableRow(label: 'کارمزد', value: Fmt.toman(0)),
+                const SizedBox(height: Space.s2),
+                RiskBadge(plan.riskLevel),
               ],
             ),
           ),
           const SizedBox(height: Space.s4),
           const NoticeBanner(
-            message: 'ارسال درخواست سفارش ایجاد می‌کند، نه سرمایه‌گذاری فعال.',
-            tone: NoticeTone.info,
+            message:
+                'نرخ اعلام‌شده به معنای تضمین پرداخت نیست. تمامی مقادیر برآورد است.',
+            tone: NoticeTone.warning,
+          ),
+          const SizedBox(height: Space.s3),
+          TextButton(
+            onPressed: () => context.push(Routes.riskDisclosure),
+            child: Text(
+              'مشاهده ریسک‌ها',
+              style: context.text.bodySmall.copyWith(color: c.actionPrimary),
+            ),
+          ),
+          TextButton(
+            onPressed: () => context.push(Routes.terms),
+            child: Text(
+              'مشاهده قرارداد',
+              style: context.text.bodySmall.copyWith(color: c.actionPrimary),
+            ),
           ),
         ],
       ),
@@ -88,7 +101,7 @@ class FinalReviewScreen extends ConsumerWidget {
         child: Padding(
           padding: const EdgeInsets.all(Space.page),
           child: PishroButton(
-            label: 'تأیید و ادامه',
+            label: 'ادامه برای تأیید قرارداد',
             onPressed: () => context.push(Routes.contractConfirmation),
           ),
         ),
@@ -97,27 +110,47 @@ class FinalReviewScreen extends ConsumerWidget {
   }
 }
 
-class _Row extends StatelessWidget {
-  const _Row(this.label, this.value);
+class _EditableRow extends StatelessWidget {
+  const _EditableRow({
+    required this.label,
+    required this.value,
+    this.action,
+    this.onAction,
+  });
+
   final String label;
   final String value;
+  final String? action;
+  final VoidCallback? onAction;
 
   @override
   Widget build(BuildContext context) {
     final c = context.colors;
     return Padding(
-      padding: const EdgeInsets.only(bottom: Space.s2),
+      padding: const EdgeInsets.only(bottom: Space.s3),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(label, style: context.text.caption.copyWith(color: c.textMuted)),
-          const Spacer(),
-          Text(
-            value,
-            style: context.text.bodySmall.copyWith(
-              color: c.textPrimary,
-              fontWeight: FontWeight.w600,
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  label,
+                  style: context.text.caption.copyWith(color: c.textMuted),
+                ),
+                Text(
+                  value,
+                  style: context.text.bodySmall.copyWith(
+                    color: c.textPrimary,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
             ),
           ),
+          if (action != null && onAction != null)
+            TextButton(onPressed: onAction, child: Text(action!)),
         ],
       ),
     );

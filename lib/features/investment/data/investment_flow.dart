@@ -151,8 +151,10 @@ final investmentFlowProvider =
 /// Mock eligibility — no KYC endpoint exists yet.
 final eligibilityProvider = Provider<Eligibility>(
   (ref) => const Eligibility([
-    EligibilityCheck('احراز هویت', CheckStatus.verified),
-    EligibilityCheck('شماره شبا', CheckStatus.pending),
-    EligibilityCheck('نشانی محل سکونت', CheckStatus.missing),
+    EligibilityCheck('اطلاعات هویتی', CheckStatus.verified),
+    EligibilityCheck('شماره موبایل تأییدشده', CheckStatus.verified),
+    EligibilityCheck('حساب بانکی به نام کاربر', CheckStatus.verified),
+    EligibilityCheck('مطالعه اطلاع‌رسانی ریسک', CheckStatus.verified),
+    EligibilityCheck('پذیرش شرایط قرارداد', CheckStatus.verified),
   ]),
 );

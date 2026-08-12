@@ -7,6 +7,7 @@ import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/tokens.dart';
 import '../../../../core/utils/formatters.dart';
 import '../../../../routing/routes.dart';
+import '../../../../shared/widgets/pishro_chip.dart';
 import '../../../../shared/widgets/pishro_text_field.dart';
 import '../../data/news_repository.dart';
 import '../../news_routes.dart';
@@ -124,9 +125,10 @@ class _NewsSearchScreenState extends ConsumerState<NewsSearchScreen> {
                 runSpacing: Space.s2,
                 children: [
                   for (final t in items)
-                    ActionChip(
-                      label: Text(t),
-                      onPressed: () {
+                    PishroChip(
+                      label: t,
+                      selected: false,
+                      onTap: () {
                         _controller.text = t;
                         _go(t);
                       },

@@ -34,7 +34,9 @@ class NewsSavedScreen extends ConsumerWidget {
         builder: (context, items) {
           if (items.isEmpty) {
             return EmptyState(
-              title: 'خبر ذخیره‌شده‌ای ندارید',
+              title: 'هنوز خبری ذخیره نکرده‌اید',
+              message:
+                  'با انتخاب نشان ذخیره، خبرها را برای مطالعه بعدی نگه دارید.',
               actionLabel: 'مشاهده اخبار',
               onAction: () => context.go(Routes.news),
             );

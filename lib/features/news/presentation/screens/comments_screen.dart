@@ -66,7 +66,8 @@ class _NewsCommentsScreenState extends ConsumerState<NewsCommentsScreen> {
               builder: (context, items) {
                 if (items.isEmpty) {
                   return const EmptyState(
-                    title: 'هنوز دیدگاهی ثبت نشده',
+                    title: 'اولین نفری باشید که نظر می‌دهد',
+                    message: 'دیدگاه‌ها پس از بررسی منتشر می‌شوند.',
                     icon: Icons.chat_bubble_outline_rounded,
                   );
                 }

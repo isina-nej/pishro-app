@@ -94,6 +94,11 @@ class NewsDetailsScreen extends ConsumerWidget {
                 ),
                 const SizedBox(height: Space.s4),
               ],
+              Text(
+                'این مطلب جنبه اطلاع‌رسانی دارد و توصیه سرمایه‌گذاری نیست.',
+                style: context.text.caption.copyWith(color: c.textMuted),
+              ),
+              const SizedBox(height: Space.s4),
               PishroButton(
                 label: 'دیدگاه‌ها',
                 variant: PishroButtonVariant.secondary,

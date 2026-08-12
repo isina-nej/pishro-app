@@ -6,6 +6,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/tokens.dart';
 import '../../../../shared/widgets/common.dart';
+import '../../../../shared/widgets/pishro_chip.dart';
 import '../../../../shared/widgets/states.dart';
 import '../../data/market_repository.dart';
 import '../widgets/market_async.dart';
@@ -45,8 +46,22 @@ class PriceChartScreen extends ConsumerWidget {
             padding: const EdgeInsets.all(Space.page),
             children: [
               Text(
-                '${data.asset.symbol} · ۷ روز',
-                style: context.text.bodySmall.copyWith(color: c.textMuted),
+                '${data.asset.persianName ?? data.asset.name} (${data.asset.symbol})',
+                style: context.text.h3.copyWith(color: c.textPrimary),
+              ),
+              const SizedBox(height: Space.s3),
+              Wrap(
+                spacing: Space.s2,
+                children: [
+                  PishroChip(label: '۲۴س', selected: false, onTap: () {}),
+                  const PishroChip(label: '۷روز', selected: true),
+                  PishroChip(label: '۳۰روز', selected: false, onTap: () {}),
+                ],
+              ),
+              const SizedBox(height: Space.s2),
+              Text(
+                'فقط بازه ۷روز از سرور می‌آید. بازه‌های دیگر به‌زودی.',
+                style: context.text.caption.copyWith(color: c.textMuted),
               ),
               const SizedBox(height: Space.s4),
               SizedBox(

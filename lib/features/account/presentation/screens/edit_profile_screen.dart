@@ -198,14 +198,16 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
           ),
           SwitchListTile.adaptive(
             contentPadding: EdgeInsets.zero,
-            value: _avatarPublic,
-            onChanged: (v) => setState(() => _avatarPublic = v),
+            // The switch is worded as privacy, so ON must mean *more* private.
+            // The stored flag is the opposite (avatarPublic), hence the flip.
+            value: !_avatarPublic,
+            onChanged: (v) => setState(() => _avatarPublic = !v),
             title: Text(
               'حریم خصوصی تصویر پروفایل',
               style: context.text.bodySmall.copyWith(color: c.textPrimary),
             ),
             subtitle: Text(
-              'با خاموش‌بودن، تصویر پروفایل فقط برای خود شما نمایش داده می‌شود.',
+              'با روشن‌بودن، تصویر پروفایل فقط برای خود شما نمایش داده می‌شود.',
               style: context.text.caption.copyWith(color: c.textMuted),
             ),
           ),

@@ -59,10 +59,13 @@ class PurchaseHistoryScreen extends ConsumerWidget {
                         const SizedBox(height: Space.s2),
                         Text(
                           // Access is a separate fact from payment: a settled
-                          // order can still be awaiting activation.
-                          o.status == 'PAID'
-                              ? 'دسترسی: فعال'
-                              : 'دسترسی: در انتظار فعال‌سازی',
+                          // order can still be awaiting activation, and a
+                          // failed one is never going to activate.
+                          switch (o.status) {
+                            'PAID' => 'دسترسی: فعال',
+                            'FAILED' || 'CANCELLED' => 'دسترسی: فعال نشد',
+                            _ => 'دسترسی: در انتظار فعال‌سازی',
+                          },
                           style: context.text.caption.copyWith(
                             color: c.textMuted,
                           ),

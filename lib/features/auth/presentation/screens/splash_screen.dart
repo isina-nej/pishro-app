@@ -45,6 +45,21 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
     });
   }
 
+  /// Routes once the stored session is known: «نشست معتبر → Courses/Home ·
+  /// بدون نشست → Welcome». Safe to call more than once — the first call
+  /// navigates away and the timer is already cancelled.
+  void _resolve(SessionState session) {
+    if (!session.isResolved || !mounted) return;
+    _timeout?.cancel();
+    final target = session.isAuthenticated
+        ? Routes.homeAfterLogin
+        : Routes.welcome;
+    // Navigating during build is not allowed; defer to the end of the frame.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) context.go(target);
+    });
+  }
+
   @override
   void dispose() {
     _timeout?.cancel();
@@ -53,11 +68,11 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
 
   @override
   Widget build(BuildContext context) {
-    ref.listen(sessionProvider, (_, next) {
-      if (!next.isResolved) return;
-      _timeout?.cancel();
-      context.go(next.isAuthenticated ? Routes.homeAfterLogin : Routes.welcome);
-    });
+    // `listen` only reports *changes*. The notifier is created by the router
+    // before this screen builds, so a fast token read can land first and no
+    // event ever arrives — hence the same handler on the current value too.
+    ref.listen(sessionProvider, (_, next) => _resolve(next));
+    _resolve(ref.read(sessionProvider));
 
     final c = context.colors;
 

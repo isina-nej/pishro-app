@@ -47,7 +47,10 @@ class _AccountNotificationsScreenState
       body: Column(
         children: [
           PishroChipBar(
-            labels: const ['همه', 'امنیت', 'پرداخت', 'سرمایه‌گذاری'],
+            labels: [
+              'همه',
+              for (final c in NotificationCategory.values) c.label,
+            ],
             selectedIndex: _tab,
             onSelected: (i) => setState(() => _tab = i),
           ),
@@ -57,7 +60,16 @@ class _AccountNotificationsScreenState
               error: (_, __) => ErrorStateView(
                 onRetry: () => ref.invalidate(notificationsProvider),
               ),
-              data: (items) {
+              data: (all) {
+                // Tab 0 is «همه»; the rest map onto the category enum.
+                final items = _tab == 0
+                    ? all
+                    : [
+                        for (final n in all)
+                          if (n.category ==
+                              NotificationCategory.values[_tab - 1])
+                            n,
+                      ];
                 if (items.isEmpty) {
                   return const EmptyState(title: 'اعلانی نیست');
                 }

@@ -72,9 +72,11 @@ class AccountReferralsScreen extends ConsumerWidget {
             PishroCard(
               child: Row(
                 children: [
-                  _Stat('واجد شرایط', Fmt.fa('${r.invites}')),
-                  _Stat('در انتظار بررسی', Fmt.fa('1')),
-                  _Stat('پاداش ثبت‌شده', Fmt.fa('1')),
+                  _Stat('دعوت‌های ثبت‌شده', Fmt.fa('${r.invites}')),
+                  // The referral service reports one figure. Splitting it into
+                  // eligible/pending/rewarded would be inventing the other two.
+                  const _Stat('در انتظار بررسی', 'داده در دسترس نیست'),
+                  const _Stat('پاداش ثبت‌شده', 'داده در دسترس نیست'),
                 ],
               ),
             ),

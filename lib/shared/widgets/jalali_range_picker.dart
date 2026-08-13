@@ -31,12 +31,14 @@ class JalaliRange {
 /// «بازه دلخواه» — a Jalali month grid, because every date the user reads in
 /// this app is Jalali and Material's own range picker is Gregorian-only.
 ///
-/// Returns null when dismissed or cleared.
-Future<JalaliRange?> showJalaliRangePicker(
+/// Dismissing (swipe, back button, tap outside) returns null and must leave an
+/// existing range untouched. Tapping «حذف بازه» returns `(range: null)` — an
+/// explicit clear. A confirmed pick returns `(range: <the range>)`.
+Future<({JalaliRange? range})?> showJalaliRangePicker(
   BuildContext context, {
   JalaliRange? initial,
   Jalali? lastDate,
-}) => showModalBottomSheet<JalaliRange?>(
+}) => showModalBottomSheet<({JalaliRange? range})>(
   context: context,
   isScrollControlled: true,
   backgroundColor: Colors.transparent,
@@ -251,7 +253,7 @@ class _JalaliRangeSheetState extends State<_JalaliRangeSheet> {
                     child: PishroButton(
                       label: 'حذف بازه',
                       variant: PishroButtonVariant.ghost,
-                      onPressed: () => Navigator.of(context).pop(),
+                      onPressed: () => Navigator.of(context).pop((range: null)),
                     ),
                   ),
                   const SizedBox(width: Space.s3),
@@ -262,7 +264,7 @@ class _JalaliRangeSheetState extends State<_JalaliRangeSheet> {
                       onPressed: _from != null && _to != null
                           ? () => Navigator.of(
                               context,
-                            ).pop(JalaliRange(from: _from!, to: _to!))
+                            ).pop((range: JalaliRange(from: _from!, to: _to!)))
                           : null,
                     ),
                   ),

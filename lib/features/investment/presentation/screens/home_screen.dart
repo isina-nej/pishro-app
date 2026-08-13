@@ -197,15 +197,6 @@ class _PortfolioSummary extends StatelessWidget {
                   ),
                 ],
               ),
-              const SizedBox(height: Space.s3),
-              Builder(
-                builder: (context) => Text(
-                  'به‌روزرسانی: ${Fmt.relative(DateTime.now())}',
-                  style: context.text.caption.copyWith(
-                    color: context.colors.textMuted,
-                  ),
-                ),
-              ),
             ],
           ),
         );

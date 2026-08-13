@@ -47,7 +47,7 @@ class NewsFiltersScreen extends ConsumerWidget {
 
     Future<void> pickCustomRange() async {
       final existing = q.custom;
-      final picked = await showJalaliRangePicker(
+      final result = await showJalaliRangePicker(
         context,
         initial: existing == null
             ? null
@@ -56,8 +56,12 @@ class NewsFiltersScreen extends ConsumerWidget {
                 to: Jalali.fromDateTime(existing.end),
               ),
       );
+      // Dismissed: leave whatever was applied alone.
+      if (result == null) return;
+      final picked = result.range;
       if (picked == null) {
-        // Cleared — fall back to همه زمان‌ها rather than an empty custom range.
+        // «حذف بازه» — fall back to همه زمان‌ها rather than an empty custom
+        // range.
         if (q.range == NewsRange.custom) {
           update(range: NewsRange.all, clearCustom: true);
         }

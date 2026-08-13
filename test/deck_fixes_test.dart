@@ -106,7 +106,7 @@ void main() {
   });
 
   testWidgets('the Jalali picker orders a backwards selection', (tester) async {
-    JalaliRange? picked;
+    ({JalaliRange? range})? picked;
     final today = Jalali.now();
 
     await tester.pumpWidget(
@@ -142,14 +142,12 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(picked, isNotNull);
-    expect(picked!.from.day, 2);
-    expect(picked!.to.day, 5);
-    expect(
-      picked!.from.month,
-      today.month,
-      reason: 'opens on the current month',
-    );
-    expect(picked!.start.isBefore(picked!.end), isTrue);
+    final range = picked!.range;
+    expect(range, isNotNull, reason: 'confirm returns the picked range');
+    expect(range!.from.day, 2);
+    expect(range.to.day, 5);
+    expect(range.from.month, today.month, reason: 'opens on the current month');
+    expect(range.start.isBefore(range.end), isTrue);
   });
 }
 

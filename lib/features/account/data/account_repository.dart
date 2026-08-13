@@ -132,6 +132,7 @@ class AppNotification {
     required this.title,
     required this.body,
     required this.at,
+    required this.category,
     this.read = false,
   });
 
@@ -139,7 +140,21 @@ class AppNotification {
   final String title;
   final String body;
   final DateTime at;
+
+  /// Which of Screen/Account/Notifications' tabs this belongs to.
+  final NotificationCategory category;
   final bool read;
+}
+
+/// «همه · امنیت · پرداخت · سرمایه‌گذاری» — the deck's notification tabs.
+enum NotificationCategory {
+  security('امنیت'),
+  payment('پرداخت'),
+  investment('سرمایه‌گذاری');
+
+  const NotificationCategory(this.label);
+
+  final String label;
 }
 
 @immutable
@@ -344,12 +359,23 @@ class MockAccountExtras implements AccountMockRepository {
         title: 'پرداخت دوره',
         body: 'سفارش شما در حال بررسی است.',
         at: now.subtract(const Duration(hours: 4)),
+        category: NotificationCategory.payment,
       ),
       AppNotification(
         id: 'n2',
-        title: 'خبر جدید',
-        body: 'یک خبر ذخیره‌شده به‌روزرسانی شد.',
+        title: 'ورود جدید به حساب شما',
+        body:
+            'ورود از دستگاه جدید ثبت شد. اگر شما نبودید، امنیت حساب را بررسی '
+            'کنید.',
+        at: now.subtract(const Duration(minutes: 20)),
+        category: NotificationCategory.security,
+      ),
+      AppNotification(
+        id: 'n3',
+        title: 'وضعیت درخواست سرمایه‌گذاری',
+        body: 'درخواست شما در صف بررسی قرار گرفت.',
         at: now.subtract(const Duration(days: 1)),
+        category: NotificationCategory.investment,
         read: true,
       ),
     ];

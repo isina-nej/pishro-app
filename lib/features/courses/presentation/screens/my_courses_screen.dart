@@ -6,6 +6,7 @@ import '../../../../core/network/api_exception.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/tokens.dart';
+import '../../../../core/utils/formatters.dart';
 import '../../../../routing/routes.dart';
 import '../../../../shared/widgets/common.dart';
 import '../../../../shared/widgets/pishro_badge.dart';
@@ -14,7 +15,7 @@ import '../../../../shared/widgets/states.dart';
 import '../../data/courses_models.dart';
 import '../../data/courses_repository.dart';
 
-/// Screen/Courses/MyCourses — در حال یادگیری / تکمیل‌شده / همه.
+/// Screen/Courses/MyCourses — تب‌ها؛ گفت‌وگوی مدرس فقط روی VIP.
 class MyCoursesScreen extends ConsumerStatefulWidget {
   const MyCoursesScreen({super.key});
 
@@ -70,6 +71,7 @@ class _MyCoursesScreenState extends ConsumerState<MyCoursesScreen> {
                     title: _tab == MyCoursesTab.completed
                         ? 'هنوز دوره‌ای را تمام نکرده‌اید'
                         : 'هنوز دوره‌ای شروع نکرده‌اید',
+                    message: 'از میان دوره‌های پیشنهادی شروع کنید.',
                     actionLabel: 'مشاهده دوره‌ها',
                     onAction: () => context.go(Routes.courses),
                   );
@@ -103,12 +105,20 @@ class _MyCoursesScreenState extends ConsumerState<MyCoursesScreen> {
                                     ),
                                   ),
                                 ),
-                                e.packageType == PackageType.vip
-                                    ? const PishroBadge.vip()
-                                    : const PishroBadge.regular(),
+                                if (e.hasInstructorChat)
+                                  const PishroBadge.vip()
+                                else
+                                  const PishroBadge.regular(),
                               ],
                             ),
-                            const SizedBox(height: Space.s2),
+                            const SizedBox(height: Space.s3),
+                            Text(
+                              '${Fmt.fa('${e.progressPercent}')}٪',
+                              style: context.text.h3.copyWith(
+                                color: c.textPrimary,
+                              ),
+                            ),
+                            const SizedBox(height: Space.s1),
                             Text(
                               e.lessonProgressLabel,
                               style: context.text.caption.copyWith(
@@ -116,7 +126,10 @@ class _MyCoursesScreenState extends ConsumerState<MyCoursesScreen> {
                               ),
                             ),
                             const SizedBox(height: Space.s3),
-                            PishroProgress(value: e.progress),
+                            PishroProgress(
+                              value: e.progress,
+                              showPercent: false,
+                            ),
                           ],
                         ),
                       );

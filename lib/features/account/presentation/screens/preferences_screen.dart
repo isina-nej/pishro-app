@@ -4,13 +4,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/tokens.dart';
+import '../../../../shared/providers/theme_provider.dart';
 import '../../../../shared/widgets/pishro_chip.dart';
 import '../../../../shared/widgets/states.dart';
 
-import '../../../../shared/providers/theme_provider.dart';
-
+/// Screen/Account/Preferences — Dark/Light.
 class AccountPreferencesScreen extends ConsumerWidget {
   const AccountPreferencesScreen({super.key});
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final c = context.colors;
@@ -18,7 +19,7 @@ class AccountPreferencesScreen extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'ترجیحات',
+          'تنظیمات',
           style: context.text.h3.copyWith(color: c.textPrimary),
         ),
       ),
@@ -26,11 +27,18 @@ class AccountPreferencesScreen extends ConsumerWidget {
         padding: const EdgeInsets.all(Space.page),
         children: [
           Text(
-            'ظاهر برنامه',
-            style: context.text.bodySmall.copyWith(
-              color: c.textSecondary,
-              fontWeight: FontWeight.w600,
-            ),
+            'زبان',
+            style: context.text.bodySmall.copyWith(color: c.textSecondary),
+          ),
+          const SizedBox(height: Space.s2),
+          Text(
+            'فارسی',
+            style: context.text.bodyMedium.copyWith(color: c.textPrimary),
+          ),
+          const SizedBox(height: Space.s5),
+          Text(
+            'حالت نمایش',
+            style: context.text.bodySmall.copyWith(color: c.textSecondary),
           ),
           const SizedBox(height: Space.s3),
           Wrap(
@@ -49,7 +57,7 @@ class AccountPreferencesScreen extends ConsumerWidget {
                     ref.read(themeModeProvider.notifier).set(ThemeMode.light),
               ),
               PishroChip(
-                label: 'سیستم',
+                label: 'هماهنگ با دستگاه',
                 selected: mode == ThemeMode.system,
                 onTap: () =>
                     ref.read(themeModeProvider.notifier).set(ThemeMode.system),
@@ -58,7 +66,8 @@ class AccountPreferencesScreen extends ConsumerWidget {
           ),
           const SizedBox(height: Space.s4),
           const NoticeBanner(
-            message: 'رنگ اکشن برند قابل تغییر نیست؛ فقط حالت روشن/تاریک.',
+            message:
+                'فقط حالت روشن/تاریک قابل تغییر است. پالت RoyalGreen برند ثابت می‌ماند.',
             tone: NoticeTone.info,
           ),
         ],

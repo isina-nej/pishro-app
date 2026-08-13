@@ -143,9 +143,13 @@ class _PriceAlertsScreenState extends ConsumerState<PriceAlertsScreen> {
             ),
             data: (items) {
               if (items.isEmpty) {
-                return Text(
-                  'هنوز هشداری ثبت نشده است.',
-                  style: context.text.caption.copyWith(color: c.textMuted),
+                return PishroCard(
+                  child: Text(
+                    'هنوز هشداری ثبت نشده است. هشدار قیمت به معنای انجام خودکار معامله نیست.',
+                    style: context.text.bodySmall.copyWith(
+                      color: c.textSecondary,
+                    ),
+                  ),
                 );
               }
               return Column(

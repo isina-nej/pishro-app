@@ -40,9 +40,12 @@ class NewsSearchResultsScreen extends ConsumerWidget {
         onRetry: () => ref.invalidate(newsFeedProvider(query)),
         builder: (context, items) {
           if (items.isEmpty) {
-            return const EmptyState(
+            return EmptyState(
               title: 'خبری مطابق جستجو پیدا نشد',
+              message: 'فیلترها را تغییر دهید یا عبارت دیگری جستجو کنید.',
               icon: Icons.search_off_rounded,
+              actionLabel: 'تغییر فیلتر',
+              onAction: () => context.push(Routes.newsFilters),
             );
           }
           return ListView.separated(

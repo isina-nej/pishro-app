@@ -13,7 +13,7 @@ import '../../../../shared/widgets/states.dart';
 import '../../data/courses_models.dart';
 import '../../data/courses_repository.dart';
 
-/// Screen/Course/Chapters — هفت حالت درس با آیکون + متن.
+/// Screen/Course/Chapters — ۷ حالت درس = آیکون + برچسب.
 class ChaptersScreen extends ConsumerWidget {
   const ChaptersScreen({super.key, this.id = ''});
 
@@ -27,7 +27,7 @@ class ChaptersScreen extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'فصل‌ها',
+          'سرفصل‌های دوره',
           style: context.text.h3.copyWith(color: c.textPrimary),
         ),
       ),
@@ -61,7 +61,7 @@ class ChaptersScreen extends ConsumerWidget {
             itemBuilder: (_, i) {
               final ch = curr.chapters[i];
               return Padding(
-                padding: const EdgeInsets.only(bottom: Space.s4),
+                padding: const EdgeInsets.only(bottom: Space.s5),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -79,11 +79,14 @@ class ChaptersScreen extends ConsumerWidget {
                     ),
                     const SizedBox(height: Space.s3),
                     for (final lesson in ch.lessons)
-                      _LessonTile(
-                        lesson: lesson,
-                        onTap: lesson.state.isPlayable
-                            ? () => context.push(Routes.lesson(id, lesson.id))
-                            : null,
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: Space.s2),
+                        child: _LessonTile(
+                          lesson: lesson,
+                          onTap: lesson.state.isPlayable
+                              ? () => context.push(Routes.lesson(id, lesson.id))
+                              : null,
+                        ),
                       ),
                   ],
                 ),
@@ -105,17 +108,34 @@ class _LessonTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final c = context.colors;
-    final (icon, color) = switch (lesson.state) {
-      LessonState.completed => (Icons.check_circle_rounded, c.success),
-      LessonState.current => (Icons.play_circle_fill_rounded, c.actionPrimary),
+    final (icon, color, label) = switch (lesson.state) {
+      LessonState.completed => (
+        Icons.check_circle_rounded,
+        c.success,
+        'تکمیل‌شده',
+      ),
+      LessonState.current => (
+        Icons.play_circle_fill_rounded,
+        c.actionPrimary,
+        'در حال پخش',
+      ),
       LessonState.available => (
         Icons.play_circle_outline_rounded,
         c.textSecondary,
+        Fmt.duration(lesson.duration),
       ),
-      LessonState.downloaded => (Icons.download_done_rounded, c.info),
-      LessonState.locked => (Icons.lock_outline_rounded, c.textMuted),
-      LessonState.preview => (Icons.visibility_outlined, c.info),
-      LessonState.downloadFailed => (Icons.error_outline_rounded, c.danger),
+      LessonState.downloaded => (
+        Icons.download_done_rounded,
+        c.info,
+        'دانلودشده',
+      ),
+      LessonState.locked => (Icons.lock_outline_rounded, c.textMuted, 'قفل'),
+      LessonState.preview => (Icons.visibility_outlined, c.info, 'پیش‌نمایش'),
+      LessonState.downloadFailed => (
+        Icons.error_outline_rounded,
+        c.danger,
+        'دانلود ناموفق بود — تلاش دوباره',
+      ),
     };
     return PishroCard(
       onTap: onTap,
@@ -139,13 +159,7 @@ class _LessonTile extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 2),
-                Text(
-                  [
-                    Fmt.duration(lesson.duration),
-                    if (lesson.state.label.isNotEmpty) lesson.state.label,
-                  ].join(' · '),
-                  style: context.text.caption.copyWith(color: color),
-                ),
+                Text(label, style: context.text.caption.copyWith(color: color)),
               ],
             ),
           ),

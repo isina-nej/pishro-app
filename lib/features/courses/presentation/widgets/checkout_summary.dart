@@ -41,17 +41,20 @@ class CheckoutSummaryCard extends StatelessWidget {
             ],
           ),
           const SizedBox(height: Space.s4),
-          _Row('مبلغ بسته', Fmt.toman(t.base)),
-          if (t.discount > 0) _Row('تخفیف کد', '− ${Fmt.toman(t.discount)}'),
+          _Row('مبلغ دوره', Fmt.toman(t.base)),
+          _Row(
+            'تخفیف',
+            t.discount == 0 ? Fmt.toman(0) : '− ${Fmt.toman(t.discount)}',
+          ),
           if (draft.useCoin)
             _Row(
-              'پیشرو کوین',
+              'کوین پیشرو',
               t.coinDiscount == null
                   ? 'طبق قوانین محاسبه می‌شود'
                   : '− ${Fmt.toman(t.coinDiscount!)}',
             ),
           const Divider(height: Space.s6),
-          _Row('قابل پرداخت', Fmt.toman(t.payable), emphasize: true),
+          _Row('مبلغ قابل پرداخت', Fmt.toman(t.payable), emphasize: true),
           const SizedBox(height: Space.s3),
           TextButton(
             onPressed: () => context.push(Routes.checkoutDiscount),

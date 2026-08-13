@@ -67,6 +67,20 @@ class KycSnapshot {
   final KycStatus iban;
   final KycStatus address;
   final KycStatus selfie;
+
+  List<KycStatus> get _all => [identity, iban, address, selfie];
+
+  bool get isComplete => _all.every((s) => s == KycStatus.verified);
+
+  /// Weighted 0–1 for the Account/Home progress bar. Pending counts as half.
+  double get completion {
+    double score(KycStatus s) => switch (s) {
+      KycStatus.verified => 1,
+      KycStatus.pending => 0.5,
+      KycStatus.missing => 0,
+    };
+    return _all.fold<double>(0, (sum, s) => sum + score(s)) / _all.length;
+  }
 }
 
 @immutable
@@ -91,12 +105,24 @@ class DeviceSession {
     required this.name,
     required this.lastSeen,
     this.current = false,
+    this.ip,
   });
 
   final String id;
   final String name;
   final DateTime lastSeen;
   final bool current;
+
+  /// Raw IP if known; UI must mask it.
+  final String? ip;
+
+  /// «۱۹۲٫۱۶۸٫•․•»
+  String get maskedIp {
+    if (ip == null || ip!.isEmpty) return '';
+    final parts = ip!.split('.');
+    if (parts.length < 2) return Fmt.fa(ip!);
+    return Fmt.fa('${parts[0]}.${parts[1]}.•.•');
+  }
 }
 
 @immutable
@@ -211,8 +237,8 @@ class MockAccountExtras implements AccountMockRepository {
     return [
       CoinLedgerEntry(
         id: 'c1',
-        title: 'پاداش تکمیل دوره',
-        delta: 250,
+        title: 'تکمیل دوره',
+        delta: 100,
         at: now.subtract(const Duration(days: 2)),
       ),
       CoinLedgerEntry(
@@ -223,8 +249,8 @@ class MockAccountExtras implements AccountMockRepository {
       ),
       CoinLedgerEntry(
         id: 'c3',
-        title: 'مصرف در تخفیف دوره',
-        delta: -80,
+        title: 'تخفیف خرید',
+        delta: -50,
         at: now.subtract(const Duration(days: 12)),
       ),
     ];
@@ -239,11 +265,13 @@ class MockAccountExtras implements AccountMockRepository {
         name: 'این دستگاه · Android',
         lastSeen: now,
         current: true,
+        ip: '192.168.1.24',
       ),
       DeviceSession(
         id: 'd2',
         name: 'Chrome · Windows',
         lastSeen: now.subtract(const Duration(days: 3)),
+        ip: '10.0.0.18',
       ),
     ];
   }

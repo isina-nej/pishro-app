@@ -12,7 +12,7 @@ import '../../../../shared/widgets/states.dart';
 import '../../data/courses_repository.dart';
 import '../widgets/course_widgets.dart';
 
-/// Screen/Courses/SearchResults — فهرست پس از جست‌وجو و فیلتر.
+/// Screen/Courses/SearchResults — «۰۴ · نتایج جست‌وجو».
 class CoursesSearchResultsScreen extends ConsumerWidget {
   const CoursesSearchResultsScreen({super.key});
 
@@ -26,12 +26,12 @@ class CoursesSearchResultsScreen extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          query.isEmpty ? 'نتایج' : query,
+          'نتایج دوره‌ها',
           style: context.text.h3.copyWith(color: c.textPrimary),
         ),
         actions: [
           IconButton(
-            tooltip: 'فیلترها',
+            tooltip: 'صافی',
             onPressed: () => context.push(Routes.courseFilters),
             icon: Badge(
               isLabelVisible: !filters.isEmpty,
@@ -45,11 +45,13 @@ class CoursesSearchResultsScreen extends ConsumerWidget {
         loading: () => ListView(
           padding: const EdgeInsets.all(Space.page),
           children: const [
+            Skeleton.line(width: 180),
+            SizedBox(height: Space.s4),
             Skeleton.box(height: 96),
             SizedBox(height: Space.s3),
             Skeleton.box(height: 96),
             SizedBox(height: Space.s3),
-            Skeleton.box(height: 96),
+            Text('در حال بارگذاری موارد بیشتر…'),
           ],
         ),
         error: (e, _) => ErrorStateView(
@@ -79,8 +81,11 @@ class CoursesSearchResultsScreen extends ConsumerWidget {
             separatorBuilder: (_, __) => const SizedBox(height: Space.s3),
             itemBuilder: (context, i) {
               if (i == 0) {
+                final q = query.trim();
                 return Text(
-                  '${Fmt.fa('${courses.length}')} دوره',
+                  q.isEmpty
+                      ? '${Fmt.fa('${courses.length}')} نتیجه'
+                      : '«$q» · ${Fmt.fa('${courses.length}')} نتیجه',
                   style: context.text.caption.copyWith(color: c.textMuted),
                 );
               }

@@ -42,7 +42,7 @@ class HistoricalDataScreen extends ConsumerWidget {
             children: [
               const NoticeBanner(
                 message:
-                    'کندل روزانه از اسپارک‌لاین ۷روزه ساخته شده؛ داده نمونه کامل نیست.',
+                    'کندل روزانه از اسپارک‌لاین ۷روزه ساخته شده؛ داده نمونه کامل نیست و سیگنال معامله محسوب نمی‌شود.',
                 tone: NoticeTone.info,
               ),
               const SizedBox(height: Space.s4),

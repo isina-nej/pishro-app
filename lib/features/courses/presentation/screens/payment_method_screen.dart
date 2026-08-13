@@ -5,12 +5,13 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/tokens.dart';
+import '../../../../core/utils/formatters.dart';
 import '../../../../shared/widgets/common.dart';
 import '../../../../shared/widgets/pishro_button.dart';
 import '../../../../shared/widgets/states.dart';
 import '../../data/checkout_repository.dart';
 
-/// Screen/Checkout/PaymentMethod — فقط درگاه مستقیم فعال است.
+/// Screen/Checkout/PaymentMethod — روی هر ردیف بزنید.
 class PaymentMethodScreen extends ConsumerWidget {
   const PaymentMethodScreen({super.key});
 
@@ -35,6 +36,16 @@ class PaymentMethodScreen extends ConsumerWidget {
       body: ListView(
         padding: const EdgeInsets.all(Space.page),
         children: [
+          Text(
+            '${draft.course.title} · ${draft.package.label}',
+            style: context.text.bodySmall.copyWith(color: c.textSecondary),
+          ),
+          const SizedBox(height: Space.s2),
+          Text(
+            Fmt.toman(draft.totals.payable),
+            style: context.text.h3.copyWith(color: c.textPrimary),
+          ),
+          const SizedBox(height: Space.s5),
           for (final m in PaymentMethod.values) ...[
             PishroCard(
               selected: draft.method == m,
@@ -57,7 +68,7 @@ class PaymentMethodScreen extends ConsumerWidget {
                         Text(
                           m.label,
                           style: context.text.bodyMedium.copyWith(
-                            color: c.textPrimary,
+                            color: m.available ? c.textPrimary : c.textMuted,
                             fontWeight: FontWeight.w600,
                           ),
                         ),
@@ -74,7 +85,9 @@ class PaymentMethodScreen extends ConsumerWidget {
                     draft.method == m
                         ? Icons.radio_button_checked_rounded
                         : Icons.radio_button_off_rounded,
-                    color: draft.method == m ? c.actionPrimary : c.textMuted,
+                    color: draft.method == m && m.available
+                        ? c.actionPrimary
+                        : c.textMuted,
                   ),
                 ],
               ),
@@ -82,7 +95,7 @@ class PaymentMethodScreen extends ConsumerWidget {
             const SizedBox(height: Space.s3),
           ],
           const NoticeBanner(
-            message: 'کیف پول بانکی و اقساط هنوز فعال نشده‌اند.',
+            message: 'اطلاعات کارت بانکی شما توسط پیشرو سرمایه ذخیره نمی‌شود.',
             tone: NoticeTone.info,
           ),
         ],
@@ -90,10 +103,7 @@ class PaymentMethodScreen extends ConsumerWidget {
       bottomNavigationBar: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(Space.page),
-          child: PishroButton(
-            label: 'تأیید روش پرداخت',
-            onPressed: () => context.pop(),
-          ),
+          child: PishroButton(label: 'ادامه', onPressed: () => context.pop()),
         ),
       ),
     );

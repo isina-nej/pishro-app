@@ -39,6 +39,16 @@ class StatisticsScreen extends ConsumerWidget {
           return ListView(
             padding: const EdgeInsets.all(Space.page),
             children: [
+              Text(
+                'آمار بازار — ${a.persianName ?? a.name}',
+                style: context.text.h3.copyWith(color: c.textPrimary),
+              ),
+              const SizedBox(height: Space.s2),
+              Text(
+                'مقدار ناموجود هرگز صفر نمایش داده نمی‌شود.',
+                style: context.text.caption.copyWith(color: c.textMuted),
+              ),
+              const SizedBox(height: Space.s4),
               _Stat(
                 'قیمت تومان',
                 orMissing(a.priceIrt, (v) => '${faToman(v)} تومان'),

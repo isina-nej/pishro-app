@@ -11,7 +11,7 @@ import '../../../../shared/widgets/states.dart';
 import '../../data/investment_models.dart';
 import '../../data/investment_repository.dart';
 
-/// Screen/Investment/PaymentSchedule — فقط وضعیت تراکنش؛ بدون اقساط جعلی.
+/// Screen/Investment/PaymentSchedule — نامشخص ≠ ناموفق.
 class PaymentScheduleScreen extends ConsumerWidget {
   const PaymentScheduleScreen({super.key, this.id = ''});
 
@@ -41,12 +41,63 @@ class PaymentScheduleScreen extends ConsumerWidget {
           return ListView(
             padding: const EdgeInsets.all(Space.page),
             children: [
+              Text(
+                '${t.title} · ${Fmt.toman(t.amount)}',
+                style: context.text.bodySmall.copyWith(color: c.textSecondary),
+              ),
+              const SizedBox(height: Space.s3),
               const NoticeBanner(
                 message:
-                    'جدول اقساط از سرور نمی‌آید؛ فقط وضعیت همین پرداخت نمایش داده می‌شود.',
+                    'جدول اقساط از سرور نمی‌آید؛ فقط وضعیت همین پرداخت نمایش داده می‌شود. نامشخص هرگز به‌عنوان ناموفق نیست.',
                 tone: NoticeTone.info,
               ),
               const SizedBox(height: Space.s4),
+              PishroCard(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      Fmt.jalaliLong(t.createdAt),
+                      style: context.text.caption.copyWith(color: c.textMuted),
+                    ),
+                    const SizedBox(height: Space.s1),
+                    if (t.refNumber != null)
+                      Text(
+                        'مرجع: ${t.refNumber}',
+                        style: context.text.caption.copyWith(
+                          color: c.textMuted,
+                        ),
+                      ),
+                    const SizedBox(height: Space.s3),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            Fmt.toman(t.amount),
+                            style: context.text.h3.copyWith(
+                              color: c.textPrimary,
+                            ),
+                          ),
+                        ),
+                        PishroBadge(
+                          label: t.scheduleStatusLabel,
+                          tone: switch (t.status) {
+                            TxStatus.success => PishroBadgeTone.success,
+                            TxStatus.pending => PishroBadgeTone.warning,
+                            TxStatus.failed => PishroBadgeTone.danger,
+                          },
+                          icon: switch (t.status) {
+                            TxStatus.success => Icons.check_rounded,
+                            TxStatus.pending => Icons.hourglass_top_rounded,
+                            TxStatus.failed => Icons.error_outline_rounded,
+                          },
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: Space.s3),
               PishroCard(
                 child: Row(
                   children: [
@@ -55,41 +106,28 @@ class PaymentScheduleScreen extends ConsumerWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            Fmt.toman(t.amount),
-                            style: context.text.bodyMedium.copyWith(
-                              color: c.textPrimary,
-                              fontWeight: FontWeight.w700,
+                            'پرداخت بعدی',
+                            style: context.text.caption.copyWith(
+                              color: c.textMuted,
                             ),
                           ),
                           Text(
-                            Fmt.jalaliLong(t.createdAt),
-                            style: context.text.caption.copyWith(
-                              color: c.textMuted,
+                            kPerContractSchedule,
+                            style: context.text.bodySmall.copyWith(
+                              color: c.textPrimary,
+                              fontWeight: FontWeight.w600,
                             ),
                           ),
                         ],
                       ),
                     ),
-                    PishroBadge(
-                      label: t.scheduleStatusLabel,
-                      tone: switch (t.status) {
-                        TxStatus.success => PishroBadgeTone.success,
-                        TxStatus.pending => PishroBadgeTone.warning,
-                        TxStatus.failed => PishroBadgeTone.danger,
-                      },
-                      icon: switch (t.status) {
-                        TxStatus.success => Icons.check_rounded,
-                        TxStatus.pending => Icons.hourglass_top_rounded,
-                        TxStatus.failed => Icons.error_outline_rounded,
-                      },
+                    const PishroBadge(
+                      label: 'برنامه‌ریزی‌شده',
+                      tone: PishroBadgeTone.info,
+                      icon: Icons.event_outlined,
                     ),
                   ],
                 ),
-              ),
-              const SizedBox(height: Space.s3),
-              Text(
-                'پرداخت بعدی: $kPerContractSchedule',
-                style: context.text.caption.copyWith(color: c.textMuted),
               ),
             ],
           );

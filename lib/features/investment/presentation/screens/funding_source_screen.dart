@@ -8,10 +8,11 @@ import '../../../../core/theme/tokens.dart';
 import '../../../../routing/routes.dart';
 import '../../../../shared/widgets/common.dart';
 import '../../../../shared/widgets/pishro_button.dart';
+import '../../../../shared/widgets/states.dart';
 import '../../data/investment_flow.dart';
 import '../../data/investment_models.dart';
 
-/// Screen/Investment/FundingSource.
+/// Screen/Investment/FundingSource — موجودی = مقدار نمونه.
 class FundingSourceScreen extends ConsumerWidget {
   const FundingSourceScreen({super.key});
 
@@ -69,13 +70,17 @@ class FundingSourceScreen extends ConsumerWidget {
             ),
             const SizedBox(height: Space.s3),
           ],
+          const NoticeBanner(
+            message: 'همه تراکنش‌ها از طریق مسیر امن پرداخت انجام می‌شود.',
+            tone: NoticeTone.info,
+          ),
         ],
       ),
       bottomNavigationBar: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(Space.page),
           child: PishroButton(
-            label: 'بازبینی نهایی',
+            label: 'ادامه با روش انتخاب‌شده',
             onPressed: () => context.push(Routes.finalReview),
           ),
         ),

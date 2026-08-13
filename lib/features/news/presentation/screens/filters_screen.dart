@@ -86,9 +86,27 @@ class NewsFiltersScreen extends ConsumerWidget {
       bottomNavigationBar: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(Space.page),
-          child: PishroButton(
-            label: 'اعمال فیلتر',
-            onPressed: () => context.go(newsSearchResultsPath()),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              PishroButton(
+                label: 'اعمال فیلتر',
+                onPressed: () => context.go(newsSearchResultsPath()),
+              ),
+              const SizedBox(height: Space.s3),
+              PishroButton(
+                label: 'حذف فیلترها',
+                variant: PishroButtonVariant.secondary,
+                onPressed: () {
+                  ref.read(newsQueryProvider.notifier).state = (
+                    search: q.search,
+                    category: q.category,
+                    sort: NewsSort.newest,
+                    range: NewsRange.all,
+                  );
+                },
+              ),
+            ],
           ),
         ),
       ),

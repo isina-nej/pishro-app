@@ -7,12 +7,13 @@ import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/tokens.dart';
 import '../../../../core/utils/formatters.dart';
 import '../../../../shared/widgets/common.dart';
+import '../../../../shared/widgets/pishro_badge.dart';
 import '../../../../shared/widgets/pishro_button.dart';
 import '../../../../shared/widgets/pishro_text_field.dart';
 import '../../../../shared/widgets/states.dart';
 import '../../data/checkout_repository.dart';
 
-/// Screen/Checkout/DiscountAndCoin — کد تخفیف + کوین غیرقابل برداشت.
+/// Screen/Checkout/DiscountAndCoin — کلید کوین؛ بدون نرخ تبدیل.
 class DiscountAndCoinScreen extends ConsumerStatefulWidget {
   const DiscountAndCoinScreen({super.key});
 
@@ -41,11 +42,12 @@ class _DiscountAndCoinScreenState extends ConsumerState<DiscountAndCoinScreen> {
         body: const EmptyState(title: 'سفارشی در جریان نیست'),
       );
     }
+    final totals = draft.totals;
 
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'تخفیف و پیشرو کوین',
+          'کد تخفیف و کوین پیشرو',
           style: context.text.h3.copyWith(color: c.textPrimary),
         ),
       ),
@@ -55,13 +57,13 @@ class _DiscountAndCoinScreenState extends ConsumerState<DiscountAndCoinScreen> {
           PishroTextField(
             controller: _code,
             label: 'کد تخفیف',
-            hint: 'مثلاً PSX10',
+            hint: 'مثال: PSX10',
             errorText: draft.discountError,
             onChanged: (_) {},
           ),
           const SizedBox(height: Space.s3),
           PishroButton(
-            label: draft.discount == null ? 'اعمال کد' : 'حذف کد',
+            label: draft.discount == null ? 'اعمال' : 'حذف کد',
             variant: PishroButtonVariant.secondary,
             loading: draft.applyingDiscount,
             onPressed: () {
@@ -73,14 +75,6 @@ class _DiscountAndCoinScreenState extends ConsumerState<DiscountAndCoinScreen> {
               ref.read(checkoutProvider.notifier).applyDiscount(_code.text);
             },
           ),
-          if (draft.discount != null) ...[
-            const SizedBox(height: Space.s3),
-            NoticeBanner(
-              message:
-                  'کد ${draft.discount!.code} · ${Fmt.fa('${draft.discount!.percent}')}٪ تخفیف',
-              tone: NoticeTone.success,
-            ),
-          ],
           const SizedBox(height: Space.s6),
           PishroCard(
             child: coin.when(
@@ -92,12 +86,23 @@ class _DiscountAndCoinScreenState extends ConsumerState<DiscountAndCoinScreen> {
               data: (b) => Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    'پیشرو کوین',
-                    style: context.text.bodyMedium.copyWith(
-                      color: c.textPrimary,
-                      fontWeight: FontWeight.w600,
-                    ),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          'کوین پیشرو',
+                          style: context.text.bodyMedium.copyWith(
+                            color: c.textPrimary,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ),
+                      const PishroBadge(
+                        label: 'غیرقابل برداشت',
+                        tone: PishroBadgeTone.premium,
+                        icon: Icons.lock_outline_rounded,
+                      ),
+                    ],
                   ),
                   const SizedBox(height: Space.s2),
                   Text(
@@ -106,11 +111,14 @@ class _DiscountAndCoinScreenState extends ConsumerState<DiscountAndCoinScreen> {
                       color: c.textSecondary,
                     ),
                   ),
-                  const SizedBox(height: Space.s2),
-                  const NoticeBanner(
-                    message:
-                        'پیشرو کوین غیرقابل برداشت است و نرخ تبدیل ثابتی ندارد.',
-                    tone: NoticeTone.info,
+                  Text(
+                    'قابل استفاده برای تخفیف',
+                    style: context.text.caption.copyWith(color: c.textMuted),
+                  ),
+                  const SizedBox(height: Space.s3),
+                  Text(
+                    'در صورت فعال‌سازی، میزان تخفیف طبق قوانین فعال کوین محاسبه و در مرحله تأیید نهایی نمایش داده می‌شود.',
+                    style: context.text.caption.copyWith(color: c.textMuted),
                   ),
                   SwitchListTile(
                     contentPadding: EdgeInsets.zero,
@@ -128,16 +136,68 @@ class _DiscountAndCoinScreenState extends ConsumerState<DiscountAndCoinScreen> {
               ),
             ),
           ),
+          const SizedBox(height: Space.s5),
+          PishroCard(
+            child: Column(
+              children: [
+                _SumRow('مبلغ دوره', Fmt.toman(totals.base)),
+                _SumRow(
+                  'تخفیف کد',
+                  totals.discount == 0
+                      ? Fmt.toman(0)
+                      : '− ${Fmt.toman(totals.discount)}',
+                ),
+                _SumRow(
+                  'کوین پیشرو',
+                  draft.useCoin
+                      ? (totals.coinDiscount == null
+                            ? 'طبق قوانین محاسبه می‌شود'
+                            : '− ${Fmt.toman(totals.coinDiscount!)}')
+                      : '۰ تومان',
+                ),
+              ],
+            ),
+          ),
         ],
       ),
       bottomNavigationBar: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(Space.page),
           child: PishroButton(
-            label: 'بازگشت به خلاصه',
+            label: 'ادامه به تأیید نهایی',
             onPressed: () => context.pop(),
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _SumRow extends StatelessWidget {
+  const _SumRow(this.label, this.value);
+  final String label;
+  final String value;
+
+  @override
+  Widget build(BuildContext context) {
+    final c = context.colors;
+    return Padding(
+      padding: const EdgeInsets.only(bottom: Space.s2),
+      child: Row(
+        children: [
+          Text(
+            label,
+            style: context.text.bodySmall.copyWith(color: c.textMuted),
+          ),
+          const Spacer(),
+          Text(
+            value,
+            style: context.text.bodySmall.copyWith(
+              color: c.textPrimary,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ],
       ),
     );
   }

@@ -102,28 +102,42 @@ class _InvestmentPreview extends StatelessWidget {
         borderRadius: BorderRadius.circular(Radii.xl),
         border: Border.all(color: c.borderDefault),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          const _PlanCard(
-            title: 'طرح دریافت ماهیانه ۸٪',
-            risk: RiskLevel.medium,
-            rows: [
-              ('مدت', 'طبق شرایط قرارداد'),
-              ('حداقل مبلغ', 'اطلاعات تکمیلی طرح'),
-            ],
-          ),
-          const SizedBox(height: Space.s3),
-          const _PlanCard(
-            title: 'طرح هولد با سود داینامیک',
-            risk: RiskLevel.high,
-            body: 'بازدهی داینامیک است و می‌تواند افزایش یا کاهش یابد.',
-          ),
-          const Spacer(),
-          const SizedBox(height: Space.s3),
-          const _RiskNotice(),
-        ],
+      // The deck fixes this panel at 320. Sample content plus Persian line
+      // heights overran it by 16px on a Pixel, so the panel keeps its size and
+      // the content scales down to fit instead — no clipped risk notice, and
+      // no growth that would push the slide's own copy off screen.
+      child: LayoutBuilder(
+        builder: (context, box) => FittedBox(
+          fit: BoxFit.scaleDown,
+          alignment: Alignment.topCenter,
+          child: SizedBox(width: box.maxWidth, child: _panelContent(context)),
+        ),
       ),
+    );
+  }
+
+  Widget _panelContent(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        const _PlanCard(
+          title: 'طرح دریافت ماهیانه ۸٪',
+          risk: RiskLevel.medium,
+          rows: [
+            ('مدت', 'طبق شرایط قرارداد'),
+            ('حداقل مبلغ', 'اطلاعات تکمیلی طرح'),
+          ],
+        ),
+        const SizedBox(height: Space.s3),
+        const _PlanCard(
+          title: 'طرح هولد با سود داینامیک',
+          risk: RiskLevel.high,
+          body: 'بازدهی داینامیک است و می‌تواند افزایش یا کاهش یابد.',
+        ),
+        const SizedBox(height: Space.s3),
+        const _RiskNotice(),
+      ],
     );
   }
 }

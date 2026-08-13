@@ -10,6 +10,7 @@ import '../../../../shared/widgets/pishro_badge.dart';
 import '../../../../shared/widgets/pishro_button.dart';
 import '../../../../shared/widgets/states.dart';
 
+import '../../../../core/utils/formatters.dart';
 import '../../data/community_repository.dart';
 
 class AnalystProfileScreen extends ConsumerWidget {
@@ -42,6 +43,48 @@ class AnalystProfileScreen extends ConsumerWidget {
               Text(
                 a.specialty,
                 style: context.text.bodySmall.copyWith(color: c.textMuted),
+              ),
+              const SizedBox(height: Space.s2),
+              Text(
+                '${a.specialty} · فعال از ${Fmt.fa('${a.activeSinceJalaliYear}')}',
+                style: context.text.caption.copyWith(color: c.textMuted),
+              ),
+              const SizedBox(height: Space.s4),
+              // The deck's three headline counts. Nothing here is a return
+              // figure — رتبه‌بندی is participation, not performance.
+              Row(
+                children: [
+                  Expanded(
+                    child: _ProfileStat(
+                      value: Fmt.fa('${a.publishedCount}'),
+                      label: 'تحلیل',
+                    ),
+                  ),
+                  Expanded(
+                    child: _ProfileStat(
+                      value: Fmt.fa(a.rating.toStringAsFixed(1)),
+                      label: 'امتیاز',
+                    ),
+                  ),
+                  Expanded(
+                    child: _ProfileStat(
+                      value: Fmt.grouped(a.followerCount),
+                      label: 'دنبال‌کننده',
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: Space.s4),
+              PishroBadge(
+                label: a.isIdentityVerified
+                    ? 'تأیید هویت'
+                    : 'تأیید مدارک: ناقص',
+                tone: a.isIdentityVerified
+                    ? PishroBadgeTone.success
+                    : PishroBadgeTone.warning,
+                icon: a.isIdentityVerified
+                    ? Icons.verified_outlined
+                    : Icons.info_outline_rounded,
               ),
               const SizedBox(height: Space.s3),
               Wrap(
@@ -95,6 +138,26 @@ class AnalystProfileScreen extends ConsumerWidget {
           );
         },
       ),
+    );
+  }
+}
+
+/// One of the «تحلیل · امتیاز · دنبال‌کننده» counters on the profile header.
+class _ProfileStat extends StatelessWidget {
+  const _ProfileStat({required this.value, required this.label});
+
+  final String value;
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    final c = context.colors;
+    return Column(
+      children: [
+        Text(value, style: context.text.h3.copyWith(color: c.textPrimary)),
+        const SizedBox(height: Space.s1),
+        Text(label, style: context.text.caption.copyWith(color: c.textMuted)),
+      ],
     );
   }
 }

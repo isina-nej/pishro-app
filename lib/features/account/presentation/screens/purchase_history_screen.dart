@@ -19,7 +19,7 @@ class PurchaseHistoryScreen extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'تاریخچه خرید',
+          'سوابق خرید',
           style: context.text.h3.copyWith(color: c.textPrimary),
         ),
       ),
@@ -52,6 +52,20 @@ class PurchaseHistoryScreen extends ConsumerWidget {
                         const SizedBox(height: Space.s2),
                         Text(
                           '${Fmt.toman(o.total)} · ${o.status}',
+                          style: context.text.caption.copyWith(
+                            color: c.textMuted,
+                          ),
+                        ),
+                        const SizedBox(height: Space.s2),
+                        Text(
+                          // Access is a separate fact from payment: a settled
+                          // order can still be awaiting activation, and a
+                          // failed one is never going to activate.
+                          switch (o.status) {
+                            'PAID' => 'دسترسی: فعال',
+                            'FAILED' || 'CANCELLED' => 'دسترسی: فعال نشد',
+                            _ => 'دسترسی: در انتظار فعال‌سازی',
+                          },
                           style: context.text.caption.copyWith(
                             color: c.textMuted,
                           ),

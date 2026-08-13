@@ -7,6 +7,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/tokens.dart';
 import '../../../../routing/routes.dart';
+import '../../../../shared/widgets/pishro_button.dart';
 import '../../../../shared/widgets/states.dart';
 import '../../data/investment_repository.dart';
 import '../widgets/plan_tile.dart';
@@ -44,17 +45,25 @@ class PlanCatalogScreen extends ConsumerWidget {
           if (items.isEmpty) {
             return const EmptyState(title: 'طرحی برای نمایش نیست');
           }
-          return ListView.separated(
+          return ListView(
             padding: const EdgeInsets.all(Space.page),
-            itemCount: items.length,
-            separatorBuilder: (_, __) => const SizedBox(height: Space.s3),
-            itemBuilder: (_, i) {
-              final p = items[i];
-              return PlanTile(
-                plan: p,
-                onTap: () => context.push(Routes.planDetails(p.id)),
-              );
-            },
+            children: [
+              for (final p in items) ...[
+                PlanTile(
+                  plan: p,
+                  onTap: () => context.push(Routes.planDetails(p.id)),
+                ),
+                const SizedBox(height: Space.s3),
+              ],
+              if (items.length > 1) ...[
+                const SizedBox(height: Space.s2),
+                PishroButton(
+                  label: 'مقایسه هر دو طرح',
+                  variant: PishroButtonVariant.secondary,
+                  onPressed: () => context.push(Routes.planComparison),
+                ),
+              ],
+            ],
           );
         },
       ),

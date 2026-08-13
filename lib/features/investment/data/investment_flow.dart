@@ -5,6 +5,16 @@ import '../../../core/network/api_exception.dart';
 import 'investment_models.dart';
 import 'investment_repository.dart';
 
+/// The four acknowledgements Screen/Investment/RiskDisclosure requires. The
+/// deck is explicit that they are separate and never pre-selected — one
+/// blanket checkbox would not be informed consent.
+const kRiskAcknowledgements = [
+  'ریسک‌های این طرح را مطالعه کرده‌ام.',
+  'می‌دانم نرخ اعلام‌شده به معنای تضمین پرداخت نیست.',
+  'شرایط برداشت و خروج زودهنگام را بررسی کرده‌ام.',
+  'از امکان کاهش یا تغییر بازده در طرح داینامیک آگاه هستم.',
+];
+
 /// Flow state from PlanDetails → Success. Never invents a rate or ROI.
 @immutable
 class InvestmentDraft {
@@ -13,7 +23,7 @@ class InvestmentDraft {
     this.amount = 0,
     this.durationMonths = 1,
     this.funding = FundingSourceKind.gateway,
-    this.riskAccepted = false,
+    this.riskChecks = const {},
     this.termsAccepted = false,
     this.showConsentError = false,
     this.submitting = false,
@@ -24,11 +34,16 @@ class InvestmentDraft {
   final int amount;
   final int durationMonths;
   final FundingSourceKind funding;
-  final bool riskAccepted;
+
+  /// Indices into [kRiskAcknowledgements] the user has ticked.
+  final Set<int> riskChecks;
   final bool termsAccepted;
   final bool showConsentError;
   final bool submitting;
   final String? orderId;
+
+  /// Every acknowledgement ticked — the gate the deck's CTA waits on.
+  bool get riskAccepted => riskChecks.length == kRiskAcknowledgements.length;
 
   bool get consentsOk => riskAccepted && termsAccepted;
 
@@ -49,7 +64,7 @@ class InvestmentDraft {
     int? amount,
     int? durationMonths,
     FundingSourceKind? funding,
-    bool? riskAccepted,
+    Set<int>? riskChecks,
     bool? termsAccepted,
     bool? showConsentError,
     bool? submitting,
@@ -60,7 +75,7 @@ class InvestmentDraft {
     amount: amount ?? this.amount,
     durationMonths: durationMonths ?? this.durationMonths,
     funding: funding ?? this.funding,
-    riskAccepted: riskAccepted ?? this.riskAccepted,
+    riskChecks: riskChecks ?? this.riskChecks,
     termsAccepted: termsAccepted ?? this.termsAccepted,
     showConsentError: showConsentError ?? this.showConsentError,
     submitting: submitting ?? this.submitting,
@@ -92,8 +107,21 @@ class InvestmentFlowNotifier extends StateNotifier<InvestmentDraft> {
   void setFunding(FundingSourceKind source) =>
       state = state.copyWith(funding: source);
 
-  void setRiskAccepted(bool v) => state = state.copyWith(
-    riskAccepted: v,
+  void toggleRiskCheck(int index, bool v) {
+    final next = {...state.riskChecks};
+    v ? next.add(index) : next.remove(index);
+    state = state.copyWith(
+      riskChecks: next,
+      showConsentError: v ? false : state.showConsentError,
+    );
+  }
+
+  /// The final confirmation screen re-asks for one combined acknowledgement,
+  /// which stands in for all four.
+  void setAllRiskChecks(bool v) => state = state.copyWith(
+    riskChecks: v
+        ? {for (var i = 0; i < kRiskAcknowledgements.length; i++) i}
+        : const {},
     showConsentError: v ? false : state.showConsentError,
   );
 

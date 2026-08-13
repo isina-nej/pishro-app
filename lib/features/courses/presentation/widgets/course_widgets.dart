@@ -353,7 +353,13 @@ class CategoryCard extends StatelessWidget {
                 ),
                 const SizedBox(height: Space.s1),
                 Text(
-                  '${Fmt.fa('${category.courseCount}')} دوره',
+                  // The deck pairs each category with a one-line description
+                  // and its course count on the same row.
+                  [
+                    '${Fmt.fa('${category.courseCount}')} دوره',
+                    if (category.latestTitle != null)
+                      'آخرین: ${category.latestTitle}',
+                  ].join(' · '),
                   style: context.text.caption.copyWith(color: c.textMuted),
                 ),
               ],

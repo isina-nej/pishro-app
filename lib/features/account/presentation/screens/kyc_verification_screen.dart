@@ -11,6 +11,7 @@ import '../../../../shared/widgets/pishro_badge.dart';
 import '../../../../shared/widgets/pishro_button.dart';
 import '../../../../shared/widgets/states.dart';
 import '../../../auth/presentation/widgets/consent_checkbox.dart';
+import '../../../../core/utils/formatters.dart';
 import '../../data/account_repository.dart';
 
 /// Screen/Account/KYCVerification — mock؛ رضایت پیش‌فرض نه.
@@ -34,7 +35,7 @@ class _KYCVerificationScreenState extends ConsumerState<KYCVerificationScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'ارسال مدارک احراز هویت',
+          'تکمیل احراز هویت',
           style: context.text.h3.copyWith(color: c.textPrimary),
         ),
       ),
@@ -51,10 +52,35 @@ class _KYCVerificationScreenState extends ConsumerState<KYCVerificationScreen> {
               tone: NoticeTone.info,
             ),
             const SizedBox(height: Space.s4),
+            Builder(
+              builder: (context) {
+                final steps = [
+                  snap.identity,
+                  snap.iban,
+                  snap.address,
+                  snap.selfie,
+                ];
+                final done = steps.where((s) => s == KycStatus.verified).length;
+                return Text(
+                  'مرحله ${Fmt.fa('${done + 1 > steps.length ? steps.length : done + 1}')} از ${Fmt.fa('${steps.length}')}',
+                  style: context.text.caption.copyWith(color: c.textMuted),
+                );
+              },
+            ),
+            const SizedBox(height: Space.s3),
             _Step('اطلاعات هویتی', snap.identity),
             _Step('شماره شبا', snap.iban),
             _Step('نشانی محل سکونت', snap.address),
             _Step('تصویر سلفی', snap.selfie),
+            const SizedBox(height: Space.s4),
+            Text(
+              'تصویر باید واضح و بدون انعکاس نور باشد. فرمت‌های JPG و PNG تا '
+              '۵ مگابایت پشتیبانی می‌شود.',
+              style: context.text.caption.copyWith(
+                color: c.textMuted,
+                height: 1.8,
+              ),
+            ),
             const SizedBox(height: Space.s4),
             ConsentCheckbox(
               value: _consent,

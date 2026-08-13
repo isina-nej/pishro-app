@@ -118,6 +118,27 @@ class _AccountSubscriptionsScreenState
                               color: c.textMuted,
                             ),
                           ),
+                          const SizedBox(height: Space.s2),
+                          // Payment settled and access granted are two facts;
+                          // a paid-but-unactivated row must say so plainly.
+                          Text(
+                            s.status == SubscriptionStatus.pending
+                                ? 'پرداخت: پرداخت‌شده · دسترسی: در انتظار'
+                                : 'پرداخت: پرداخت‌شده · دسترسی: ${s.status.label}',
+                            style: context.text.caption.copyWith(
+                              color: c.textMuted,
+                            ),
+                          ),
+                          if (s.status == SubscriptionStatus.pending) ...[
+                            const SizedBox(height: Space.s2),
+                            Text(
+                              'پرداخت ثبت شد؛ فعال‌سازی محتوا هنوز تأیید نشده '
+                              'است.',
+                              style: context.text.caption.copyWith(
+                                color: c.warning,
+                              ),
+                            ),
+                          ],
                         ],
                       ),
                     );

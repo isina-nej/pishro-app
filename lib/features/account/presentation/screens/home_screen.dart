@@ -96,6 +96,8 @@ class AccountHomeScreen extends ConsumerWidget {
               ),
             ),
           ),
+          _profileCompletion(context, ref),
+          const SectionHeader(title: 'حساب و هویت'),
           _Item(
             'احراز هویت',
             Icons.verified_outlined,
@@ -111,6 +113,7 @@ class AccountHomeScreen extends ConsumerWidget {
             Icons.stars_outlined,
             () => context.push(Routes.pishroCoin),
           ),
+          const SectionHeader(title: 'اشتراک‌ها و خریدها'),
           _Item(
             'خریدها',
             Icons.receipt_long_outlined,
@@ -126,6 +129,7 @@ class AccountHomeScreen extends ConsumerWidget {
             Icons.card_membership_outlined,
             () => context.push(Routes.accountSubscriptions),
           ),
+          const SectionHeader(title: 'فعالیت‌ها'),
           _Item(
             'ذخیره‌شده‌ها',
             Icons.bookmark_border_rounded,
@@ -151,6 +155,7 @@ class AccountHomeScreen extends ConsumerWidget {
             Icons.privacy_tip_outlined,
             () => context.push(Routes.privacy),
           ),
+          const SectionHeader(title: 'پشتیبانی و تنظیمات'),
           _Item(
             'پشتیبانی',
             Icons.support_agent_rounded,
@@ -186,6 +191,54 @@ class AccountHomeScreen extends ConsumerWidget {
       ),
     );
   }
+}
+
+/// «نیازمند تکمیل اطلاعات» — shown until every KYC step is verified, which is
+/// the only completion signal the account service exposes.
+Widget _profileCompletion(BuildContext context, WidgetRef ref) {
+  final kyc = ref.watch(kycSnapshotProvider);
+  return kyc.maybeWhen(
+    data: (snap) {
+      final pending = [
+        snap.identity,
+        snap.iban,
+        snap.address,
+        snap.selfie,
+      ].where((s) => s != KycStatus.verified).length;
+      if (pending == 0) return const SizedBox.shrink();
+      return Padding(
+        padding: const EdgeInsets.fromLTRB(Space.page, Space.s4, Space.page, 0),
+        child: PishroCard(
+          onTap: () => context.push(Routes.kycVerification),
+          child: Row(
+            children: [
+              Icon(
+                Icons.error_outline_rounded,
+                size: 18,
+                color: context.colors.warning,
+              ),
+              const SizedBox(width: Space.s3),
+              Expanded(
+                child: Text(
+                  'نیازمند تکمیل اطلاعات',
+                  style: context.text.bodySmall.copyWith(
+                    color: context.colors.textPrimary,
+                  ),
+                ),
+              ),
+              Text(
+                'تکمیل پروفایل',
+                style: context.text.caption.copyWith(
+                  color: context.colors.actionPrimary,
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    },
+    orElse: () => const SizedBox.shrink(),
+  );
 }
 
 class _Item extends StatelessWidget {

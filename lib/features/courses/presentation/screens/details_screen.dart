@@ -143,7 +143,7 @@ class CourseDetailsScreen extends ConsumerWidget {
               if (course.learningGoals.isNotEmpty) ...[
                 const SizedBox(height: Space.s6),
                 Text(
-                  'آنچه یاد می‌گیرید',
+                  'خروجی‌های یادگیری',
                   style: context.text.h3.copyWith(color: c.textPrimary),
                 ),
                 const SizedBox(height: Space.s2),

@@ -118,6 +118,23 @@ class PaymentScheduleScreen extends ConsumerWidget {
                               fontWeight: FontWeight.w600,
                             ),
                           ),
+                          const SizedBox(height: Space.s2),
+                          Text(
+                            'مبلغ برنامه‌ریزی‌شده',
+                            style: context.text.caption.copyWith(
+                              color: c.textMuted,
+                            ),
+                          ),
+                          Text(
+                            // No instalment table exists; the amount of the
+                            // next payment is a contract term, not a figure
+                            // this screen may compute.
+                            kPerContractSchedule,
+                            style: context.text.bodySmall.copyWith(
+                              color: c.textPrimary,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
                         ],
                       ),
                     ),

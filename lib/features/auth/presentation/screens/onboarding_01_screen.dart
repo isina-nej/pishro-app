@@ -4,21 +4,19 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/tokens.dart';
-import '../../../../core/utils/formatters.dart';
 import '../../../../routing/routes.dart';
-import '../../../../shared/widgets/common.dart';
 import '../../../../shared/widgets/pishro_button.dart';
 import '../widgets/auth_scaffold.dart';
 import '../widgets/onboarding_dots.dart';
 
 /// Screen/Auth/Onboarding-01 — «آشنایی ۱».
 ///
-/// Slide ۲ / ۳ of Flow A (بازار و تحلیل). «رد کردن» jumps to Signup; «ادامه»
-/// advances to Onboarding-02 once the Coordinator wires a dedicated path.
+/// Slide ۱ / ۳ of Flow A (آموزش‌های تخصصی). «رد کردن» jumps to Signup;
+/// «ادامه» advances to Onboarding-02 (بازار و تحلیل).
 class Onboarding01Screen extends StatelessWidget {
   const Onboarding01Screen({super.key});
 
-  static const _slideIndex = 1;
+  static const _slideIndex = 0;
   static const _slideCount = 3;
 
   @override
@@ -70,10 +68,12 @@ class Onboarding01Screen extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    const Expanded(child: Center(child: _MarketIllustration())),
+                    const Expanded(
+                      child: Center(child: _CoursesIllustration()),
+                    ),
                     const SizedBox(height: Space.s5),
                     Text(
-                      'بازار و تحلیل',
+                      'آموزش‌های تخصصی',
                       style: context.text.displaySmall.copyWith(
                         color: c.textPrimary,
                         fontSize: 26,
@@ -82,8 +82,8 @@ class Onboarding01Screen extends StatelessWidget {
                     ),
                     const SizedBox(height: Space.s3 + 2),
                     Text(
-                      'قیمت ارزها، داده‌های بازار و تحلیل کاربران حرفه‌ای را '
-                      'دنبال کنید.',
+                      'دوره‌های عادی و VIP را متناسب با مسیر یادگیری خود '
+                      'انتخاب کنید.',
                       style: context.text.bodyLarge.copyWith(
                         color: c.textSecondary,
                         fontSize: 15,
@@ -121,9 +121,10 @@ class Onboarding01Screen extends StatelessWidget {
   }
 }
 
-/// Sample market + analyst card from the deck illustration (not live data).
-class _MarketIllustration extends StatelessWidget {
-  const _MarketIllustration();
+/// The deck ships slide ۱ with a placeholder illustration frame, not artwork:
+/// a hatched panel holding an outlined mark and a mono caption.
+class _CoursesIllustration extends StatelessWidget {
+  const _CoursesIllustration();
 
   @override
   Widget build(BuildContext context) {
@@ -131,251 +132,40 @@ class _MarketIllustration extends StatelessWidget {
 
     return Container(
       height: 320,
-      padding: const EdgeInsets.all(Space.s5),
       decoration: BoxDecoration(
         color: c.surfacePrimary,
         borderRadius: BorderRadius.circular(Radii.xl),
         border: Border.all(color: c.borderDefault),
       ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Row(
-            children: [
-              Container(
-                width: 30,
-                height: 30,
-                alignment: Alignment.center,
-                decoration: BoxDecoration(
-                  color: c.surfaceSecondary,
-                  shape: BoxShape.circle,
-                  border: Border.all(color: c.borderDefault),
-                ),
-                child: Text(
-                  'BTC',
-                  style: context.text.micro.copyWith(
-                    fontFamily: AppFonts.latin,
-                    fontSize: 9,
-                    color: c.textSecondary,
-                  ),
-                ),
-              ),
-              const SizedBox(width: Space.s2 + 1),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'بیت‌کوین',
-                      style: context.text.caption.copyWith(
-                        color: c.textPrimary,
-                      ),
-                    ),
-                    Text(
-                      'BTC / USDT',
-                      style: context.text.micro.copyWith(
-                        fontFamily: AppFonts.latin,
-                        fontSize: 9,
-                        color: c.textMuted,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Text(
-                    // Deck: ۶۴,۷۵۱ — Persian digits; western comma in capture.
-                    Fmt.fa('64,751'),
-                    style: context.text.numeric.copyWith(
-                      fontSize: 14,
-                      height: 1.2,
-                      color: c.textPrimary,
-                    ),
-                  ),
-                  // Deck shows +۰٫۲٪ (one decimal); MarketDelta keeps arrow+label.
-                  const MarketDelta(0.2, compact: true),
-                ],
-              ),
-            ],
-          ),
-          const SizedBox(height: Space.s3 + 2),
-          Expanded(
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(Radii.md),
-              child: Stack(
-                fit: StackFit.expand,
-                children: [
-                  CustomPaint(painter: _HatchPainter(c)),
-                  CustomPaint(painter: _SparklinePainter(c.marketUp)),
-                  PositionedDirectional(
-                    start: 10,
-                    bottom: 8,
-                    child: Text(
-                      '۷ روز · داده نمونه',
-                      style: context.text.micro.copyWith(
-                        fontFamily: AppFonts.latin,
-                        fontSize: 9,
-                        color: c.textMuted,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          const SizedBox(height: Space.s3 + 2),
           Container(
-            padding: const EdgeInsets.symmetric(
-              horizontal: Space.s3,
-              vertical: Space.s2 + 2,
-            ),
+            width: 72,
+            height: 72,
             decoration: BoxDecoration(
               color: c.surfaceSecondary,
-              borderRadius: BorderRadius.circular(Radii.md),
-              border: Border.all(color: c.borderDefault),
+              borderRadius: BorderRadius.circular(Radii.xl),
+              border: Border.all(color: c.actionPrimary),
             ),
-            child: Row(
-              children: [
-                Container(
-                  width: 28,
-                  height: 28,
-                  decoration: BoxDecoration(
-                    color: c.surfacePrimary,
-                    shape: BoxShape.circle,
-                    border: Border.all(color: c.borderDefault),
-                  ),
-                ),
-                const SizedBox(width: Space.s2 + 1),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Text(
-                            'تحلیلگر نمونه',
-                            style: context.text.caption.copyWith(
-                              color: c.textPrimary,
-                            ),
-                          ),
-                          const SizedBox(width: 5),
-                          Text(
-                            '✓',
-                            style: context.text.micro.copyWith(
-                              fontSize: 9,
-                              color: c.info,
-                            ),
-                          ),
-                        ],
-                      ),
-                      Text(
-                        'تحلیل تکنیکال · افق میان‌مدت',
-                        style: context.text.micro.copyWith(
-                          fontSize: 10,
-                          color: c.textMuted,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Text(
-                  'نمونه',
-                  style: context.text.micro.copyWith(
-                    fontFamily: AppFonts.latin,
-                    fontSize: 9,
-                    color: c.textMuted,
-                  ),
-                ),
-              ],
+            child: Icon(
+              Icons.menu_book_outlined,
+              size: 34,
+              color: c.actionPrimary,
+            ),
+          ),
+          const SizedBox(height: Space.s4 + 2),
+          Text(
+            'ILLUSTRATION · COURSES',
+            style: context.text.micro.copyWith(
+              fontFamily: AppFonts.latin,
+              fontSize: 10,
+              letterSpacing: 0.6,
+              color: c.textMuted,
             ),
           ),
         ],
       ),
     );
   }
-}
-
-class _HatchPainter extends CustomPainter {
-  _HatchPainter(this.colors);
-
-  final AppColors colors;
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final a = Paint()..color = colors.surfaceSecondary;
-    final b = Paint()..color = colors.surfacePrimary;
-    const stripe = 10.0;
-    // Deck: repeating-linear-gradient(135deg, n800 0 10px, n850 10px 20px).
-    for (var x = -size.height; x < size.width + size.height; x += stripe * 2) {
-      final pathA = Path()
-        ..moveTo(x, 0)
-        ..lineTo(x + size.height, size.height)
-        ..lineTo(x + size.height + stripe, size.height)
-        ..lineTo(x + stripe, 0)
-        ..close();
-      canvas.drawPath(pathA, a);
-      final pathB = Path()
-        ..moveTo(x + stripe, 0)
-        ..lineTo(x + stripe + size.height, size.height)
-        ..lineTo(x + size.height + stripe * 2, size.height)
-        ..lineTo(x + stripe * 2, 0)
-        ..close();
-      canvas.drawPath(pathB, b);
-    }
-  }
-
-  @override
-  bool shouldRepaint(covariant _HatchPainter oldDelegate) =>
-      oldDelegate.colors != colors;
-}
-
-/// Sample sparkline matching the deck polyline (viewBox 300×130).
-class _SparklinePainter extends CustomPainter {
-  _SparklinePainter(this.color);
-
-  final Color color;
-
-  static const _points = <Offset>[
-    Offset(4, 104),
-    Offset(34, 86),
-    Offset(64, 94),
-    Offset(94, 58),
-    Offset(124, 72),
-    Offset(154, 40),
-    Offset(184, 52),
-    Offset(214, 28),
-    Offset(244, 38),
-    Offset(296, 14),
-  ];
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    const vbW = 300.0;
-    const vbH = 130.0;
-    final path = Path();
-    for (var i = 0; i < _points.length; i++) {
-      final p = Offset(
-        _points[i].dx / vbW * size.width,
-        _points[i].dy / vbH * size.height,
-      );
-      if (i == 0) {
-        path.moveTo(p.dx, p.dy);
-      } else {
-        path.lineTo(p.dx, p.dy);
-      }
-    }
-    final paint = Paint()
-      ..color = color
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 2.2
-      ..strokeCap = StrokeCap.round
-      ..strokeJoin = StrokeJoin.round;
-    canvas.drawPath(path, paint);
-  }
-
-  @override
-  bool shouldRepaint(covariant _SparklinePainter oldDelegate) =>
-      oldDelegate.color != color;
 }

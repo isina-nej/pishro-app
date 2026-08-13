@@ -23,6 +23,10 @@ class _AccountNotificationsScreenState
     extends ConsumerState<AccountNotificationsScreen> {
   var _tab = 0;
 
+  /// Local only — there is no read-state endpoint, so «علامت‌گذاری همه» dims
+  /// the unread dots for this session rather than claiming a server write.
+  var _allRead = false;
+
   @override
   Widget build(BuildContext context) {
     final c = context.colors;
@@ -33,11 +37,20 @@ class _AccountNotificationsScreenState
           'اعلان‌ها',
           style: context.text.h3.copyWith(color: c.textPrimary),
         ),
+        actions: [
+          TextButton(
+            onPressed: () => setState(() => _allRead = true),
+            child: const Text('علامت‌گذاری همه'),
+          ),
+        ],
       ),
       body: Column(
         children: [
           PishroChipBar(
-            labels: const ['همه', 'امنیت', 'پرداخت', 'سرمایه‌گذاری'],
+            labels: [
+              'همه',
+              for (final c in NotificationCategory.values) c.label,
+            ],
             selectedIndex: _tab,
             onSelected: (i) => setState(() => _tab = i),
           ),
@@ -47,7 +60,16 @@ class _AccountNotificationsScreenState
               error: (_, __) => ErrorStateView(
                 onRetry: () => ref.invalidate(notificationsProvider),
               ),
-              data: (items) {
+              data: (all) {
+                // Tab 0 is «همه»; the rest map onto the category enum.
+                final items = _tab == 0
+                    ? all
+                    : [
+                        for (final n in all)
+                          if (n.category ==
+                              NotificationCategory.values[_tab - 1])
+                            n,
+                      ];
                 if (items.isEmpty) {
                   return const EmptyState(title: 'اعلانی نیست');
                 }
@@ -63,7 +85,7 @@ class _AccountNotificationsScreenState
                         children: [
                           Row(
                             children: [
-                              if (!n.read)
+                              if (!n.read && !_allRead)
                                 Container(
                                   width: 8,
                                   height: 8,

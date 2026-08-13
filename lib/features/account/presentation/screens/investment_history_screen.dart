@@ -11,6 +11,7 @@ import '../../../../shared/widgets/pishro_badge.dart';
 import '../../../../shared/widgets/states.dart';
 
 import '../../../../core/utils/formatters.dart';
+import '../../../investment/data/investment_models.dart';
 import '../../../investment/data/investment_repository.dart';
 
 class InvestmentHistoryScreen extends ConsumerWidget {
@@ -22,7 +23,7 @@ class InvestmentHistoryScreen extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'تاریخچه سرمایه‌گذاری',
+          'سوابق سرمایه‌گذاری',
           style: context.text.h3.copyWith(color: c.textPrimary),
         ),
       ),
@@ -38,9 +39,16 @@ class InvestmentHistoryScreen extends ConsumerWidget {
               )
             : ListView.separated(
                 padding: const EdgeInsets.all(Space.page),
-                itemCount: items.length,
+                // One extra row for the deck's closing note about returns.
+                itemCount: items.length + 1,
                 separatorBuilder: (_, __) => const SizedBox(height: Space.s3),
                 itemBuilder: (_, i) {
+                  if (i == items.length) {
+                    return const NoticeBanner(
+                      message: 'داده بازده ثبت‌شده در دسترس نیست.',
+                      tone: NoticeTone.info,
+                    );
+                  }
                   final t = items[i];
                   return PishroCard(
                     onTap: () => context.push(Routes.investmentDetails(t.id)),
@@ -67,9 +75,21 @@ class InvestmentHistoryScreen extends ConsumerWidget {
                           ),
                         ),
                         PishroBadge(
-                          label: t.investmentStatusLabel,
-                          tone: PishroBadgeTone.neutral,
-                          icon: Icons.info_outline_rounded,
+                          // The deck calls a failed record «نیازمند پیگیری»:
+                          // the user's action, not the system's verdict.
+                          label: t.status == TxStatus.failed
+                              ? 'نیازمند پیگیری'
+                              : t.investmentStatusLabel,
+                          tone: switch (t.status) {
+                            TxStatus.success => PishroBadgeTone.success,
+                            TxStatus.pending => PishroBadgeTone.warning,
+                            TxStatus.failed => PishroBadgeTone.danger,
+                          },
+                          icon: switch (t.status) {
+                            TxStatus.success => Icons.check_rounded,
+                            TxStatus.pending => Icons.hourglass_top_rounded,
+                            TxStatus.failed => Icons.flag_outlined,
+                          },
                         ),
                       ],
                     ),

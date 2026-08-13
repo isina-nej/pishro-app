@@ -93,14 +93,58 @@ class _FixedBody extends ConsumerWidget {
             ),
           ],
           const SizedBox(height: Space.s4),
+          _Spec(
+            label: 'نرخ اعلام‌شده طرح',
+            value: rate == null
+                ? kPerContract
+                : '${Fmt.fa(rate.toStringAsFixed(0))}٪ ماهیانه',
+          ),
+          const _Spec(
+            label: 'نحوه محاسبه',
+            value: 'طبق شرایط و نحوه محاسبه قرارداد',
+          ),
+          _Spec(
+            label: 'مدت طرح',
+            value:
+                '${Fmt.fa('${plan.minDurationMonths}')} تا ${Fmt.fa('${plan.maxDurationMonths}')} ماه',
+          ),
+          _Spec(
+            label: 'حداقل / حداکثر مبلغ',
+            value:
+                '${Fmt.toman(plan.minAmount)} تا ${Fmt.toman(plan.maxAmount)}',
+          ),
+          const _Spec(label: 'شرایط برداشت', value: 'طبق شرایط قرارداد طرح'),
+          const _Spec(label: 'احراز هویت موردنیاز', value: 'سطح پایه'),
+          const SizedBox(height: Space.s4),
           Text(
-            'حداقل مبلغ ${Fmt.toman(plan.minAmount)} · حداکثر ${Fmt.toman(plan.maxAmount)}',
+            'این نرخ به‌تنهایی به معنای تضمین پرداخت یا نبود ریسک نیست.',
             style: context.text.caption.copyWith(color: c.textMuted),
           ),
-          const SizedBox(height: Space.s2),
-          Text(
-            'مدت ${Fmt.fa('${plan.minDurationMonths}')} تا ${Fmt.fa('${plan.maxDurationMonths}')} ماه',
-            style: context.text.caption.copyWith(color: c.textMuted),
+          const SizedBox(height: Space.s4),
+          Row(
+            children: [
+              Expanded(
+                child: PishroButton(
+                  label: 'محاسبه‌گر',
+                  variant: PishroButtonVariant.ghost,
+                  onPressed: () => context.push(Routes.calculator),
+                ),
+              ),
+              Expanded(
+                child: PishroButton(
+                  label: 'مقایسه طرح‌ها',
+                  variant: PishroButtonVariant.ghost,
+                  onPressed: () => context.push(Routes.planComparison),
+                ),
+              ),
+              Expanded(
+                child: PishroButton(
+                  label: 'قرارداد',
+                  variant: PishroButtonVariant.ghost,
+                  onPressed: () => context.push(Routes.terms),
+                ),
+              ),
+            ],
           ),
           const SizedBox(height: Space.s5),
           const NoticeBanner(
@@ -113,13 +157,46 @@ class _FixedBody extends ConsumerWidget {
         child: Padding(
           padding: const EdgeInsets.all(Space.page),
           child: PishroButton(
-            label: 'شروع سرمایه‌گذاری',
+            label: 'بررسی شرایط سرمایه‌گذاری',
             onPressed: () {
               ref.read(investmentFlowProvider.notifier).start(plan);
               context.push(Routes.amountEntry);
             },
           ),
         ),
+      ),
+    );
+  }
+}
+
+/// A «برچسب … مقدار» row from the deck's plan spec table.
+class _Spec extends StatelessWidget {
+  const _Spec({required this.label, required this.value});
+
+  final String label;
+  final String value;
+
+  @override
+  Widget build(BuildContext context) {
+    final c = context.colors;
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: Space.s2),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(label, style: context.text.caption.copyWith(color: c.textMuted)),
+          const SizedBox(width: Space.s3),
+          Expanded(
+            child: Text(
+              value,
+              textAlign: TextAlign.end,
+              style: context.text.bodySmall.copyWith(
+                color: c.textPrimary,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

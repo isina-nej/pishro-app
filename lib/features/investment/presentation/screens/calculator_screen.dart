@@ -6,6 +6,7 @@ import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/tokens.dart';
 import '../../../../core/utils/formatters.dart';
 import '../../../../shared/widgets/common.dart';
+import '../../../../shared/widgets/pishro_button.dart';
 import '../../../../shared/widgets/pishro_chip.dart';
 import '../../../../shared/widgets/pishro_text_field.dart';
 import '../../../../shared/widgets/states.dart';
@@ -35,7 +36,7 @@ class _InvestmentCalculatorScreenState
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'ماشین‌حساب برآورد',
+          'محاسبه‌گر سرمایه‌گذاری',
           style: context.text.h3.copyWith(color: c.textPrimary),
         ),
       ),
@@ -110,14 +111,34 @@ class _InvestmentCalculatorScreenState
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      plan.isDynamic || monthly == null
-                          ? 'برآورد ماهانه: $kPerContract'
-                          : 'برآورد ماهانه: ${Fmt.toman(monthly)}',
-                      style: context.text.bodyMedium.copyWith(
-                        color: c.textPrimary,
-                      ),
+                      'برآورد مبلغ ماهیانه',
+                      style: context.text.caption.copyWith(color: c.textMuted),
                     ),
-                    const SizedBox(height: Space.s2),
+                    const SizedBox(height: Space.s1),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.baseline,
+                      textBaseline: TextBaseline.alphabetic,
+                      children: [
+                        Text(
+                          plan.isDynamic || monthly == null
+                              ? kPerContract
+                              : Fmt.grouped(monthly),
+                          style: context.text.h2.copyWith(color: c.textPrimary),
+                        ),
+                        if (!plan.isDynamic && monthly != null) ...[
+                          const SizedBox(width: Space.s2),
+                          Text(
+                            // The unit carries the «برآورد» qualifier so the
+                            // number can never be read as a promise.
+                            'تومان (برآورد)',
+                            style: context.text.caption.copyWith(
+                              color: c.textMuted,
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
+                    const SizedBox(height: Space.s3),
                     Text(
                       total == null
                           ? 'برآورد کل دوره: $kPerContract'
@@ -129,14 +150,70 @@ class _InvestmentCalculatorScreenState
                   ],
                 ),
               ),
-              const SizedBox(height: Space.s4),
+              const SizedBox(height: Space.s3),
+              Align(
+                alignment: AlignmentDirectional.centerStart,
+                child: PishroButton(
+                  label: 'مشاهده روش محاسبه',
+                  variant: PishroButtonVariant.ghost,
+                  onPressed: () => showModalBottomSheet<void>(
+                    context: context,
+                    builder: (_) => const _MethodSheet(),
+                  ),
+                ),
+              ),
+              const SizedBox(height: Space.s3),
               const NoticeBanner(
-                message: 'این اعداد برآورد است و تضمین سود نیست.',
+                message:
+                    'این محاسبه صرفاً یک برآورد بر اساس اطلاعات واردشده و '
+                    'پارامترهای فعلی طرح است و تعهد پرداخت ایجاد نمی‌کند.',
                 tone: NoticeTone.warning,
               ),
             ],
           );
         },
+      ),
+    );
+  }
+}
+
+/// «مشاهده روش محاسبه» — the deck's calculation-method overlay. It states the
+/// formula and that the parameters come from the plan, never a rate of its own.
+class _MethodSheet extends StatelessWidget {
+  const _MethodSheet();
+
+  @override
+  Widget build(BuildContext context) {
+    final c = context.colors;
+    return SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.all(Space.page),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'روش محاسبه',
+              style: context.text.h3.copyWith(color: c.textPrimary),
+            ),
+            const SizedBox(height: Space.s3),
+            Text(
+              'برآورد ماهیانه از ضرب مبلغ واردشده در نرخ اعلام‌شده طرح به دست '
+              'می‌آید و برآورد کل، حاصل‌ضرب آن در تعداد ماه‌های انتخابی است. '
+              'طرح‌های داینامیک نرخ ثابتی ندارند، بنابراین برای آن‌ها عددی '
+              'محاسبه نمی‌شود.',
+              style: context.text.bodySmall.copyWith(
+                color: c.textSecondary,
+                height: 1.9,
+              ),
+            ),
+            const SizedBox(height: Space.s3),
+            Text(
+              'پارامترهای محاسبه از سرویس طرح‌ها خوانده می‌شود.',
+              style: context.text.caption.copyWith(color: c.textMuted),
+            ),
+          ],
+        ),
       ),
     );
   }

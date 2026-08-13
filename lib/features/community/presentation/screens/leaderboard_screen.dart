@@ -21,7 +21,7 @@ class LeaderboardScreen extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'رتبه‌بندی',
+          'رتبه‌بندی تحلیلگران',
           style: context.text.h3.copyWith(color: c.textPrimary),
         ),
       ),
@@ -56,12 +56,21 @@ class LeaderboardScreen extends ConsumerWidget {
                             ),
                           ),
                           Text(
-                            '${Fmt.fa('${e.analysisCount}')} تحلیل · امتیاز ${Fmt.fa(e.rating.toStringAsFixed(1))}',
+                            '${Fmt.fa('${e.analysisCount}')} تحلیل · ${Fmt.fa('${e.reviewCount}')} نظر',
                             style: context.text.caption.copyWith(
                               color: c.textMuted,
                             ),
                           ),
                         ],
+                      ),
+                    ),
+                    // Rating carries the star glyph and the number, never a
+                    // colour on its own.
+                    Text(
+                      '★ ${Fmt.fa(e.rating.toStringAsFixed(1))}',
+                      style: context.text.bodySmall.copyWith(
+                        color: c.textPrimary,
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
                   ],

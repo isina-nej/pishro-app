@@ -63,6 +63,28 @@ class InvestmentSuccessScreen extends ConsumerWidget {
                     'فعال‌سازی پس از تأیید بک‌اند نمایش داده می‌شود. هیچ بازدهی تضمینی اعلام نشده است.',
                 tone: NoticeTone.info,
               ),
+              const SizedBox(height: Space.s3),
+              Row(
+                children: [
+                  Expanded(
+                    child: PishroButton(
+                      label: 'مشاهده قرارداد',
+                      variant: PishroButtonVariant.ghost,
+                      onPressed: () => context.push(Routes.terms),
+                    ),
+                  ),
+                  Expanded(
+                    child: PishroButton(
+                      label: 'مشاهده رسید',
+                      variant: PishroButtonVariant.ghost,
+                      // The receipt lives with the transaction record.
+                      onPressed: id == null || id.isEmpty
+                          ? null
+                          : () => context.push(Routes.paymentSchedule(id)),
+                    ),
+                  ),
+                ],
+              ),
               const Spacer(),
               PishroButton(
                 label: 'مشاهده جزئیات سرمایه‌گذاری',

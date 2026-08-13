@@ -8,7 +8,9 @@ import '../../../../core/theme/tokens.dart';
 import '../../../../shared/widgets/common.dart';
 import '../../../../shared/widgets/pishro_chip.dart';
 import '../../../../shared/widgets/states.dart';
+import '../../data/market_models.dart';
 import '../../data/market_repository.dart';
+import '../widgets/data_source_note.dart';
 import '../widgets/market_async.dart';
 
 /// Screen/Market/PriceChart — اسپارک‌لاین ۷روزه، تنها تاریخچه موجود.
@@ -90,15 +92,60 @@ class PriceChartScreen extends ConsumerWidget {
               ),
               const SizedBox(height: Space.s4),
               MarketDelta(data.asset.change7d),
+              const SizedBox(height: Space.s4),
+              // The deck's three period readings, taken from the same series
+              // the chart draws — no second source, no invented figures.
+              _PeriodStat(label: 'بیشترین', value: max),
+              _PeriodStat(label: 'کمترین', value: min),
+              _PeriodStat(label: 'شروع دوره', value: spark.first),
+              const SizedBox(height: Space.s3),
+              Text(
+                'در بازه انتخاب‌شده، قیمت از مقدار آغازین به مقدار پایانی '
+                'تغییر کرده است.',
+                style: context.text.caption.copyWith(color: c.textMuted),
+              ),
               const SizedBox(height: Space.s3),
               const NoticeBanner(
                 message:
                     'این نمودار فقط ۷ روز گذشته را نشان می‌دهد و سیگنال معامله نیست.',
                 tone: NoticeTone.info,
               ),
+              DataSourceNote(
+                source: data.asset.priceSource,
+                generatedAt: data.generatedAt,
+              ),
             ],
           );
         },
+      ),
+    );
+  }
+}
+
+/// One «بیشترین / کمترین / شروع دوره» reading under the chart.
+class _PeriodStat extends StatelessWidget {
+  const _PeriodStat({required this.label, required this.value});
+
+  final String label;
+  final double value;
+
+  @override
+  Widget build(BuildContext context) {
+    final c = context.colors;
+    return Padding(
+      padding: const EdgeInsets.only(bottom: Space.s2),
+      child: Row(
+        children: [
+          Text(label, style: context.text.caption.copyWith(color: c.textMuted)),
+          const Spacer(),
+          Text(
+            faToman(value),
+            style: context.text.bodySmall.copyWith(
+              color: c.textPrimary,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ],
       ),
     );
   }

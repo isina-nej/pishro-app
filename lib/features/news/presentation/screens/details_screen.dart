@@ -100,7 +100,9 @@ class NewsDetailsScreen extends ConsumerWidget {
               ),
               const SizedBox(height: Space.s4),
               PishroButton(
-                label: 'دیدگاه‌ها',
+                label: a.commentCount == null
+                    ? 'دیدگاه‌ها'
+                    : 'دیدگاه‌ها (${Fmt.fa('${a.commentCount}')})',
                 variant: PishroButtonVariant.secondary,
                 onPressed: () => context.push(Routes.newsComments(a.slug)),
               ),

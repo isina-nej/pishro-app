@@ -12,6 +12,7 @@ import '../../../../shared/widgets/pishro_badge.dart';
 import '../../../../shared/widgets/pishro_button.dart';
 import '../../../../shared/widgets/pishro_text_field.dart';
 import '../../../../shared/widgets/states.dart';
+import '../../../../shared/providers/session_provider.dart';
 import '../../data/account_repository.dart';
 
 /// Screen/Account/Security — تغییر رمز موجود.
@@ -149,11 +150,30 @@ class _AccountSecurityScreenState extends ConsumerState<AccountSecurityScreen> {
               ],
             ),
           ),
-          const SizedBox(height: Space.s4),
+          const SizedBox(height: Space.s5),
+          Text(
+            'توصیه‌های امنیتی',
+            style: context.text.bodyMedium.copyWith(
+              color: c.textPrimary,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          const SizedBox(height: Space.s3),
           const NoticeBanner(
             message:
                 'فعال‌سازی تأیید دومرحله‌ای امنیت حساب را افزایش می‌دهد. امتیاز امنیتی جعلی نمایش داده نمی‌شود.',
             tone: NoticeTone.info,
+          ),
+          const SizedBox(height: Space.s4),
+          PishroButton(
+            label: 'خروج از همه دستگاه‌ها',
+            variant: PishroButtonVariant.danger,
+            // Ends this session too — there is no per-device revoke endpoint,
+            // so the honest action is a full sign-out.
+            onPressed: () async {
+              await ref.read(sessionProvider.notifier).signOut();
+              if (context.mounted) context.go(Routes.welcome);
+            },
           ),
         ],
       ),

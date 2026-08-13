@@ -42,7 +42,7 @@ class _PriceAlertsScreenState extends ConsumerState<PriceAlertsScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'هشدار قیمت',
+          'هشدارهای قیمت',
           style: context.text.h3.copyWith(color: c.textPrimary),
         ),
       ),
